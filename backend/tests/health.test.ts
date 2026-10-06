@@ -29,6 +29,9 @@ describe('Health Check API', () => {
     expect(body.data.version).toBe('0.1.0');
     expect(typeof body.data.uptimeSeconds).toBe('number');
     expect(typeof body.data.timestamp).toBe('string');
+    expect(body.data.database).toBeDefined();
+    expect(body.data.database.status).toBe('connected');
+    expect(typeof body.data.database.latencyMs).toBe('number');
   });
 
   it('should return 404 for unknown endpoints', async () => {

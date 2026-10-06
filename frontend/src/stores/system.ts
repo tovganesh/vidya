@@ -8,6 +8,11 @@ export interface HealthState {
   timestamp: string;
   uptimeSeconds: number;
   environment: string;
+  database?: {
+    status: 'connected' | 'disconnected';
+    latencyMs: number;
+    error?: string;
+  };
   lastChecked: Date | null;
   errorMessage: string | null;
 }

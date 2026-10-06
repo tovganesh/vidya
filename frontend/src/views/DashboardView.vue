@@ -160,16 +160,16 @@ onMounted(() => {
               <span class="wf-name">M1: Core Workspace & Dev Environment</span>
               <span class="wf-desc">Fastify API, Vue 3 PWA Shell, Docker Compose & Diagnostics</span>
             </div>
-            <span class="badge badge-emerald">Active</span>
+            <span class="badge badge-emerald">Complete</span>
           </div>
 
           <div class="workflow-item">
-            <div class="wf-dot queued"></div>
+            <div class="wf-dot active"></div>
             <div class="wf-info">
               <span class="wf-name">M2: Database Layer & Prisma Migrations</span>
-              <span class="wf-desc">Schemas for Organizations, Schools, Academic Years, Users</span>
+              <span class="wf-desc">Schemas for Organizations, Schools, Academic Years, Users & Seed</span>
             </div>
-            <span class="badge badge-indigo">Next</span>
+            <span class="badge badge-emerald">Complete</span>
           </div>
 
           <div class="workflow-item">
@@ -178,7 +178,7 @@ onMounted(() => {
               <span class="wf-name">M3: Authentication & 2FA</span>
               <span class="wf-desc">Argon2id, JWT Rotation, 11-Role RBAC & Audit Interceptor</span>
             </div>
-            <span class="badge badge-indigo">Queued</span>
+            <span class="badge badge-indigo">Next</span>
           </div>
 
           <div class="workflow-item">
