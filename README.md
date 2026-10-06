@@ -99,7 +99,7 @@ Detailed architectural blueprints and documentation:
 
 ### 1. Clone & Configure Environment
 ```bash
-git clone https://github.com/vidyasetu/vidyasetu.git
+git clone https://github.com/tovganesh/vidyasetu.git
 cd vidyasetu
 cp .env.example .env
 ```

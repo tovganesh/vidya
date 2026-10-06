@@ -235,7 +235,7 @@ Every mutating operation (POST, PUT, PATCH, DELETE) passes through an audit midd
 ### 9.1 Self-Hosting & Containerization
 - **Single Command Bootstrapping**:
   ```bash
-  git clone https://github.com/vidyasetu/vidyasetu.git
+  git clone https://github.com/tovganesh/vidyasetu.git
   cp .env.example .env
   docker compose up -d
   ```
