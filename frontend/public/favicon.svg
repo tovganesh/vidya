@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="vsGrad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="50%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="sunGrad" x1="20" y1="8" x2="28" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="12" fill="#0f172a" />
+  <!-- Radiant Knowledge Sun -->
+  <circle cx="24" cy="18" r="5" fill="url(#sunGrad)" />
+  <!-- The Bridge Arch / Open Book (Setu) -->
+  <path d="M10 34C15 26 21 24 24 24C27 24 33 26 38 34" stroke="url(#vsGrad)" stroke-width="3.5" stroke-linecap="round" />
+  <path d="M14 38C18 31 22 30 24 30C26 30 30 31 34 38" stroke="url(#vsGrad)" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.7" />
+  <!-- Foundation Dots -->
+  <circle cx="10" cy="34" r="2.5" fill="#6366f1" />
+  <circle cx="38" cy="34" r="2.5" fill="#06b6d4" />
+</svg>

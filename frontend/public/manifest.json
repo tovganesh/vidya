@@ -1,0 +1,17 @@
+{
+  "name": "VidyaSetu — Open School Operating System",
+  "short_name": "VidyaSetu",
+  "description": "The modern open-source operating system for schools",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

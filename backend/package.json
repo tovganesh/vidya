@@ -1,0 +1,33 @@
+{
+  "name": "@vidyasetu/backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VidyaSetu Core Backend API Engine",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.1",
+    "@fastify/helmet": "^13.0.0",
+    "@fastify/rate-limit": "^10.1.1",
+    "@fastify/sensible": "^6.0.1",
+    "dotenv": "^16.4.5",
+    "fastify": "^5.0.0",
+    "pino": "^9.4.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "pino-pretty": "^11.2.2",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.2"
+  }
+}

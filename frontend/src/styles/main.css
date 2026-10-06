@@ -1,0 +1,140 @@
+@import './tokens.css';
+@import './reset.css';
+
+/* =========================================================================
+   Typography & Headers
+   ========================================================================= */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.1rem; }
+
+p {
+  color: var(--text-secondary);
+}
+
+/* =========================================================================
+   Glassmorphic & Card Components
+   ========================================================================= */
+.card {
+  background: var(--color-card);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--duration-fast) var(--ease-spring),
+              border-color var(--duration-fast) var(--ease-spring),
+              box-shadow var(--duration-fast) var(--ease-spring);
+}
+
+.card:hover {
+  border-color: var(--color-card-border-hover);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+/* =========================================================================
+   Buttons
+   ========================================================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-spring);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-cyan-500) 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-cyan-400) 100%);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--color-surface-raised);
+  color: var(--text-primary);
+  border: 1px solid var(--color-card-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-surface-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================================================
+   Badges
+   ========================================================================= */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-emerald-400);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-indigo {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-primary-400);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.badge-amber {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-amber-400);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* =========================================================================
+   Scrollbars
+   ========================================================================= */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-canvas);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-hover);
+}
