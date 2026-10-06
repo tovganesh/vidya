@@ -53,9 +53,22 @@ function formatUptime(seconds: number): string {
       </div>
 
       <div class="card stat-card">
+        <span class="stat-label">PostgreSQL Database</span>
+        <div class="stat-body">
+          <StatusBadge
+            :status="systemStore.health.database?.status === 'connected' ? 'healthy' : 'unhealthy'"
+            :label="systemStore.health.database?.status === 'connected' ? 'CONNECTED' : 'DISCONNECTED'"
+          />
+          <span class="stat-sub font-mono" v-if="systemStore.health.database">
+            {{ systemStore.health.database.latencyMs }}ms latency
+          </span>
+        </div>
+      </div>
+
+      <div class="card stat-card">
         <span class="stat-label">Platform Version</span>
         <div class="stat-value font-mono">v{{ systemStore.health.version }}</div>
-        <span class="stat-sub">Milestone 1 (Foundation)</span>
+        <span class="stat-sub">Milestone 2 (Database & Seeds)</span>
       </div>
 
       <div class="card stat-card">

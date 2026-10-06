@@ -1,0 +1,303 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum BoardType {
+  CBSE
+  ICSE
+  STATE_BOARD
+  IB
+  CAMBRIDGE
+  OTHER
+}
+
+enum AcademicYearStatus {
+  PLANNING
+  ACTIVE
+  CONCLUDED
+  ARCHIVED
+}
+
+enum AcademicStage {
+  PRE_PRIMARY
+  PRIMARY
+  MIDDLE
+  SECONDARY
+  HIGHER_SECONDARY
+}
+
+enum SubjectType {
+  THEORY
+  PRACTICAL
+  CO_SCHOLASTIC
+  VOCATIONAL
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  SCHOOL_ADMIN
+  PRINCIPAL
+  VICE_PRINCIPAL
+  TEACHER
+  ACCOUNTANT
+  LIBRARIAN
+  TRANSPORT_MANAGER
+  HR_MANAGER
+  PARENT
+  STUDENT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+// ============================================================================
+// Multi-Tenancy & School Hierarchy
+// ============================================================================
+
+model Organization {
+  id                 String   @id @default(uuid())
+  name               String
+  registrationNumber String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  schools School[]
+
+  @@map("organizations")
+}
+
+model School {
+  id                 String     @id @default(uuid())
+  organizationId     String?
+  organization       Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  name               String
+  code               String     @unique
+  board              BoardType  @default(CBSE)
+  affiliationNumber  String?
+  email              String?
+  phone              String?
+  address            Json?
+  currency           String     @default("INR")
+  settings           Json?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  deletedAt          DateTime?
+
+  campuses      Campus[]
+  academicYears AcademicYear[]
+  classes       Class[]
+  sections      Section[]
+  subjects      Subject[]
+  users         User[]
+  auditLogs     AuditLog[]
+
+  @@map("schools")
+}
+
+model Campus {
+  id        String   @id @default(uuid())
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name      String
+  address   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("campuses")
+}
+
+// ============================================================================
+// Academic Calendar & Structure
+// ============================================================================
+
+model AcademicYear {
+  id        String             @id @default(uuid())
+  schoolId  String
+  school    School             @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  status    AcademicYearStatus @default(PLANNING)
+  isCurrent Boolean            @default(false)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@unique([schoolId, name])
+  @@index([schoolId, isCurrent])
+  @@map("academic_years")
+}
+
+model Class {
+  id         String        @id @default(uuid())
+  schoolId   String
+  school     School        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name       String
+  code       String
+  stage      AcademicStage @default(SECONDARY)
+  orderIndex Int
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  sections      Section[]
+  classSubjects ClassSubject[]
+
+  @@unique([schoolId, code])
+  @@index([schoolId, orderIndex])
+  @@map("classes")
+}
+
+model Section {
+  id         String   @id @default(uuid())
+  schoolId   String
+  school     School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  classId    String
+  class      Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name       String
+  roomNumber String?
+  capacity   Int      @default(40)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([classId, name])
+  @@index([schoolId])
+  @@map("sections")
+}
+
+model Subject {
+  id        String      @id @default(uuid())
+  schoolId  String
+  school    School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name      String
+  code      String
+  type      SubjectType @default(THEORY)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  classSubjects ClassSubject[]
+
+  @@unique([schoolId, code])
+  @@map("subjects")
+}
+
+model ClassSubject {
+  id            String   @id @default(uuid())
+  classId       String
+  class         Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subjectId     String
+  subject       Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  isCompulsory  Boolean  @default(true)
+  weeklyPeriods Int      @default(5)
+  createdAt     DateTime @default(now())
+
+  @@unique([classId, subjectId])
+  @@map("class_subjects")
+}
+
+// ============================================================================
+// Identity, Access & RBAC
+// ============================================================================
+
+model User {
+  id            String     @id @default(uuid())
+  schoolId      String?
+  school        School?    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  email         String     @unique
+  phone         String?
+  passwordHash  String
+  firstName     String
+  lastName      String
+  primaryRole   UserRole   @default(TEACHER)
+  status        UserStatus @default(ACTIVE)
+  isTotpEnabled Boolean    @default(false)
+  totpSecret    String?
+  lastLoginAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  roles     UserRoleAssignment[]
+  auditLogs AuditLog[]
+
+  @@index([schoolId, primaryRole])
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  isSystem    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  permissions     RolePermission[]
+  userAssignments UserRoleAssignment[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  category    String
+  description String?
+  createdAt   DateTime @default(now())
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRoleAssignment {
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_role_assignments")
+}
+
+// ============================================================================
+// Audit Logging
+// ============================================================================
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  schoolId   String?
+  school     School?  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String?
+  diff       Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([schoolId, createdAt])
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
