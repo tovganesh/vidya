@@ -8,6 +8,47 @@
 
 ---
 
+## 🎯 Vision
+
+### **Free schools from WhatsApp dependence. Build an open digital foundation for Indian education.**
+
+Indian schools increasingly depend on WhatsApp for everyday operations — announcements, homework, attendance updates, fee reminders, documents, parent communication and even critical school coordination.
+
+It works, but it was never designed to be a school's operating system.
+
+**VidyaSetu exists to change that.**
+
+Our vision is to provide every Indian school with a **complete, open and community-developed School Operating System** that brings administration, academics, communication, finance and school operations into one platform.
+
+VidyaSetu will be:
+
+- **Open source** — schools should not be locked into a proprietary vendor.
+- **Built for Indian schools** — designed around the realities of Indian education.
+- **Accessible** — capable of serving schools of different sizes and budgets.
+- **Community driven** — developed by a community of educators, developers, schools and technology partners.
+- **Self-hostable** — schools should have the freedom to own and control their data.
+- **Local-first** — deployment, customization, training and maintenance can be provided by technology partners within the school's own region.
+
+We believe open-source software can create more than a product. It can create an **ecosystem**.
+
+VidyaSetu will provide the software platform, while local IT companies, consultants and technology providers can build sustainable businesses around **deployment, customization, integrations, training, support and maintenance**.
+
+This creates a model where:
+
+**VidyaSetu builds the platform.**  
+**The community builds the software.**  
+**Local partners deliver and support it.**  
+**Schools own their digital future.**
+
+Our long-term ambition is not simply to build another school ERP.
+
+It is to create the **open digital infrastructure for Indian schools** — reducing dependence on fragmented communication tools, giving schools control over their technology and data, and making modern school management accessible to every institution.
+
+### **VidyaSetu**  
+**The Open School Operating System for India.**
+
+---
+
 ## 🌟 Overview
 
 **VidyaSetu** is an open-source digital operating system for schools. Built from the ground up for the educational fabric of India (CBSE, ICSE, State Boards, and International curricula), it unites school administration, teachers, parents, students, accounts, academics, and operations into a cohesive, responsive web platform.
