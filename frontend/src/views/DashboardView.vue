@@ -173,10 +173,19 @@ onMounted(() => {
           </div>
 
           <div class="workflow-item">
-            <div class="wf-dot queued"></div>
+            <div class="wf-dot active"></div>
             <div class="wf-info">
               <span class="wf-name">M3: Authentication & 2FA</span>
-              <span class="wf-desc">Argon2id, JWT Rotation, 11-Role RBAC & Audit Interceptor</span>
+              <span class="wf-desc">Bcrypt/Argon2, JWT Rotation, 11-Role RBAC & TOTP 2FA</span>
+            </div>
+            <span class="badge badge-emerald">Complete</span>
+          </div>
+
+          <div class="workflow-item">
+            <div class="wf-dot queued"></div>
+            <div class="wf-info">
+              <span class="wf-name">M4: School Administration & Setup</span>
+              <span class="wf-desc">School profiles, academic sessions, classes & subjects management</span>
             </div>
             <span class="badge badge-indigo">Next</span>
           </div>
