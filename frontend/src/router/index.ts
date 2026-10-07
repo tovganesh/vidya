@@ -22,19 +22,19 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'dashboard',
     component: DashboardView,
-    meta: { title: 'Dashboard — Vidya' },
+    meta: { title: 'Dashboard — Vidya', requiresAuth: true },
   },
   {
     path: '/health',
     name: 'health',
     component: HealthView,
-    meta: { title: 'System Health — Vidya' },
+    meta: { title: 'System Health — Vidya', requiresAuth: true },
   },
   {
     path: '/login',
     name: 'login',
     component: LoginView,
-    meta: { title: 'Sign In — Vidya', guestOnly: true },
+    meta: { title: 'Sign In — Vidya', guestOnly: true, layout: 'auth' },
   },
   {
     path: '/security',
@@ -140,11 +140,15 @@ router.beforeEach(async (to, _from, next) => {
     await authStore.fetchMe();
   }
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+  const isGuestOnly = to.meta.guestOnly === true;
+  const isPublic = to.meta.public === true;
+  const requiresAuth = to.meta.requiresAuth ?? (!isPublic && !isGuestOnly);
+
+  if (requiresAuth && !authStore.isAuthenticated) {
     return next({ name: 'login', query: { redirect: to.fullPath } });
   }
 
-  if (to.meta.guestOnly && authStore.isAuthenticated) {
+  if (isGuestOnly && authStore.isAuthenticated) {
     return next({ name: 'dashboard' });
   }
 
