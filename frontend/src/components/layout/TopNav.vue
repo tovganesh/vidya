@@ -1,8 +1,17 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import { useSystemStore } from '@/stores/system.js';
+import { useAuthStore } from '@/stores/auth.js';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 
+const router = useRouter();
 const systemStore = useSystemStore();
+const authStore = useAuthStore();
+
+async function handleLogout() {
+  await authStore.logout();
+  router.push('/login');
+}
 </script>
 
 <template>
@@ -54,13 +63,28 @@ const systemStore = useSystemStore();
         <span class="notif-dot"></span>
       </button>
 
-      <div class="user-pill" id="user-profile-pill">
-        <div class="avatar">SA</div>
-        <div class="user-meta">
-          <span class="user-name">School Admin</span>
-          <span class="user-role">SUPERVISOR</span>
-        </div>
+      <!-- Authenticated User Pill -->
+      <div v-if="authStore.isAuthenticated" class="user-pill-group">
+        <router-link to="/security" class="user-pill" id="user-profile-pill">
+          <div class="avatar">
+            {{ authStore.user?.firstName?.charAt(0) || 'U' }}{{ authStore.user?.lastName?.charAt(0) || '' }}
+          </div>
+          <div class="user-meta">
+            <span class="user-name">{{ authStore.userFullName }}</span>
+            <span class="user-role">{{ authStore.userRole }}</span>
+          </div>
+        </router-link>
+        <button class="sign-out-btn" title="Sign Out" @click="handleLogout" id="sign-out-btn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="icon-svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </button>
       </div>
+
+      <!-- Guest Login Button -->
+      <router-link v-else to="/login" class="btn btn-primary" id="top-nav-login-btn">
+        Sign In
+      </router-link>
     </div>
   </header>
 </template>
@@ -273,6 +297,29 @@ const systemStore = useSystemStore();
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 1.1;
+}
+
+.user-pill-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sign-out-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-raised);
+  color: var(--text-muted);
+  transition: all var(--duration-fast);
+}
+
+.sign-out-btn:hover {
+  background: rgba(244, 63, 94, 0.2);
+  color: var(--color-rose-400);
 }
 
 .user-role {

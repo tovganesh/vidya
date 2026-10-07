@@ -222,15 +222,32 @@ model User {
   status        UserStatus @default(ACTIVE)
   isTotpEnabled Boolean    @default(false)
   totpSecret    String?
+  backupCodes   Json?
   lastLoginAt   DateTime?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
-  roles     UserRoleAssignment[]
-  auditLogs AuditLog[]
+  roles         UserRoleAssignment[]
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
 
   @@index([schoolId, primaryRole])
   @@map("users")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  userAgent String?
+  ipAddress String?
+
+  @@index([userId])
+  @@map("refresh_tokens")
 }
 
 model Role {
