@@ -1,4 +1,17 @@
-import { PrismaClient, BoardType, AcademicStage, SubjectType, UserRole } from '@prisma/client';
+import {
+  PrismaClient,
+  BoardType,
+  AcademicStage,
+  SubjectType,
+  UserRole,
+  Gender,
+  BloodGroup,
+  StudentCategory,
+  StudentStatus,
+  GuardianRelationship,
+  EnrollmentStatus,
+  TeacherStatus,
+} from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -84,7 +97,7 @@ async function main() {
     },
   });
 
-  await prisma.academicYear.upsert({
+  const ayPast = await prisma.academicYear.upsert({
     where: {
       schoolId_name: {
         schoolId: school.id,
@@ -423,7 +436,264 @@ async function main() {
   }
   console.log(`✅ Demo accounts seeded (${demoUsers.length} users with password: VidyaSetu@2026)`);
 
-  // 11. Initial Audit Log
+  // 11. Teachers
+  const teacherUser = await prisma.user.findUnique({ where: { email: 'teacher@vidyasetu.org' } });
+  if (teacherUser) {
+    await prisma.teacher.upsert({
+      where: { schoolId_employeeCode: { schoolId: school.id, employeeCode: 'EMP-2023-0101' } },
+      update: {},
+      create: {
+        schoolId: school.id,
+        userId: teacherUser.id,
+        employeeCode: 'EMP-2023-0101',
+        firstName: 'Rajesh',
+        lastName: 'Sharma',
+        qualification: 'M.Sc (Mathematics), B.Ed',
+        specialization: 'Secondary Mathematics & Statistics',
+        phone: '+91 98000 00004',
+        status: TeacherStatus.ACTIVE,
+        joiningDate: new Date('2023-06-01T00:00:00Z'),
+      },
+    });
+  }
+
+  // 12. Guardians (Parents)
+  const parentUser = await prisma.user.findUnique({ where: { email: 'parent@vidyasetu.org' } });
+  const guardianFather = await prisma.guardian.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000050' },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000050',
+      schoolId: school.id,
+      userId: parentUser ? parentUser.id : undefined,
+      name: 'Suresh Kumar',
+      relationship: GuardianRelationship.FATHER,
+      phone: '+91 98000 00005',
+      email: 'parent@vidyasetu.org',
+      occupation: 'Software Engineer',
+      annualIncome: '1800000',
+      address: {
+        street: 'Flat 302, Palm Meadows, Whitefield',
+        city: 'Bengaluru',
+        state: 'Karnataka',
+        postalCode: '560066',
+      },
+    },
+  });
+
+  const guardianMother = await prisma.guardian.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000051' },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000051',
+      schoolId: school.id,
+      name: 'Sunita Kumar',
+      relationship: GuardianRelationship.MOTHER,
+      phone: '+91 98000 00015',
+      email: 'sunita.k@example.com',
+      occupation: 'Architect',
+      annualIncome: '1600000',
+    },
+  });
+
+  // 13. Students & Lifelong Trajectory
+  const studentUser = await prisma.user.findUnique({ where: { email: 'student@vidyasetu.org' } });
+  const student1 = await prisma.student.upsert({
+    where: { schoolId_admissionNumber: { schoolId: school.id, admissionNumber: 'VS-2024-0101' } },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000060',
+      schoolId: school.id,
+      userId: studentUser ? studentUser.id : undefined,
+      admissionNumber: 'VS-2024-0101',
+      admissionDate: new Date('2024-06-01T00:00:00Z'),
+      firstName: 'Aarav',
+      middleName: 'S',
+      lastName: 'Kumar',
+      gender: Gender.MALE,
+      dateOfBirth: new Date('2011-04-14T00:00:00Z'),
+      bloodGroup: BloodGroup.O_POS,
+      apaarId: '984512345678',
+      aadhaarLastFour: '4512',
+      nationality: 'Indian',
+      category: StudentCategory.GENERAL,
+      currentAddress: {
+        street: 'Flat 302, Palm Meadows, Whitefield',
+        city: 'Bengaluru',
+        state: 'Karnataka',
+        postalCode: '560066',
+      },
+      status: StudentStatus.ENROLLED,
+    },
+  });
+
+  // Link Aarav to Guardians
+  await prisma.studentGuardian.upsert({
+    where: { studentId_guardianId: { studentId: student1.id, guardianId: guardianFather.id } },
+    update: {},
+    create: {
+      studentId: student1.id,
+      guardianId: guardianFather.id,
+      isPrimaryContact: true,
+      isAuthorizedPickup: true,
+      receivesNotifications: true,
+    },
+  });
+
+  await prisma.studentGuardian.upsert({
+    where: { studentId_guardianId: { studentId: student1.id, guardianId: guardianMother.id } },
+    update: {},
+    create: {
+      studentId: student1.id,
+      guardianId: guardianMother.id,
+      isPrimaryContact: false,
+      isAuthorizedPickup: true,
+      receivesNotifications: true,
+    },
+  });
+
+  // Additional Students
+  const student2 = await prisma.student.upsert({
+    where: { schoolId_admissionNumber: { schoolId: school.id, admissionNumber: 'VS-2024-0102' } },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000061',
+      schoolId: school.id,
+      admissionNumber: 'VS-2024-0102',
+      admissionDate: new Date('2024-06-01T00:00:00Z'),
+      firstName: 'Diya',
+      lastName: 'Sharma',
+      gender: Gender.FEMALE,
+      dateOfBirth: new Date('2011-08-22T00:00:00Z'),
+      bloodGroup: BloodGroup.B_POS,
+      apaarId: '876543210987',
+      category: StudentCategory.GENERAL,
+      status: StudentStatus.ENROLLED,
+    },
+  });
+
+  const student3 = await prisma.student.upsert({
+    where: { schoolId_admissionNumber: { schoolId: school.id, admissionNumber: 'VS-2024-0103' } },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000062',
+      schoolId: school.id,
+      admissionNumber: 'VS-2024-0103',
+      admissionDate: new Date('2024-06-05T00:00:00Z'),
+      firstName: 'Rohan',
+      lastName: 'Verma',
+      gender: Gender.MALE,
+      dateOfBirth: new Date('2011-01-10T00:00:00Z'),
+      bloodGroup: BloodGroup.A_POS,
+      apaarId: '654321098765',
+      category: StudentCategory.OBC,
+      status: StudentStatus.ENROLLED,
+    },
+  });
+
+  console.log('✅ Students & Guardians seeded');
+
+  // 14. Enrollments (Historical 2025-26 & Current 2026-27)
+  const class9 = await prisma.class.findFirst({ where: { schoolId: school.id, code: 'STD-09' } });
+  const class10 = await prisma.class.findFirst({ where: { schoolId: school.id, code: 'STD-10' } });
+  const section9A = class9 ? await prisma.section.findFirst({ where: { classId: class9.id, name: 'A' } }) : null;
+  const section10A = class10 ? await prisma.section.findFirst({ where: { classId: class10.id, name: 'A' } }) : null;
+
+  if (class9 && section9A) {
+    // Historical 2025-26 Enrollment for Aarav (Promoted)
+    await prisma.enrollment.upsert({
+      where: {
+        studentId_academicYearId: {
+          studentId: student1.id,
+          academicYearId: ayPast.id,
+        },
+      },
+      update: {
+        classId: class9.id,
+        sectionId: section9A.id,
+        rollNumber: 15,
+        status: EnrollmentStatus.PROMOTED,
+      },
+      create: {
+        schoolId: school.id,
+        studentId: student1.id,
+        academicYearId: ayPast.id,
+        classId: class9.id,
+        sectionId: section9A.id,
+        rollNumber: 15,
+        status: EnrollmentStatus.PROMOTED,
+        remarks: 'Promoted to Class 10 with distinction',
+      },
+    });
+  }
+
+  if (class10 && section10A) {
+    // Current 2026-27 Enrollments
+    await prisma.enrollment.upsert({
+      where: {
+        studentId_academicYearId: {
+          studentId: student1.id,
+          academicYearId: ayCurrent.id,
+        },
+      },
+      update: {
+        classId: class10.id,
+        sectionId: section10A.id,
+        rollNumber: 1,
+        status: EnrollmentStatus.ACTIVE,
+      },
+      create: {
+        schoolId: school.id,
+        studentId: student1.id,
+        academicYearId: ayCurrent.id,
+        classId: class10.id,
+        sectionId: section10A.id,
+        rollNumber: 1,
+        status: EnrollmentStatus.ACTIVE,
+      },
+    });
+
+    await prisma.enrollment.upsert({
+      where: {
+        studentId_academicYearId: {
+          studentId: student2.id,
+          academicYearId: ayCurrent.id,
+        },
+      },
+      update: {},
+      create: {
+        schoolId: school.id,
+        studentId: student2.id,
+        academicYearId: ayCurrent.id,
+        classId: class10.id,
+        sectionId: section10A.id,
+        rollNumber: 2,
+        status: EnrollmentStatus.ACTIVE,
+      },
+    });
+
+    await prisma.enrollment.upsert({
+      where: {
+        studentId_academicYearId: {
+          studentId: student3.id,
+          academicYearId: ayCurrent.id,
+        },
+      },
+      update: {},
+      create: {
+        schoolId: school.id,
+        studentId: student3.id,
+        academicYearId: ayCurrent.id,
+        classId: class10.id,
+        sectionId: section10A.id,
+        rollNumber: 3,
+        status: EnrollmentStatus.ACTIVE,
+      },
+    });
+  }
+  console.log('✅ Enrollments seeded (Active & Historical Multi-Year)');
+
+  // 15. Initial Audit Log
   await prisma.auditLog.create({
     data: {
       schoolId: school.id,

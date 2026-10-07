@@ -9,6 +9,7 @@ import { healthRoutes } from './modules/health/health.routes.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { schoolRoutes } from './modules/schools/schools.routes.js';
 import { academicRoutes } from './modules/academics/academics.routes.js';
+import { peopleRoutes } from './modules/people/people.routes.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -94,6 +95,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(authRoutes, { prefix: '/api/v1' });
   await app.register(schoolRoutes, { prefix: '/api/v1' });
   await app.register(academicRoutes, { prefix: '/api/v1' });
+  await app.register(peopleRoutes, { prefix: '/api/v1' });
 
   return app;
 }
