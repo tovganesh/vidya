@@ -115,6 +115,23 @@ enum TeacherStatus {
   RESIGNED
 }
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  HALF_DAY
+  EXCUSED
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
 // ============================================================================
 // Multi-Tenancy & School Hierarchy
 // ============================================================================
@@ -159,6 +176,10 @@ model School {
   teachers      Teacher[]
   enrollments   Enrollment[]
   auditLogs     AuditLog[]
+  attendanceRecords AttendanceRecord[]
+  periods       Period[]
+  timetableSlots TimetableSlot[]
+  teacherAllocations TeacherAllocation[]
 
   @@map("schools")
 }
@@ -193,6 +214,8 @@ model AcademicYear {
   updatedAt DateTime           @updatedAt
 
   enrollments Enrollment[]
+  timetableSlots TimetableSlot[]
+  teacherAllocations TeacherAllocation[]
 
   @@unique([schoolId, name])
   @@index([schoolId, isCurrent])
@@ -214,6 +237,8 @@ model Class {
   sections      Section[]
   classSubjects ClassSubject[]
   enrollments   Enrollment[]
+  timetableSlots TimetableSlot[]
+  teacherAllocations TeacherAllocation[]
 
   @@unique([schoolId, code])
   @@index([schoolId, orderIndex])
@@ -233,6 +258,8 @@ model Section {
   updatedAt  DateTime @updatedAt
 
   enrollments Enrollment[]
+  timetableSlots TimetableSlot[]
+  teacherAllocations TeacherAllocation[]
 
   @@unique([classId, name])
   @@index([schoolId])
@@ -250,6 +277,8 @@ model Subject {
   updatedAt DateTime    @updatedAt
 
   classSubjects ClassSubject[]
+  timetableSlots TimetableSlot[]
+  teacherAllocations TeacherAllocation[]
 
   @@unique([schoolId, code])
   @@index([schoolId])
@@ -298,6 +327,7 @@ model User {
   student       Student?
   guardian      Guardian?
   teacher       Teacher?
+  recordedAttendance AttendanceRecord[]
 
   @@index([schoolId, primaryRole])
   @@map("users")
@@ -483,6 +513,9 @@ model Teacher {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
+  timetableSlots TimetableSlot[]
+  allocations    TeacherAllocation[]
+
   @@unique([schoolId, employeeCode])
   @@index([schoolId, status])
   @@map("teachers")
@@ -507,9 +540,104 @@ model Enrollment {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 
+  attendanceRecords AttendanceRecord[]
+
   @@unique([studentId, academicYearId])
   @@index([schoolId, academicYearId, classId, sectionId])
   @@index([studentId])
   @@map("enrollments")
+}
+
+// ============================================================================
+// Operations: Daily Attendance, Timetables & Staff Allocations
+// ============================================================================
+
+model AttendanceRecord {
+  id           String           @id @default(uuid())
+  schoolId     String
+  school       School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  enrollmentId String
+  enrollment   Enrollment       @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  date         DateTime         @db.Date
+  status       AttendanceStatus @default(PRESENT)
+  remarks      String?
+  recordedById String?
+  recordedBy   User?            @relation(fields: [recordedById], references: [id], onDelete: SetNull)
+  recordedAt   DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@unique([enrollmentId, date])
+  @@index([schoolId, date])
+  @@map("attendance_records")
+}
+
+model Period {
+  id           String          @id @default(uuid())
+  schoolId     String
+  school       School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name         String
+  periodNumber Int
+  startTime    String
+  endTime      String
+  isBreak      Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  timetableSlots TimetableSlot[]
+
+  @@unique([schoolId, periodNumber])
+  @@index([schoolId])
+  @@map("periods")
+}
+
+model TimetableSlot {
+  id             String       @id @default(uuid())
+  schoolId       String
+  school         School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  classId        String
+  class          Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  sectionId      String
+  section        Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  dayOfWeek      DayOfWeek
+  periodId       String
+  period         Period       @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  subjectId      String?
+  subject        Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  teacherId      String?
+  teacher        Teacher?     @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+  roomNumber     String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([sectionId, academicYearId, dayOfWeek, periodId])
+  @@index([schoolId, academicYearId, dayOfWeek])
+  @@index([teacherId, academicYearId, dayOfWeek, periodId])
+  @@map("timetable_slots")
+}
+
+model TeacherAllocation {
+  id             String       @id @default(uuid())
+  schoolId       String
+  school         School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  teacherId      String
+  teacher        Teacher      @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  classId        String
+  class          Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  sectionId      String
+  section        Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subjectId      String?
+  subject        Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  isClassTeacher Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([schoolId, academicYearId])
+  @@index([teacherId, academicYearId])
+  @@index([sectionId, academicYearId])
+  @@map("teacher_allocations")
 }
 

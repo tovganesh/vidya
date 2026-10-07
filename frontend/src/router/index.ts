@@ -12,6 +12,9 @@ import AcademicOnboardingView from '../views/admin/AcademicOnboardingView.vue';
 import PeopleDirectoryView from '../views/people/PeopleDirectoryView.vue';
 import StudentProfileView from '../views/people/StudentProfileView.vue';
 import BatchPromotionView from '../views/people/BatchPromotionView.vue';
+import RollCallView from '../views/attendance/RollCallView.vue';
+import AttendanceRegisterView from '../views/attendance/AttendanceRegisterView.vue';
+import TimetableGridView from '../views/timetable/TimetableGridView.vue';
 import { useAuthStore } from '../stores/auth.js';
 
 const routes: RouteRecordRaw[] = [
@@ -90,6 +93,24 @@ const routes: RouteRecordRaw[] = [
     name: 'batch-promotion',
     component: BatchPromotionView,
     meta: { title: 'Batch Student Promotion — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/attendance',
+    name: 'attendance-rollcall',
+    component: RollCallView,
+    meta: { title: 'Daily Attendance Roll Call — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/attendance/register',
+    name: 'attendance-register',
+    component: AttendanceRegisterView,
+    meta: { title: 'Monthly Attendance Register — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/timetable',
+    name: 'timetable-grid',
+    component: TimetableGridView,
+    meta: { title: 'Class Timetable & Allocations — Vidya', requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',
