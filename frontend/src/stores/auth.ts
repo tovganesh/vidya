@@ -248,6 +248,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  function hasPermission(permission: string): boolean {
+    if (userRole.value === 'SUPER_ADMIN') return true;
+    return user.value?.permissions?.includes(permission) ?? false;
+  }
+
+  function hasRole(role: string): boolean {
+    return user.value?.primaryRole === role;
+  }
+
   return {
     user,
     accessToken,
@@ -259,6 +268,8 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     userFullName,
     userRole,
+    hasPermission,
+    hasRole,
     login,
     verify2FALogin,
     fetchMe,

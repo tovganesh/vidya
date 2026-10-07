@@ -9,6 +9,9 @@ import AcademicYearsView from '../views/admin/AcademicYearsView.vue';
 import ClassesSectionsView from '../views/admin/ClassesSectionsView.vue';
 import SubjectsView from '../views/admin/SubjectsView.vue';
 import AcademicOnboardingView from '../views/admin/AcademicOnboardingView.vue';
+import PeopleDirectoryView from '../views/people/PeopleDirectoryView.vue';
+import StudentProfileView from '../views/people/StudentProfileView.vue';
+import BatchPromotionView from '../views/people/BatchPromotionView.vue';
 import { useAuthStore } from '../stores/auth.js';
 
 const routes: RouteRecordRaw[] = [
@@ -66,6 +69,27 @@ const routes: RouteRecordRaw[] = [
     name: 'academic-onboarding',
     component: AcademicOnboardingView,
     meta: { title: 'Academic Setup Wizard — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/people',
+    alias: ['/students', '/guardians', '/teachers'],
+    name: 'people-directory',
+    component: PeopleDirectoryView,
+    meta: { title: 'People & Registry — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/people/students/:id',
+    alias: ['/students/:id'],
+    name: 'student-profile',
+    component: StudentProfileView,
+    meta: { title: 'Student 360 Profile — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/people/promote',
+    alias: ['/students/promote', '/promote'],
+    name: 'batch-promotion',
+    component: BatchPromotionView,
+    meta: { title: 'Batch Student Promotion — Vidya', requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',

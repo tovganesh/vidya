@@ -29,6 +29,7 @@ const navigationSections: NavSection[] = [
       { name: 'Students', path: '/students', icon: 'users' },
       { name: 'Guardians / Parents', path: '/guardians', icon: 'heart' },
       { name: 'Teachers & Staff', path: '/teachers', icon: 'briefcase' },
+      { name: 'Batch Promotion', path: '/people/promote', icon: 'trending-up' },
     ],
   },
   {
@@ -96,6 +97,9 @@ const navigationSections: NavSection[] = [
               </svg>
               <svg v-else-if="item.icon === 'check-circle'" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="nav-icon">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <svg v-else-if="item.icon === 'trending-up'" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="nav-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
               <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24" class="nav-icon">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
