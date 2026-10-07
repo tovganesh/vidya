@@ -182,28 +182,37 @@ onMounted(() => {
           </div>
 
           <div class="workflow-item">
-            <div class="wf-dot queued"></div>
+            <div class="wf-dot active"></div>
             <div class="wf-info">
-              <span class="wf-name">M4: School Administration & Setup</span>
-              <span class="wf-desc">School profiles, academic sessions, classes & subjects management</span>
+              <span class="wf-name">M4: School Administration & Curriculum</span>
+              <span class="wf-desc">Campuses, academic years, classes, sections, and subjects</span>
             </div>
-            <span class="badge badge-indigo">Next</span>
+            <span class="badge badge-emerald">Complete</span>
           </div>
 
           <div class="workflow-item">
-            <div class="wf-dot queued"></div>
+            <div class="wf-dot active"></div>
             <div class="wf-info">
-              <span class="wf-name">M4–M6: Academics, People & Attendance</span>
-              <span class="wf-desc">Lifelong Enrollment, Roll Call, Timetable Conflict Avoidance</span>
+              <span class="wf-name">M5: People Registry & Lifelong Enrollment</span>
+              <span class="wf-desc">Students 360, APAAR IDs, Guardians, Teachers, and Batch Promotion</span>
             </div>
-            <span class="badge badge-indigo">Planned</span>
+            <span class="badge badge-emerald">Complete</span>
+          </div>
+
+          <div class="workflow-item">
+            <div class="wf-dot active"></div>
+            <div class="wf-info">
+              <span class="wf-name">M6: Attendance, Timetable & Allocations</span>
+              <span class="wf-desc">Daily Roll Call, Monthly Registers, Weekly Timetable Grid & Collision Engine</span>
+            </div>
+            <span class="badge badge-emerald">Complete</span>
           </div>
 
           <div class="workflow-item">
             <div class="wf-dot queued"></div>
             <div class="wf-info">
               <span class="wf-name">M7–M9: Web Push, Exams & Fees</span>
-              <span class="wf-desc">VAPID Push, CBSE Report Cards, Indian Fee Receipts</span>
+              <span class="wf-desc">VAPID Push Alerts, CBSE Report Cards, Indian Fee Receipts</span>
             </div>
             <span class="badge badge-indigo">Planned</span>
           </div>

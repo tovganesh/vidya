@@ -2,11 +2,13 @@
 import { useRouter } from 'vue-router';
 import { useSystemStore } from '@/stores/system.js';
 import { useAuthStore } from '@/stores/auth.js';
+import { useThemeStore } from '@/stores/theme.js';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 
 const router = useRouter();
 const systemStore = useSystemStore();
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
 
 async function handleLogout() {
   await authStore.logout();
@@ -55,6 +57,22 @@ async function handleLogout() {
       <router-link to="/health" class="health-indicator" title="System Diagnostic Health">
         <StatusBadge :status="systemStore.health.status" :label="systemStore.health.status" />
       </router-link>
+
+      <!-- Global Theme Switcher (Dark / Light) -->
+      <button
+        class="icon-btn theme-toggle-btn"
+        :aria-label="themeStore.isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+        :title="themeStore.isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+        id="theme-toggle-btn"
+        @click="themeStore.toggleTheme"
+      >
+        <svg v-if="themeStore.isDark" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="icon-svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24" class="icon-svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      </button>
 
       <button class="icon-btn" aria-label="Notifications" id="notifications-bell-btn">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="icon-svg">

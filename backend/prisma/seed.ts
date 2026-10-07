@@ -11,6 +11,8 @@ import {
   GuardianRelationship,
   EnrollmentStatus,
   TeacherStatus,
+  AttendanceStatus,
+  DayOfWeek,
 } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -693,7 +695,183 @@ async function main() {
   }
   console.log('✅ Enrollments seeded (Active & Historical Multi-Year)');
 
-  // 15. Initial Audit Log
+  // 15. Standard Indian School Periods
+  const periodsData = [
+    { periodNumber: 0, name: 'Morning Assembly', startTime: '08:30', endTime: '08:50', isBreak: true },
+    { periodNumber: 1, name: 'Period 1', startTime: '08:50', endTime: '09:35', isBreak: false },
+    { periodNumber: 2, name: 'Period 2', startTime: '09:35', endTime: '10:20', isBreak: false },
+    { periodNumber: 3, name: 'Short Break', startTime: '10:20', endTime: '10:35', isBreak: true },
+    { periodNumber: 4, name: 'Period 3', startTime: '10:35', endTime: '11:20', isBreak: false },
+    { periodNumber: 5, name: 'Period 4', startTime: '11:20', endTime: '12:05', isBreak: false },
+    { periodNumber: 6, name: 'Lunch Break', startTime: '12:05', endTime: '12:45', isBreak: true },
+    { periodNumber: 7, name: 'Period 5', startTime: '12:45', endTime: '13:30', isBreak: false },
+    { periodNumber: 8, name: 'Period 6', startTime: '13:30', endTime: '14:15', isBreak: false },
+    { periodNumber: 9, name: 'Period 7', startTime: '14:15', endTime: '15:00', isBreak: false },
+  ];
+
+  const seededPeriods = [];
+  for (const p of periodsData) {
+    const period = await prisma.period.upsert({
+      where: {
+        schoolId_periodNumber: {
+          schoolId: school.id,
+          periodNumber: p.periodNumber,
+        },
+      },
+      update: {
+        name: p.name,
+        startTime: p.startTime,
+        endTime: p.endTime,
+        isBreak: p.isBreak,
+      },
+      create: {
+        schoolId: school.id,
+        name: p.name,
+        periodNumber: p.periodNumber,
+        startTime: p.startTime,
+        endTime: p.endTime,
+        isBreak: p.isBreak,
+      },
+    });
+    seededPeriods.push(period);
+  }
+  console.log(`✅ Standard School Periods seeded (${seededPeriods.length} periods & breaks)`);
+
+  // 16. Teacher Allocations
+  const teacher = await prisma.teacher.findFirst({ where: { schoolId: school.id } });
+  const mathSubject = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'MATH' } });
+  const engSubject = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'ENG' } });
+  const sciSubject = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'SCI' } });
+
+  if (teacher && class10 && section10A) {
+    await prisma.teacherAllocation.deleteMany({
+      where: {
+        schoolId: school.id,
+        teacherId: teacher.id,
+        academicYearId: ayCurrent.id,
+        sectionId: section10A.id,
+      },
+    });
+
+    await prisma.teacherAllocation.create({
+      data: {
+        schoolId: school.id,
+        teacherId: teacher.id,
+        academicYearId: ayCurrent.id,
+        classId: class10.id,
+        sectionId: section10A.id,
+        subjectId: mathSubject?.id,
+        isClassTeacher: true,
+      },
+    });
+    console.log('✅ Class Teacher Allocation seeded for Class 10-A (Rajesh Sharma)');
+  }
+
+  // 17. Weekly Timetable Slots for Class 10-A
+  if (class10 && section10A) {
+    const days: DayOfWeek[] = [
+      DayOfWeek.MONDAY,
+      DayOfWeek.TUESDAY,
+      DayOfWeek.WEDNESDAY,
+      DayOfWeek.THURSDAY,
+      DayOfWeek.FRIDAY,
+      DayOfWeek.SATURDAY,
+    ];
+
+    const teachingPeriods = seededPeriods.filter((p) => !p.isBreak);
+    const subjectsCycle = [mathSubject, sciSubject, engSubject].filter(Boolean);
+
+    for (const day of days) {
+      for (let i = 0; i < teachingPeriods.length; i++) {
+        const period = teachingPeriods[i];
+        const sub = subjectsCycle[(i + days.indexOf(day)) % subjectsCycle.length];
+        const assignedTeacher = sub?.code === 'MATH' && teacher ? teacher.id : null;
+
+        await prisma.timetableSlot.upsert({
+          where: {
+            sectionId_academicYearId_dayOfWeek_periodId: {
+              sectionId: section10A.id,
+              academicYearId: ayCurrent.id,
+              dayOfWeek: day,
+              periodId: period.id,
+            },
+          },
+          update: {
+            subjectId: sub?.id,
+            teacherId: assignedTeacher,
+            roomNumber: section10A.roomNumber || 'Room-10A',
+          },
+          create: {
+            schoolId: school.id,
+            academicYearId: ayCurrent.id,
+            classId: class10.id,
+            sectionId: section10A.id,
+            dayOfWeek: day,
+            periodId: period.id,
+            subjectId: sub?.id,
+            teacherId: assignedTeacher,
+            roomNumber: section10A.roomNumber || 'Room-10A',
+          },
+        });
+      }
+    }
+    console.log('✅ Weekly Timetable slots seeded for Class 10-A (Mon–Sat)');
+  }
+
+  // 18. Daily Attendance Records for Class 10-A
+  if (section10A) {
+    const enrollments = await prisma.enrollment.findMany({
+      where: { sectionId: section10A.id, academicYearId: ayCurrent.id },
+    });
+
+    const adminUser = await prisma.user.findUnique({ where: { email: 'admin@vidyasetu.org' } });
+
+    const dates = [
+      new Date('2026-10-01T00:00:00Z'),
+      new Date('2026-10-02T00:00:00Z'),
+      new Date('2026-10-05T00:00:00Z'),
+      new Date('2026-10-06T00:00:00Z'),
+      new Date('2026-10-07T00:00:00Z'),
+    ];
+
+    for (const d of dates) {
+      for (const enr of enrollments) {
+        let status = AttendanceStatus.PRESENT;
+        let remarks: string | null = null;
+        if (enr.rollNumber === 3 && d.toISOString().startsWith('2026-10-05')) {
+          status = AttendanceStatus.ABSENT;
+          remarks = 'Sick leave requested by parent';
+        } else if (enr.rollNumber === 2 && d.toISOString().startsWith('2026-10-06')) {
+          status = AttendanceStatus.LATE;
+          remarks = 'School bus delayed due to traffic';
+        }
+
+        await prisma.attendanceRecord.upsert({
+          where: {
+            enrollmentId_date: {
+              enrollmentId: enr.id,
+              date: d,
+            },
+          },
+          update: {
+            status,
+            remarks,
+          },
+          create: {
+            schoolId: school.id,
+            enrollmentId: enr.id,
+            date: d,
+            status,
+            remarks,
+            recordedById: adminUser?.id,
+          },
+        });
+      }
+    }
+    console.log('✅ Daily Attendance Records seeded for Class 10-A');
+  }
+
+  // 19. Initial Audit Log
   await prisma.auditLog.create({
     data: {
       schoolId: school.id,
