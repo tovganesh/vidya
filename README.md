@@ -1,7 +1,7 @@
-# VidyaSetu — The Open School Operating System
+# Vidya — The Open School Operating System
 
 <div align="center">
-  <img src="frontend/public/favicon.svg" alt="VidyaSetu Logo" width="80" height="80" />
+  <img src="frontend/public/favicon.svg" alt="Vidya Logo" width="80" height="80" />
   <h3>Connect. Manage. Educate.</h3>
   <p>A modern, modular, open-source school operating system designed for Indian primary, secondary, and higher-secondary institutions.</p>
 </div>
@@ -16,11 +16,11 @@ Indian schools increasingly depend on WhatsApp for everyday operations — annou
 
 It works, but it was never designed to be a school's operating system.
 
-**VidyaSetu exists to change that.**
+**Vidya exists to change that.**
 
 Our vision is to provide every Indian school with a **complete, open and community-developed School Operating System** that brings administration, academics, communication, finance and school operations into one platform.
 
-VidyaSetu will be:
+Vidya will be:
 
 - **Open source** — schools should not be locked into a proprietary vendor.
 - **Built for Indian schools** — designed around the realities of Indian education.
@@ -31,11 +31,11 @@ VidyaSetu will be:
 
 We believe open-source software can create more than a product. It can create an **ecosystem**.
 
-VidyaSetu will provide the software platform, while local IT companies, consultants and technology providers can build sustainable businesses around **deployment, customization, integrations, training, support and maintenance**.
+Vidya will provide the software platform, while local IT companies, consultants and technology providers can build sustainable businesses around **deployment, customization, integrations, training, support and maintenance**.
 
 This creates a model where:
 
-**VidyaSetu builds the platform.**  
+**Vidya builds the platform.**  
 **The community builds the software.**  
 **Local partners deliver and support it.**  
 **Schools own their digital future.**
@@ -44,16 +44,16 @@ Our long-term ambition is not simply to build another school ERP.
 
 It is to create the **open digital infrastructure for Indian schools** — reducing dependence on fragmented communication tools, giving schools control over their technology and data, and making modern school management accessible to every institution.
 
-### **VidyaSetu**  
+### **Vidya**  
 **The Open School Operating System for India.**
 
 ---
 
 ## 🌟 Overview
 
-**VidyaSetu** is an open-source digital operating system for schools. Built from the ground up for the educational fabric of India (CBSE, ICSE, State Boards, and International curricula), it unites school administration, teachers, parents, students, accounts, academics, and operations into a cohesive, responsive web platform.
+**Vidya** is an open-source digital operating system for schools. Built from the ground up for the educational fabric of India (CBSE, ICSE, State Boards, and International curricula), it unites school administration, teachers, parents, students, accounts, academics, and operations into a cohesive, responsive web platform.
 
-Unlike legacy school ERP software characterized by dated UI grids, proprietary vendor lock-in, and excessive per-student licensing costs, VidyaSetu is:
+Unlike legacy school ERP software characterized by dated UI grids, proprietary vendor lock-in, and excessive per-student licensing costs, Vidya is:
 - **100% Open Source**: Built on standard PostgreSQL, Node.js (TypeScript), and Vue 3.
 - **Web-First & Responsive**: Full desktop, tablet, and mobile support with zero reliance on proprietary native app stores.
 - **Web Push Notifications**: Browser-native push alerts (VAPID) with no recurring SMS or proprietary push vendor fees.
@@ -99,8 +99,8 @@ Detailed architectural blueprints and documentation:
 
 ### 1. Clone & Configure Environment
 ```bash
-git clone https://github.com/tovganesh/vidyasetu.git
-cd vidyasetu
+git clone https://github.com/tovganesh/vidya.git
+cd vidya
 cp .env.example .env
 ```
 
@@ -141,5 +141,5 @@ npm run lint
 
 ## 📄 License & Community
 
-VidyaSetu is licensed under the [Apache 2.0 License](LICENSE).
+Vidya is licensed under the [Apache 2.0 License](LICENSE).
 Contributions, feedback, and suggestions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -35,6 +35,7 @@ const navigationSections: NavSection[] = [
     title: 'ACADEMICS',
     items: [
       { name: 'Classes & Sections', path: '/classes', icon: 'grid' },
+      { name: 'Subjects Master', path: '/admin/subjects', icon: 'book' },
       { name: 'Attendance Register', path: '/attendance', icon: 'check-circle' },
       { name: 'Timetable', path: '/timetable', icon: 'calendar' },
       { name: 'Exams & Results', path: '/exams', icon: 'award' },
@@ -59,6 +60,7 @@ const navigationSections: NavSection[] = [
     items: [
       { name: 'School Setup', path: '/admin/school', icon: 'settings' },
       { name: 'Academic Years', path: '/admin/academic-years', icon: 'clock' },
+      { name: 'Setup Wizard', path: '/admin/onboarding', icon: 'activity', badge: 'NEW' },
       { name: 'Audit Trail', path: '/admin/audit', icon: 'shield' },
     ],
   },

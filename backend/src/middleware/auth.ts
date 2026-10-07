@@ -50,9 +50,9 @@ export function requireRole(allowedRoles: UserRole[]) {
 
 /**
  * Granular Permission Guard
- * Requires user to have the specific permission code
+ * Requires user to have the specific permission code (or any of the codes if an array is passed)
  */
-export function requirePermission(permissionCode: string) {
+export function requirePermission(permissionCode: string | string[]) {
   return async (request: FastifyRequest, _reply: FastifyReply): Promise<void> => {
     if (!request.user) {
       throw new UnauthorizedError('Authentication required', 'AUTH_REQUIRED');
@@ -63,9 +63,13 @@ export function requirePermission(permissionCode: string) {
       return;
     }
 
-    if (!request.user.permissions || !request.user.permissions.includes(permissionCode)) {
+    const required = Array.isArray(permissionCode) ? permissionCode : [permissionCode];
+    const userPerms = request.user.permissions || [];
+    const hasPermission = required.some((p) => userPerms.includes(p));
+
+    if (!hasPermission) {
       throw new ForbiddenError(
-        `Missing required permission: ${permissionCode}`,
+        `Missing required permission: ${Array.isArray(permissionCode) ? permissionCode.join(' or ') : permissionCode}`,
         'INSUFFICIENT_PERMISSION',
       );
     }

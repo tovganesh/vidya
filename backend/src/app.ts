@@ -7,6 +7,8 @@ import { env } from './config/env.js';
 import { AppError } from './shared/errors/index.js';
 import { healthRoutes } from './modules/health/health.routes.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
+import { schoolRoutes } from './modules/schools/schools.routes.js';
+import { academicRoutes } from './modules/academics/academics.routes.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -90,6 +92,8 @@ export async function buildApp(): Promise<FastifyInstance> {
   // Register API Routes
   await app.register(healthRoutes, { prefix: '/api/v1' });
   await app.register(authRoutes, { prefix: '/api/v1' });
+  await app.register(schoolRoutes, { prefix: '/api/v1' });
+  await app.register(academicRoutes, { prefix: '/api/v1' });
 
   return app;
 }

@@ -27,7 +27,7 @@ async function handleLogout() {
           </svg>
         </div>
         <div class="brand-text">
-          <span class="brand-title">VidyaSetu</span>
+          <span class="brand-title">Vidya</span>
           <span class="brand-tagline">Open School OS</span>
         </div>
       </router-link>

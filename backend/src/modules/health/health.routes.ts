@@ -30,7 +30,7 @@ export const healthRoutes: FastifyPluginAsync = async (fastify: FastifyInstance)
       success: true,
       data: {
         status: isDegraded ? 'degraded' : 'healthy',
-        service: 'vidyasetu-api',
+        service: 'vidya-api',
         version: '0.1.0',
         timestamp: new Date().toISOString(),
         uptimeSeconds: Math.floor(process.uptime()),

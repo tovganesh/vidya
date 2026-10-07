@@ -71,7 +71,7 @@ async function handleVerify2FA() {
             <path d="M14 38C18 31 22 30 24 30C26 30 30 31 34 38" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" />
           </svg>
         </div>
-        <h2>VidyaSetu</h2>
+        <h2>Vidya</h2>
         <p class="tagline">The Open School Operating System</p>
       </div>
 
@@ -111,7 +111,7 @@ async function handleVerify2FA() {
 
         <button type="submit" class="btn btn-primary btn-block" :disabled="authStore.isLoading">
           <span v-if="authStore.isLoading">Authenticating...</span>
-          <span v-else>Sign In to VidyaSetu</span>
+          <span v-else>Sign In to Vidya</span>
         </button>
 
         <!-- Quick Demo Switcher -->

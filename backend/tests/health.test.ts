@@ -25,7 +25,7 @@ describe('Health Check API', () => {
     const body = JSON.parse(response.payload);
     expect(body.success).toBe(true);
     expect(body.data.status).toBe('healthy');
-    expect(body.data.service).toBe('vidyasetu-api');
+    expect(body.data.service).toBe('vidya-api');
     expect(body.data.version).toBe('0.1.0');
     expect(typeof body.data.uptimeSeconds).toBe('number');
     expect(typeof body.data.timestamp).toBe('string');

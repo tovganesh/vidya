@@ -1,13 +1,13 @@
-# VidyaSetu — Architecture & Engineering Master Plan
+# Vidya — Architecture & Engineering Master Plan
 
-> **VidyaSetu — The Open School Operating System**  
+> **Vidya — The Open School Operating System**  
 > *"Connect. Manage. Educate."*
 
 ---
 
 ## Documentation Navigation
 
-This directory contains the foundational architectural blueprints, domain models, decisions, and execution roadmaps for **VidyaSetu**.
+This directory contains the foundational architectural blueprints, domain models, decisions, and execution roadmaps for **Vidya**.
 
 | Document | Purpose & Contents |
 | :--- | :--- |
@@ -21,7 +21,7 @@ This directory contains the foundational architectural blueprints, domain models
 
 ## Target Repository Structure
 
-The VidyaSetu repository is organized as a clean, modular monorepo using npm workspaces:
+The Vidya repository is organized as a clean, modular monorepo using npm workspaces:
 
 ```text
 vidyasetu/

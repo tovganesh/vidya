@@ -9,7 +9,7 @@ async function start() {
       port: env.PORT,
       host: env.HOST,
     });
-    app.log.info(`🚀 VidyaSetu API server listening on ${address}`);
+    app.log.info(`🚀 Vidya API server listening on ${address}`);
     app.log.info(`🩺 Health check accessible at ${address}/api/v1/health`);
   } catch (err) {
     app.log.error(err);

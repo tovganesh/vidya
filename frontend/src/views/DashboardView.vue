@@ -19,7 +19,7 @@ onMounted(() => {
           <span class="badge badge-indigo">Academic Year 2026–27</span>
           <span class="badge badge-emerald">CBSE Affiliation #830412</span>
         </div>
-        <h1 class="hero-title">VidyaSetu Academy</h1>
+        <h1 class="hero-title">Vidya Academy</h1>
         <p class="hero-subtitle">
           Open School Operating System — Central Administration & Operations Hub
         </p>

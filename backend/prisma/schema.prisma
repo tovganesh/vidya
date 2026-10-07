@@ -115,6 +115,7 @@ model Campus {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([schoolId])
   @@map("campuses")
 }
 
@@ -136,6 +137,7 @@ model AcademicYear {
 
   @@unique([schoolId, name])
   @@index([schoolId, isCurrent])
+  @@index([schoolId, status])
   @@map("academic_years")
 }
 
@@ -188,6 +190,7 @@ model Subject {
   classSubjects ClassSubject[]
 
   @@unique([schoolId, code])
+  @@index([schoolId])
   @@map("subjects")
 }
 
