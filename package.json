@@ -1,8 +1,8 @@
 {
-  "name": "vidyasetu",
+  "name": "vidya",
   "version": "0.1.0",
   "private": true,
-  "description": "VidyaSetu — The Open School Operating System",
+  "description": "Vidya — The Open School Operating System",
   "workspaces": [
     "backend",
     "frontend"
