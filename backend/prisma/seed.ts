@@ -16,6 +16,8 @@ import {
   AnnouncementPriority,
   AnnouncementAudience,
   NotificationType,
+  ExamTermType,
+  AssessmentType,
 } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -1030,7 +1032,236 @@ async function main() {
     console.log('✅ Sample Web Push Subscription registered');
   }
 
-  // 22. Initial Audit Log
+  // 22. CBSE 9-Point Grading Scale (Milestone 8)
+  const cbseScales = [
+    { grade: 'A1', min: 91.0, max: 100.0, gp: 10.0, desc: 'Outstanding' },
+    { grade: 'A2', min: 81.0, max: 90.99, gp: 9.0, desc: 'Excellent' },
+    { grade: 'B1', min: 71.0, max: 80.99, gp: 8.0, desc: 'Very Good' },
+    { grade: 'B2', min: 61.0, max: 70.99, gp: 7.0, desc: 'Good' },
+    { grade: 'C1', min: 51.0, max: 60.99, gp: 6.0, desc: 'Fair' },
+    { grade: 'C2', min: 41.0, max: 50.99, gp: 5.0, desc: 'Average' },
+    { grade: 'D',  min: 33.0, max: 40.99, gp: 4.0, desc: 'Pass' },
+    { grade: 'E',  min: 0.0,  max: 32.99, gp: 0.0, desc: 'Essential Repeat' },
+  ];
+
+  for (const s of cbseScales) {
+    await prisma.gradingScale.upsert({
+      where: { schoolId_grade: { schoolId: school.id, grade: s.grade } },
+      update: {},
+      create: {
+        schoolId: school.id,
+        name: 'CBSE 9-Point Scale',
+        grade: s.grade,
+        minPercentage: s.min,
+        maxPercentage: s.max,
+        gradePoint: s.gp,
+        description: s.desc,
+      },
+    });
+  }
+  console.log('✅ CBSE 9-Point Grading Scales seeded');
+
+  // 23. Exam Terms (Term 1 & Term 2)
+  const term1 = await prisma.examTerm.upsert({
+    where: {
+      schoolId_academicYearId_name: {
+        schoolId: school.id,
+        academicYearId: ayCurrent.id,
+        name: 'Term 1 (Mid-Term Assessment)',
+      },
+    },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000101',
+      schoolId: school.id,
+      academicYearId: ayCurrent.id,
+      name: 'Term 1 (Mid-Term Assessment)',
+      type: ExamTermType.TERM_1,
+      startDate: new Date('2026-09-15T00:00:00Z'),
+      endDate: new Date('2026-09-30T00:00:00Z'),
+      isCurrent: true,
+    },
+  });
+
+  await prisma.examTerm.upsert({
+    where: {
+      schoolId_academicYearId_name: {
+        schoolId: school.id,
+        academicYearId: ayCurrent.id,
+        name: 'Term 2 (Annual Assessment)',
+      },
+    },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000102',
+      schoolId: school.id,
+      academicYearId: ayCurrent.id,
+      name: 'Term 2 (Annual Assessment)',
+      type: ExamTermType.TERM_2,
+      startDate: new Date('2027-02-15T00:00:00Z'),
+      endDate: new Date('2027-03-05T00:00:00Z'),
+      isCurrent: false,
+    },
+  });
+
+  // 24. Class 10 Mid-Term Examination & Subject Assessments
+  if (class10) {
+    const examClass10 = await prisma.exam.upsert({
+      where: {
+        termId_classId_name: {
+          termId: term1.id,
+          classId: class10.id,
+          name: 'Class 10 Mid-Term Examination 2026',
+        },
+      },
+      update: {},
+      create: {
+        id: '00000000-0000-0000-0000-000000000103',
+        schoolId: school.id,
+        termId: term1.id,
+        classId: class10.id,
+        name: 'Class 10 Mid-Term Examination 2026',
+        startDate: new Date('2026-09-15T00:00:00Z'),
+        endDate: new Date('2026-09-30T00:00:00Z'),
+      },
+    });
+
+    const subEng = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'ENG' } });
+    const subMath = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'MATH' } });
+    const subSci = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'SCI' } });
+    const subSoc = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'SOC' } });
+    const subHin = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'HIN' } });
+
+    const assessmentSpecs = [
+      { sub: subEng, type: AssessmentType.THEORY, max: 80, pass: 26, date: '2026-09-16' },
+      { sub: subEng, type: AssessmentType.INTERNAL_ASSESSMENT, max: 20, pass: 7, date: '2026-09-17' },
+      { sub: subMath, type: AssessmentType.THEORY, max: 80, pass: 26, date: '2026-09-19' },
+      { sub: subMath, type: AssessmentType.INTERNAL_ASSESSMENT, max: 20, pass: 7, date: '2026-09-20' },
+      { sub: subSci, type: AssessmentType.THEORY, max: 80, pass: 26, date: '2026-09-22' },
+      { sub: subSci, type: AssessmentType.PRACTICAL, max: 20, pass: 7, date: '2026-09-23' },
+      { sub: subSoc, type: AssessmentType.THEORY, max: 80, pass: 26, date: '2026-09-25' },
+      { sub: subSoc, type: AssessmentType.INTERNAL_ASSESSMENT, max: 20, pass: 7, date: '2026-09-26' },
+      { sub: subHin, type: AssessmentType.THEORY, max: 80, pass: 26, date: '2026-09-28' },
+      { sub: subHin, type: AssessmentType.INTERNAL_ASSESSMENT, max: 20, pass: 7, date: '2026-09-29' },
+    ];
+
+    const createdAssessments: Record<string, string> = {};
+
+    for (const spec of assessmentSpecs) {
+      if (spec.sub) {
+        const ass = await prisma.assessment.upsert({
+          where: {
+            examId_subjectId_type: {
+              examId: examClass10.id,
+              subjectId: spec.sub.id,
+              type: spec.type,
+            },
+          },
+          update: {},
+          create: {
+            schoolId: school.id,
+            examId: examClass10.id,
+            subjectId: spec.sub.id,
+            type: spec.type,
+            maxMarks: spec.max,
+            passingMarks: spec.pass,
+            date: new Date(spec.date),
+          },
+        });
+        createdAssessments[`${spec.sub.code}_${spec.type}`] = ass.id;
+      }
+    }
+    console.log('✅ Class 10 Mid-Term Assessments seeded');
+
+    // 25. Marks for Aarav Kumar (student1) & Diya Sharma (student2)
+    const enrAarav = await prisma.enrollment.findFirst({
+      where: { studentId: student1.id, academicYearId: ayCurrent.id },
+    });
+    const enrDiya = await prisma.enrollment.findFirst({
+      where: { studentId: student2.id, academicYearId: ayCurrent.id },
+    });
+
+    if (enrAarav) {
+      const aaravMarks = [
+        { key: 'ENG_THEORY', marks: 72.0 },
+        { key: 'ENG_INTERNAL_ASSESSMENT', marks: 18.0 },
+        { key: 'MATH_THEORY', marks: 76.0 },
+        { key: 'MATH_INTERNAL_ASSESSMENT', marks: 19.0 },
+        { key: 'SCI_THEORY', marks: 74.0 },
+        { key: 'SCI_PRACTICAL', marks: 19.0 },
+        { key: 'SOC_THEORY', marks: 70.0 },
+        { key: 'SOC_INTERNAL_ASSESSMENT', marks: 18.0 },
+        { key: 'HIN_THEORY', marks: 71.0 },
+        { key: 'HIN_INTERNAL_ASSESSMENT', marks: 17.0 },
+      ];
+
+      for (const m of aaravMarks) {
+        const assId = createdAssessments[m.key];
+        if (assId) {
+          await prisma.marksRecord.upsert({
+            where: {
+              assessmentId_enrollmentId: {
+                assessmentId: assId,
+                enrollmentId: enrAarav.id,
+              },
+            },
+            update: { marksObtained: m.marks },
+            create: {
+              schoolId: school.id,
+              assessmentId: assId,
+              enrollmentId: enrAarav.id,
+              marksObtained: m.marks,
+              isAbsent: false,
+              remarks: 'Excellent performance',
+              enteredById: commTeacherUser?.id,
+            },
+          });
+        }
+      }
+    }
+
+    if (enrDiya) {
+      const diyaMarks = [
+        { key: 'ENG_THEORY', marks: 68.0 },
+        { key: 'ENG_INTERNAL_ASSESSMENT', marks: 17.0 },
+        { key: 'MATH_THEORY', marks: 65.0 },
+        { key: 'MATH_INTERNAL_ASSESSMENT', marks: 16.0 },
+        { key: 'SCI_THEORY', marks: 62.0 },
+        { key: 'SCI_PRACTICAL', marks: 17.0 },
+        { key: 'SOC_THEORY', marks: 64.0 },
+        { key: 'SOC_INTERNAL_ASSESSMENT', marks: 17.0 },
+        { key: 'HIN_THEORY', marks: 66.0 },
+        { key: 'HIN_INTERNAL_ASSESSMENT', marks: 16.0 },
+      ];
+
+      for (const m of diyaMarks) {
+        const assId = createdAssessments[m.key];
+        if (assId) {
+          await prisma.marksRecord.upsert({
+            where: {
+              assessmentId_enrollmentId: {
+                assessmentId: assId,
+                enrollmentId: enrDiya.id,
+              },
+            },
+            update: { marksObtained: m.marks },
+            create: {
+              schoolId: school.id,
+              assessmentId: assId,
+              enrollmentId: enrDiya.id,
+              marksObtained: m.marks,
+              isAbsent: false,
+              remarks: 'Good consistency',
+              enteredById: commTeacherUser?.id,
+            },
+          });
+        }
+      }
+    }
+    console.log('✅ Student Marks Records seeded for Class 10');
+  }
+
+  // 26. Initial Audit Log
   await prisma.auditLog.create({
     data: {
       schoolId: school.id,

@@ -132,6 +132,23 @@ enum DayOfWeek {
   SATURDAY
 }
 
+enum ExamTermType {
+  TERM_1
+  TERM_2
+  UNIT_TEST_1
+  UNIT_TEST_2
+  PRE_BOARD
+  ANNUAL
+}
+
+enum AssessmentType {
+  THEORY
+  PRACTICAL
+  INTERNAL_ASSESSMENT
+  PROJECT
+  ORAL
+}
+
 // ============================================================================
 // Multi-Tenancy & School Hierarchy
 // ============================================================================
@@ -183,6 +200,9 @@ model School {
   announcements Announcement[]
   notifications Notification[]
   pushSubscriptions PushSubscription[]
+  examTerms     ExamTerm[]
+  exams         Exam[]
+  gradingScales GradingScale[]
 
   @@map("schools")
 }
@@ -219,6 +239,7 @@ model AcademicYear {
   enrollments Enrollment[]
   timetableSlots TimetableSlot[]
   teacherAllocations TeacherAllocation[]
+  examTerms   ExamTerm[]
 
   @@unique([schoolId, name])
   @@index([schoolId, isCurrent])
@@ -242,6 +263,7 @@ model Class {
   enrollments   Enrollment[]
   timetableSlots TimetableSlot[]
   teacherAllocations TeacherAllocation[]
+  exams         Exam[]
 
   @@unique([schoolId, code])
   @@index([schoolId, orderIndex])
@@ -282,6 +304,7 @@ model Subject {
   classSubjects ClassSubject[]
   timetableSlots TimetableSlot[]
   teacherAllocations TeacherAllocation[]
+  assessments   Assessment[]
 
   @@unique([schoolId, code])
   @@index([schoolId])
@@ -334,6 +357,7 @@ model User {
   authoredAnnouncements Announcement[]
   notifications Notification[]
   pushSubscriptions PushSubscription[]
+  enteredMarks  MarksRecord[]
 
   @@index([schoolId, primaryRole])
   @@map("users")
@@ -547,6 +571,7 @@ model Enrollment {
   updatedAt      DateTime         @updatedAt
 
   attendanceRecords AttendanceRecord[]
+  marksRecords      MarksRecord[]
 
   @@unique([studentId, academicYearId])
   @@index([schoolId, academicYearId, classId, sectionId])
@@ -730,6 +755,116 @@ model PushSubscription {
 
   @@index([schoolId, userId])
   @@map("push_subscriptions")
+}
+
+// ============================================================================
+// Academics: Examinations, Assessments, Marks & Grading Scales (Milestone 8)
+// ============================================================================
+
+model ExamTerm {
+  id             String       @id @default(uuid())
+  schoolId       String
+  school         School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  name           String
+  type           ExamTermType @default(TERM_1)
+  startDate      DateTime
+  endDate        DateTime
+  isCurrent      Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  exams Exam[]
+
+  @@unique([schoolId, academicYearId, name])
+  @@index([schoolId, academicYearId])
+  @@map("exam_terms")
+}
+
+model Exam {
+  id        String   @id @default(uuid())
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  termId    String
+  term      ExamTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assessments Assessment[]
+
+  @@unique([termId, classId, name])
+  @@index([schoolId, termId])
+  @@index([classId])
+  @@map("exams")
+}
+
+model Assessment {
+  id           String         @id @default(uuid())
+  schoolId     String
+  examId       String
+  exam         Exam           @relation(fields: [examId], references: [id], onDelete: Cascade)
+  subjectId    String
+  subject      Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  type         AssessmentType @default(THEORY)
+  maxMarks     Float          @default(100.0)
+  passingMarks Float          @default(33.0)
+  weightage    Float?
+  date         DateTime
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  marksRecords MarksRecord[]
+
+  @@unique([examId, subjectId, type])
+  @@index([examId])
+  @@index([subjectId])
+  @@map("assessments")
+}
+
+model MarksRecord {
+  id            String     @id @default(uuid())
+  schoolId      String
+  assessmentId  String
+  assessment    Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  enrollmentId  String
+  enrollment    Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  marksObtained Float?
+  isAbsent      Boolean    @default(false)
+  remarks       String?
+  enteredById   String?
+  enteredBy     User?      @relation(fields: [enteredById], references: [id], onDelete: SetNull)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([assessmentId, enrollmentId])
+  @@index([assessmentId])
+  @@index([enrollmentId])
+  @@index([schoolId])
+  @@map("marks_records")
+}
+
+model GradingScale {
+  id            String   @id @default(uuid())
+  schoolId      String
+  school        School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name          String   @default("CBSE 9-Point Scale")
+  grade         String
+  minPercentage Float
+  maxPercentage Float
+  gradePoint    Float
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([schoolId, grade])
+  @@index([schoolId])
+  @@map("grading_scales")
 }
 
 
