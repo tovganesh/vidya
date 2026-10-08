@@ -1,6 +1,7 @@
 import { prisma } from '../../database/db.js';
 import { AttendanceStatus } from '@prisma/client';
 import { NotFoundError, BadRequestError } from '../../shared/errors/index.js';
+import { CommunicationService } from '../communication/communication.service.js';
 
 export interface RecordAttendanceItemDto {
   enrollmentId: string;
@@ -241,6 +242,18 @@ export class AttendanceService {
         },
       });
     });
+
+    // Asynchronously dispatch attendance notifications to guardians for absent/late students
+    for (const record of dto.records) {
+      if (record.status === AttendanceStatus.ABSENT || record.status === AttendanceStatus.LATE) {
+        CommunicationService.dispatchAttendanceAlert(
+          schoolId,
+          record.enrollmentId,
+          record.status,
+          targetDate,
+        ).catch(() => {});
+      }
+    }
 
     return {
       success: true,

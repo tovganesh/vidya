@@ -180,6 +180,9 @@ model School {
   periods       Period[]
   timetableSlots TimetableSlot[]
   teacherAllocations TeacherAllocation[]
+  announcements Announcement[]
+  notifications Notification[]
+  pushSubscriptions PushSubscription[]
 
   @@map("schools")
 }
@@ -328,6 +331,9 @@ model User {
   guardian      Guardian?
   teacher       Teacher?
   recordedAttendance AttendanceRecord[]
+  authoredAnnouncements Announcement[]
+  notifications Notification[]
+  pushSubscriptions PushSubscription[]
 
   @@index([schoolId, primaryRole])
   @@map("users")
@@ -640,4 +646,90 @@ model TeacherAllocation {
   @@index([sectionId, academicYearId])
   @@map("teacher_allocations")
 }
+
+// ============================================================================
+// Communication, Announcements & Web Push Notifications (Milestone 7)
+// ============================================================================
+
+enum AnnouncementPriority {
+  NORMAL
+  URGENT
+  EMERGENCY
+}
+
+enum AnnouncementAudience {
+  ALL_SCHOOL
+  SPECIFIC_CLASSES
+  TEACHERS_ONLY
+  PARENTS_ONLY
+  STAFF_ONLY
+}
+
+enum NotificationType {
+  ANNOUNCEMENT
+  ATTENDANCE_ALERT
+  TIMETABLE_UPDATE
+  FEE_REMINDER
+  SYSTEM_ALERT
+}
+
+model Announcement {
+  id             String               @id @default(uuid())
+  schoolId       String
+  school         School               @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  title          String
+  content        String
+  priority       AnnouncementPriority @default(NORMAL)
+  targetAudience AnnouncementAudience @default(ALL_SCHOOL)
+  targetClassIds String[]             @default([])
+  authorId       String
+  author         User                 @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  isPublished    Boolean              @default(true)
+  publishedAt    DateTime             @default(now())
+  expiresAt      DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@index([schoolId, isPublished, publishedAt])
+  @@index([authorId])
+  @@map("announcements")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  schoolId  String
+  school    School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  type      NotificationType @default(ANNOUNCEMENT)
+  data      Json?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([schoolId, userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([schoolId, userId])
+  @@map("push_subscriptions")
+}
+
 

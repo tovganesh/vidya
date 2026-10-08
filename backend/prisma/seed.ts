@@ -13,6 +13,9 @@ import {
   TeacherStatus,
   AttendanceStatus,
   DayOfWeek,
+  AnnouncementPriority,
+  AnnouncementAudience,
+  NotificationType,
 } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -871,7 +874,163 @@ async function main() {
     console.log('✅ Daily Attendance Records seeded for Class 10-A');
   }
 
-  // 19. Initial Audit Log
+  // 19. School Announcements (Milestone 7)
+  const commPrincipalUser = await prisma.user.findUnique({ where: { email: 'principal@vidyasetu.org' } });
+  const commTeacherUser = await prisma.user.findUnique({ where: { email: 'teacher@vidyasetu.org' } });
+  const commParentUser = await prisma.user.findUnique({ where: { email: 'parent@vidyasetu.org' } });
+  const commAdminUser = await prisma.user.findUnique({ where: { email: 'admin@vidyasetu.org' } });
+
+  const ann1 = await prisma.announcement.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000091' },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000091',
+      schoolId: school.id,
+      title: 'Annual Sports Day 2026-27: Registration & Track Events',
+      content: 'We are delighted to announce that Vidya Academy Annual Athletic Meet will be held on November 14, 2026. All students from Class 1 to 12 can register for track and field events with their respective house captains.',
+      priority: AnnouncementPriority.NORMAL,
+      targetAudience: AnnouncementAudience.ALL_SCHOOL,
+      authorId: commPrincipalUser?.id || commAdminUser!.id,
+      isPublished: true,
+      publishedAt: new Date('2026-10-01T08:30:00Z'),
+    },
+  });
+
+  const ann2 = await prisma.announcement.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000092' },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000092',
+      schoolId: school.id,
+      title: 'Urgent Weather Advisory: Heavy Rainfall & Safety Protocols',
+      content: 'In accordance with the district administration advisory for heavy monsoon rains, school transport routes will operate 30 minutes earlier in the afternoon. Parents are requested to track the bus alerts on the portal.',
+      priority: AnnouncementPriority.URGENT,
+      targetAudience: AnnouncementAudience.ALL_SCHOOL,
+      authorId: commAdminUser!.id,
+      isPublished: true,
+      publishedAt: new Date('2026-10-06T06:00:00Z'),
+    },
+  });
+
+  const ann3 = await prisma.announcement.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000093' },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000093',
+      schoolId: school.id,
+      title: 'Class 10 CBSE Pre-Board Examination Schedule Released',
+      content: 'The date sheet for CBSE Class 10 Pre-Board Assessment has been published. Mathematics Paper 1 will be held on October 25, followed by Science on October 28. Detailed syllabus breakdown is available in the academic section.',
+      priority: AnnouncementPriority.NORMAL,
+      targetAudience: AnnouncementAudience.SPECIFIC_CLASSES,
+      targetClassIds: [class10!.id],
+      authorId: commTeacherUser?.id || commAdminUser!.id,
+      isPublished: true,
+      publishedAt: new Date('2026-10-07T10:00:00Z'),
+    },
+  });
+
+  const ann4 = await prisma.announcement.upsert({
+    where: { id: '00000000-0000-0000-0000-000000000094' },
+    update: {},
+    create: {
+      id: '00000000-0000-0000-0000-000000000094',
+      schoolId: school.id,
+      title: 'Faculty Council: Term 1 Academic Progress & Remedial Classes',
+      content: 'All secondary and senior secondary teachers are requested to attend the Term 1 progress evaluation meeting on Friday at 3:30 PM in the Conference Hall.',
+      priority: AnnouncementPriority.NORMAL,
+      targetAudience: AnnouncementAudience.TEACHERS_ONLY,
+      authorId: commPrincipalUser?.id || commAdminUser!.id,
+      isPublished: true,
+      publishedAt: new Date('2026-10-07T14:00:00Z'),
+    },
+  });
+  console.log('✅ Announcements seeded (All-School, Urgent, Class 10, Staff-Only)');
+
+  // 20. In-App Notifications
+  if (commParentUser) {
+    await prisma.notification.upsert({
+      where: { id: '00000000-0000-0000-0000-000000000081' },
+      update: {},
+      create: {
+        id: '00000000-0000-0000-0000-000000000081',
+        schoolId: school.id,
+        userId: commParentUser.id,
+        title: 'Daily Attendance Update: Present',
+        body: 'Aarav Sharma was marked PRESENT in Class 10-A for today (07 Oct 2026).',
+        type: NotificationType.ATTENDANCE_ALERT,
+        data: { link: '/attendance' },
+        isRead: false,
+      },
+    });
+
+    await prisma.notification.upsert({
+      where: { id: '00000000-0000-0000-0000-000000000082' },
+      update: {},
+      create: {
+        id: '00000000-0000-0000-0000-000000000082',
+        schoolId: school.id,
+        userId: commParentUser.id,
+        title: 'Urgent Weather Advisory Published',
+        body: 'School transport routes will operate 30 minutes earlier today due to heavy monsoon rains.',
+        type: NotificationType.ANNOUNCEMENT,
+        data: { announcementId: ann2.id, link: '/announcements' },
+        isRead: false,
+      },
+    });
+
+    await prisma.notification.upsert({
+      where: { id: '00000000-0000-0000-0000-000000000083' },
+      update: {},
+      create: {
+        id: '00000000-0000-0000-0000-000000000083',
+        schoolId: school.id,
+        userId: commParentUser.id,
+        title: 'Class 10-A Timetable Updated',
+        body: 'New timetable schedule for Academic Year 2026-27 is now active.',
+        type: NotificationType.TIMETABLE_UPDATE,
+        data: { link: '/timetable' },
+        isRead: true,
+        readAt: new Date('2026-10-07T12:00:00Z'),
+      },
+    });
+  }
+
+  if (commAdminUser) {
+    await prisma.notification.upsert({
+      where: { id: '00000000-0000-0000-0000-000000000084' },
+      update: {},
+      create: {
+        id: '00000000-0000-0000-0000-000000000084',
+        schoolId: school.id,
+        userId: commAdminUser.id,
+        title: 'Daily Attendance Roll Call Complete',
+        body: 'Attendance for Class 10 Section A has been submitted by Rajesh Sharma (Teacher).',
+        type: NotificationType.ATTENDANCE_ALERT,
+        data: { link: '/attendance/register' },
+        isRead: false,
+      },
+    });
+  }
+  console.log('✅ In-App Notifications seeded');
+
+  // 21. Sample Push Subscription
+  if (commParentUser) {
+    await prisma.pushSubscription.upsert({
+      where: { endpoint: 'https://fcm.googleapis.com/fcm/send/demo-parent-subscription-token-123' },
+      update: {},
+      create: {
+        schoolId: school.id,
+        userId: commParentUser.id,
+        endpoint: 'https://fcm.googleapis.com/fcm/send/demo-parent-subscription-token-123',
+        p256dh: 'BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QT9AcUbVYOISxuj12ScpqqDTMR21WvKVW82K_6OO1aswQW7A',
+        auth: 'tBHItJI5svbpez7KI4CCXg',
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/129.0.0.0 Safari/537.36',
+      },
+    });
+    console.log('✅ Sample Web Push Subscription registered');
+  }
+
+  // 22. Initial Audit Log
   await prisma.auditLog.create({
     data: {
       schoolId: school.id,

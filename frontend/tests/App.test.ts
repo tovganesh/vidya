@@ -36,6 +36,18 @@ describe('App Layout Shell Switching (Authentication Boundaries)', () => {
     window.scrollTo = vi.fn();
     setActivePinia(createPinia());
     localStorage.clear();
+    global.fetch = vi.fn().mockImplementation((url: string) => {
+      if (url.includes('/health')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ success: true, data: { status: 'healthy', service: 'vidyasetu-api' } }),
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ announcements: [], notifications: [], unreadCount: 0 }),
+      });
+    });
     await router.push('/login');
   });
 
