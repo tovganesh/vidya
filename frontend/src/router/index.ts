@@ -15,6 +15,7 @@ import BatchPromotionView from '../views/people/BatchPromotionView.vue';
 import RollCallView from '../views/attendance/RollCallView.vue';
 import AttendanceRegisterView from '../views/attendance/AttendanceRegisterView.vue';
 import TimetableGridView from '../views/timetable/TimetableGridView.vue';
+import AnnouncementsView from '../views/communication/AnnouncementsView.vue';
 import { useAuthStore } from '../stores/auth.js';
 
 const routes: RouteRecordRaw[] = [
@@ -111,6 +112,13 @@ const routes: RouteRecordRaw[] = [
     name: 'timetable-grid',
     component: TimetableGridView,
     meta: { title: 'Class Timetable & Allocations — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/announcements',
+    alias: ['/notifications', '/notice-board'],
+    name: 'announcements',
+    component: AnnouncementsView,
+    meta: { title: 'Notice Board & Announcements — Vidya', requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',

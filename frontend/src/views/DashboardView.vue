@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useSystemStore } from '@/stores/system.js';
+import { useCommunicationStore } from '@/stores/communication.js';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 
 const systemStore = useSystemStore();
+const commStore = useCommunicationStore();
 
 onMounted(() => {
   systemStore.checkHealth();
+  commStore.fetchAnnouncements();
 });
 </script>
 
@@ -209,10 +212,19 @@ onMounted(() => {
           </div>
 
           <div class="workflow-item">
+            <div class="wf-dot active"></div>
+            <div class="wf-info">
+              <span class="wf-name">M7: Communication & Web Push Engine</span>
+              <span class="wf-desc">Notice Board, VAPID Web Push, In-App Center, Absence Alerts Dispatcher</span>
+            </div>
+            <span class="badge badge-emerald">Complete</span>
+          </div>
+
+          <div class="workflow-item">
             <div class="wf-dot queued"></div>
             <div class="wf-info">
-              <span class="wf-name">M7–M9: Web Push, Exams & Fees</span>
-              <span class="wf-desc">VAPID Push Alerts, CBSE Report Cards, Indian Fee Receipts</span>
+              <span class="wf-name">M8–M9: Exams, Report Cards & Fees</span>
+              <span class="wf-desc">CBSE Term Assessments, CCE Grading, Indian Fee Schedules & Receipts</span>
             </div>
             <span class="badge badge-indigo">Planned</span>
           </div>
