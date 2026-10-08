@@ -221,10 +221,19 @@ onMounted(() => {
           </div>
 
           <div class="workflow-item">
+            <div class="wf-dot active"></div>
+            <div class="wf-info">
+              <span class="wf-name">M8: Examinations, Grading Engine & CBSE Report Cards</span>
+              <span class="wf-desc">Exam terms, assessments master, spreadsheet marks entry, CBSE 9-point grading, and printable A4 report cards</span>
+            </div>
+            <span class="badge badge-emerald">Complete</span>
+          </div>
+
+          <div class="workflow-item">
             <div class="wf-dot queued"></div>
             <div class="wf-info">
-              <span class="wf-name">M8–M9: Exams, Report Cards & Fees</span>
-              <span class="wf-desc">CBSE Term Assessments, CCE Grading, Indian Fee Schedules & Receipts</span>
+              <span class="wf-name">M9: Finance, Fee Schedules & Collections</span>
+              <span class="wf-desc">Indian Fee Heads, Concessions, Online/Offline Receipts, Ledger & Dues Tracking</span>
             </div>
             <span class="badge badge-indigo">Planned</span>
           </div>

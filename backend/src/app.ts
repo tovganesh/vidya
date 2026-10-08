@@ -13,6 +13,7 @@ import { peopleRoutes } from './modules/people/people.routes.js';
 import { attendanceRoutes } from './modules/attendance/attendance.routes.js';
 import { timetableRoutes } from './modules/timetable/timetable.routes.js';
 import { communicationRoutes } from './modules/communication/communication.routes.js';
+import { examsRoutes } from './modules/exams/exams.routes.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -102,6 +103,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(attendanceRoutes, { prefix: '/api/v1' });
   await app.register(timetableRoutes, { prefix: '/api/v1' });
   await app.register(communicationRoutes, { prefix: '/api/v1/communication' });
+  await app.register(examsRoutes, { prefix: '/api/v1/exams' });
 
   return app;
 }

@@ -16,6 +16,7 @@ import RollCallView from '../views/attendance/RollCallView.vue';
 import AttendanceRegisterView from '../views/attendance/AttendanceRegisterView.vue';
 import TimetableGridView from '../views/timetable/TimetableGridView.vue';
 import AnnouncementsView from '../views/communication/AnnouncementsView.vue';
+import ExamsView from '../views/exams/ExamsView.vue';
 import { useAuthStore } from '../stores/auth.js';
 
 const routes: RouteRecordRaw[] = [
@@ -119,6 +120,19 @@ const routes: RouteRecordRaw[] = [
     name: 'announcements',
     component: AnnouncementsView,
     meta: { title: 'Notice Board & Announcements — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/exams',
+    name: 'exams-hub',
+    component: ExamsView,
+    meta: { title: 'Examinations & CBSE Report Cards — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/exams/report-card/:enrollmentId',
+    alias: ['/report-card/:enrollmentId'],
+    name: 'exam-report-card',
+    component: ExamsView,
+    meta: { title: 'CBSE Official Report Card — Vidya', requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',

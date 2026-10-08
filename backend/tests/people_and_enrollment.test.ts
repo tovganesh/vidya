@@ -331,7 +331,7 @@ describe('People Management & Academic Enrollment (Milestone 5)', () => {
     it('should list existing teachers with user account information', async () => {
       const res = await app.inject({
         method: 'GET',
-        url: '/api/v1/teachers',
+        url: '/api/v1/teachers?limit=100',
         headers: { authorization: `Bearer ${adminToken}` },
       });
 
