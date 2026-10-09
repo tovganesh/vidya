@@ -19,8 +19,8 @@ describe('School Administration & Academic Setup (Milestone 4)', () => {
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'admin@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'admin@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(adminLoginRes.statusCode).toBe(200);
@@ -33,8 +33,8 @@ describe('School Administration & Academic Setup (Milestone 4)', () => {
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'teacher@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'teacher@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(teacherLoginRes.statusCode).toBe(200);
@@ -59,7 +59,7 @@ describe('School Administration & Academic Setup (Milestone 4)', () => {
       expect(res.statusCode).toBe(200);
       const body = JSON.parse(res.payload);
       expect(body.success).toBe(true);
-      expect(body.data.name).toBe('VidyaSetu Academy, Bengaluru');
+      expect(body.data.name).toBe('Vidya Academy, Bengaluru');
       expect(body.data.code).toBe('VS-BLR-01');
       expect(body.data.board).toBe('CBSE');
       expect(body.data._count.classes).toBeGreaterThan(0);

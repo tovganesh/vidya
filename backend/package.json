@@ -1,8 +1,8 @@
 {
-  "name": "@vidyasetu/backend",
+  "name": "@vidya/backend",
   "version": "0.1.0",
   "private": true,
-  "description": "VidyaSetu Core Backend API Engine",
+  "description": "Vidya Core Backend API Engine",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

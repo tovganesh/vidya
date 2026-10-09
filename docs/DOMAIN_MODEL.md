@@ -1,4 +1,4 @@
-# VidyaSetu — Domain Model & ERD Specification
+# Vidya — Domain Model & ERD Specification
 
 > **Version:** 1.0.0  
 > **Status:** Approved / Foundational  
@@ -85,7 +85,7 @@ Represents the umbrella educational trust, society, or management committee (e.g
 The individual school unit holding distinct board affiliations.
 - `id`: UUID (Primary Key)
 - `organization_id`: UUID (Foreign Key -> `organizations.id`)
-- `name`: String (e.g., *"VidyaSetu Academy, Bengaluru"*)
+- `name`: String (e.g., *"Vidya Academy, Bengaluru"*)
 - `code`: String (Unique school code)
 - `board`: Enum (`CBSE`, `ICSE`, `STATE_BOARD`, `IB`, `CAMBRIDGE`, `OTHER`)
 - `affiliation_number`: String (Official board affiliation code)

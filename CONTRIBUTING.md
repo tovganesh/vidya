@@ -1,6 +1,6 @@
-# Contributing to VidyaSetu
+# Contributing to Vidya
 
-Thank you for your interest in contributing to **VidyaSetu — The Open School Operating System**! We welcome community contributions, bug reports, and enhancements.
+Thank you for your interest in contributing to **Vidya — The Open School Operating System**! We welcome community contributions, bug reports, and enhancements.
 
 ---
 
@@ -14,8 +14,8 @@ Please review and adhere to our [Code of Conduct](CODE_OF_CONDUCT.md). We are co
 
 1. **Fork and clone the repository:**
    ```bash
-   git clone https://github.com/your-username/vidyasetu.git
-   cd vidyasetu
+   git clone https://github.com/your-username/vidya.git
+   cd vidya
    ```
 
 2. **Initialize configuration:**

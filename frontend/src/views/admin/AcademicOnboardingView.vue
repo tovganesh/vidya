@@ -144,7 +144,7 @@ function toggleSection(sec: string) {
         <div class="profile-preview-box">
           <div class="preview-item">
             <span class="preview-label">School Name</span>
-            <span class="preview-value">{{ academicsStore.school?.name || 'VidyaSetu Academy' }}</span>
+            <span class="preview-value">{{ academicsStore.school?.name || 'Vidya Academy' }}</span>
           </div>
           <div class="preview-item">
             <span class="preview-label">Institution Code</span>

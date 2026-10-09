@@ -499,7 +499,7 @@ function viewStudentReportCard(enrollmentId: string) {
 </script>
 
 <template>
-  <div class="exams-container" id="vidyasetu-exams-view">
+  <div class="exams-container" id="vidya-exams-view">
     <!-- Header -->
     <header class="page-header no-print">
       <div class="header-content">
@@ -2180,7 +2180,7 @@ function viewStudentReportCard(enrollmentId: string) {
     display: none !important;
   }
 
-  body, html, #vidyasetu-root-app, .main-content, .exams-container {
+  body, html, #vidya-root-app, .main-content, .exams-container {
     background: #ffffff !important;
     color: #000000 !important;
     padding: 0 !important;

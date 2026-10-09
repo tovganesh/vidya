@@ -258,7 +258,7 @@ async function handleDeleteCampus(id: string) {
               v-model="form.name"
               type="text"
               class="form-input"
-              placeholder="e.g. VidyaSetu Academy"
+              placeholder="e.g. Vidya Academy"
               required
             />
           </div>
@@ -332,7 +332,7 @@ async function handleDeleteCampus(id: string) {
               v-model="form.email"
               type="email"
               class="form-input"
-              placeholder="e.g. contact@vidyasetu.org"
+              placeholder="e.g. contact@vidya.org"
             />
           </div>
 

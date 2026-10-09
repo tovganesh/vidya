@@ -4,7 +4,7 @@ import Sidebar from './Sidebar.vue';
 </script>
 
 <template>
-  <div class="app-layout" id="vidyasetu-root-app">
+  <div class="app-layout" id="vidya-root-app">
     <TopNav />
     <div class="app-body">
       <Sidebar />

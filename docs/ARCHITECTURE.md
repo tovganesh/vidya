@@ -1,23 +1,23 @@
-# VidyaSetu — System Architecture Document
+# Vidya — System Architecture Document
 
 > **Version:** 1.0.0  
 > **Status:** Approved / Foundational  
-> **Author:** VidyaSetu Core Architecture Team  
+> **Author:** Vidya Core Architecture Team  
 > **Scope:** Product Architecture, Modular Boundaries, Security & Deployment  
 
 ---
 
 ## 1. Executive Overview
 
-**VidyaSetu** ("Bridge of Knowledge") is an open-source, modern School Operating System engineered specifically for the operational reality of Indian primary, secondary, and higher-secondary educational institutions (CBSE, ICSE, State Boards, and International curricula).
+**Vidya** is an open-source, modern School Operating System engineered specifically for the operational reality of Indian primary, secondary, and higher-secondary educational institutions (CBSE, ICSE, State Boards, and International curricula).
 
-Unlike legacy school ERP systems characterized by clunky table dumps, archaic 2000s web interfaces, and rigid commercial lock-ins, VidyaSetu is designed as a **modular monolith** with a web-first, mobile-responsive, role-adaptive UX. It is fully self-hostable using standard open-source technologies: **PostgreSQL**, **Node.js (TypeScript)**, and **Vue 3**.
+Unlike legacy school ERP systems characterized by clunky table dumps, archaic 2000s web interfaces, and rigid commercial lock-ins, Vidya is designed as a **modular monolith** with a web-first, mobile-responsive, role-adaptive UX. It is fully self-hostable using standard open-source technologies: **PostgreSQL**, **Node.js (TypeScript)**, and **Vue 3**.
 
 ---
 
 ## 2. High-Level Architecture
 
-VidyaSetu follows a strict **Modular Monolith** pattern. All business domains are organized as isolated functional modules that communicate through strictly typed contracts, in-memory event dispatching, and well-defined service interfaces. This delivers fast local development, single-binary container deployment, zero distributed systems operational overhead, and a clear migration path to microservices if multi-campus scaling demands it.
+Vidya follows a strict **Modular Monolith** pattern. All business domains are organized as isolated functional modules that communicate through strictly typed contracts, in-memory event dispatching, and well-defined service interfaces. This delivers fast local development, single-binary container deployment, zero distributed systems operational overhead, and a clear migration path to microservices if multi-campus scaling demands it.
 
 ```text
  ┌────────────────────────────────────────────────────────────────────────┐
@@ -235,15 +235,15 @@ Every mutating operation (POST, PUT, PATCH, DELETE) passes through an audit midd
 ### 9.1 Self-Hosting & Containerization
 - **Single Command Bootstrapping**:
   ```bash
-  git clone https://github.com/tovganesh/vidyasetu.git
+  git clone https://github.com/tovganesh/vidya.git
   cp .env.example .env
   docker compose up -d
   ```
 - **Docker Compose Topology**:
-  1. `vidyasetu-db`: PostgreSQL 16 image with healthcheck.
-  2. `vidyasetu-api`: Node.js multi-stage production container running the Fastify backend.
-  3. `vidyasetu-web`: Lightweight Nginx container serving compiled Vue 3 SPA/PWA assets and proxying `/api` traffic.
-  4. *(Optional)* `vidyasetu-cache`: Valkey container for session caching and rate-limiting.
+  1. `vidya-db`: PostgreSQL 16 image with healthcheck.
+  2. `vidya-api`: Node.js multi-stage production container running the Fastify backend.
+  3. `vidya-web`: Lightweight Nginx container serving compiled Vue 3 SPA/PWA assets and proxying `/api` traffic.
+  4. *(Optional)* `vidya-cache`: Valkey container for session caching and rate-limiting.
 
 ### 9.2 Zero-Downtime Migration Execution
 - Database migrations execute during container startup (`prisma migrate deploy`) with backward-compatible additive changes.

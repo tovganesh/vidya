@@ -1,4 +1,4 @@
-# VidyaSetu — Implementation Roadmap & Milestone Specifications
+# Vidya — Implementation Roadmap & Milestone Specifications
 
 > **Version:** 1.0.0  
 > **Status:** Active Execution  
@@ -8,7 +8,7 @@
 
 ## Roadmap Overview
 
-VidyaSetu is built in tightly scoped, independently verifiable milestones. Each milestone represents a complete, cohesive slice of functionality backed by automated tests, type validation, and clear acceptance criteria.
+Vidya is built in tightly scoped, independently verifiable milestones. Each milestone represents a complete, cohesive slice of functionality backed by automated tests, type validation, and clear acceptance criteria.
 
 ```text
   [M1: Workspace & Dev Env] ──► [M2: Database & Core Migrations] ──► [M3: Auth, RBAC & 2FA]
@@ -61,7 +61,7 @@ VidyaSetu is built in tightly scoped, independently verifiable milestones. Each 
 ### 1.7 Acceptance Criteria
 - Running `docker compose up -d` starts PostgreSQL 16.
 - Running `npm run dev` boots both backend (port 4000) and frontend (port 5173).
-- Visiting `http://localhost:5173` renders the modern VidyaSetu shell and successfully queries the backend `/api/v1/health` endpoint.
+- Visiting `http://localhost:5173` renders the modern Vidya shell and successfully queries the backend `/api/v1/health` endpoint.
 - All lint, typecheck, and unit test commands exit with code 0.
 
 ---
@@ -71,7 +71,7 @@ VidyaSetu is built in tightly scoped, independently verifiable milestones. Each 
 ### 2.1 Objectives
 - Establish the PostgreSQL relational schema using Prisma ORM.
 - Implement database migrations for Core, Identity, Academics, and People tables.
-- Build an idempotent database seeder (`backend/prisma/seeds/seed.ts`) that populates a realistic Indian school: *"VidyaSetu Demo Academy"* (CBSE Board, 2026-27 Academic Year, Classes Nursery–12, Sections A/B, Subjects, Demo Users for all 11 roles).
+- Build an idempotent database seeder (`backend/prisma/seeds/seed.ts`) that populates a realistic Indian school: *"Vidya Demo Academy"* (CBSE Board, 2026-27 Academic Year, Classes Nursery–12, Sections A/B, Subjects, Demo Users for all 11 roles).
 
 ### 2.2 Database Changes
 - Tables created: `organizations`, `schools`, `campuses`, `academic_years`, `classes`, `sections`, `subjects`, `class_subjects`, `users`, `roles`, `permissions`, `role_permissions`, `audit_logs`.
@@ -136,7 +136,7 @@ VidyaSetu is built in tightly scoped, independently verifiable milestones. Each 
 - API tests: Login success, invalid credentials 401, token rotation, 2FA challenge flow, unauthorized 403.
 
 ### 3.7 Acceptance Criteria
-- Logging in as `schooladmin@vidyasetu.org` returns tokens and requires 2FA if enabled.
+- Logging in as `schooladmin@vidya.org` returns tokens and requires 2FA if enabled.
 - Accessing protected endpoints without token returns 401; with wrong permissions returns 403.
 - Audit log entry is written for every state-changing authentication request.
 

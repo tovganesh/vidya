@@ -1,7 +1,7 @@
-# VidyaSetu — Architecture Decision Records (ADRs)
+# Vidya — Architecture Decision Records (ADRs)
 
 > **Document Status:** Active  
-> **Repository:** `vidyasetu`  
+> **Repository:** `vidya`  
 
 ---
 
@@ -48,7 +48,7 @@ The backend requires strict TypeScript type safety, high throughput, robust midd
 ## ADR 003: Database Engine & ORM Layer — PostgreSQL + Prisma ORM
 
 ### Context
-VidyaSetu is a data-critical application requiring ACID transactions for financial ledgers (fees, payments, concessions) and strict relational foreign keys (enrollment, attendance, examinations).
+Vidya is a data-critical application requiring ACID transactions for financial ledgers (fees, payments, concessions) and strict relational foreign keys (enrollment, attendance, examinations).
 
 ### Options
 1. **MongoDB / Document Store**: Flexible schema, but catastrophic for complex relational structures like academic lifecycles, and lacks native relational integrity.
@@ -109,7 +109,7 @@ Schools typically spend excessive funds building or white-labeling native iOS an
 ## ADR 006: Multi-Tenancy Architecture — Shared Database with Discriminator Column
 
 ### Context
-VidyaSetu should support both standalone single-school installations and multi-school group deployments (e.g. 10 branch campuses).
+Vidya should support both standalone single-school installations and multi-school group deployments (e.g. 10 branch campuses).
 
 ### Options
 1. **Database-Per-Tenant**: Highest isolation, but enormous DevOps overhead (managing hundreds of database instances, running migrations in loops).

@@ -15,16 +15,16 @@ const isUsingBackupCode = ref(false);
 const localError = ref<string | null>(null);
 
 const demoAccounts = [
-  { role: 'School Admin', email: 'admin@vidyasetu.org', color: 'indigo' },
-  { role: 'Principal', email: 'principal@vidyasetu.org', color: 'emerald' },
-  { role: 'Teacher', email: 'teacher@vidyasetu.org', color: 'cyan' },
-  { role: 'Accountant', email: 'accountant@vidyasetu.org', color: 'amber' },
-  { role: 'Parent', email: 'parent@vidyasetu.org', color: 'rose' },
+  { role: 'School Admin', email: 'admin@vidya.org', color: 'indigo' },
+  { role: 'Principal', email: 'principal@vidya.org', color: 'emerald' },
+  { role: 'Teacher', email: 'teacher@vidya.org', color: 'cyan' },
+  { role: 'Accountant', email: 'accountant@vidya.org', color: 'amber' },
+  { role: 'Parent', email: 'parent@vidya.org', color: 'rose' },
 ];
 
 function selectDemo(demoEmail: string) {
   email.value = demoEmail;
-  password.value = 'VidyaSetu@2026';
+  password.value = 'Vidya@2026';
 }
 
 async function handleLogin() {
@@ -130,7 +130,7 @@ async function handleVerify2FA() {
               id="login-email"
               v-model="email"
               type="email"
-              placeholder="admin@vidyasetu.org"
+              placeholder="admin@vidya.org"
               required
               autocomplete="email"
             />
@@ -139,7 +139,7 @@ async function handleVerify2FA() {
           <div class="form-group">
             <div class="password-label-row">
               <label for="login-password">Password</label>
-              <span class="demo-hint">Demo: VidyaSetu@2026</span>
+              <span class="demo-hint">Demo: Vidya@2026</span>
             </div>
             <input
               id="login-password"

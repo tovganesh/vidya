@@ -20,7 +20,7 @@ export interface HealthState {
 export const useSystemStore = defineStore('system', () => {
   const health = ref<HealthState>({
     status: 'checking',
-    service: 'vidyasetu-api',
+    service: 'vidya-api',
     version: '0.1.0',
     timestamp: '',
     uptimeSeconds: 0,

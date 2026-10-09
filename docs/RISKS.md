@@ -1,4 +1,4 @@
-# VidyaSetu — Comprehensive Risk Analysis & Mitigation Matrix
+# Vidya — Comprehensive Risk Analysis & Mitigation Matrix
 
 > **Version:** 1.0.0  
 > **Status:** Active Reference  
@@ -29,7 +29,7 @@
 
 | Risk | Impact | Probability | Mitigation Strategy |
 | :--- | :--- | :--- | :--- |
-| **Growing File Attachment Storage (Student Photos, Transfer Certificates, Marksheets)** | PostgreSQL database bloating if documents are stored as bytea/blobs. | High | High | • Zero BLOB storage in PostgreSQL.<br>• Abstracted `StorageService` interface storing files in local filesystem (`/var/vidyasetu/uploads`) or S3-compatible object storage (MinIO, AWS S3).<br>• PostgreSQL stores only secure metadata, content type, and SHA-256 hash. |
+| **Growing File Attachment Storage (Student Photos, Transfer Certificates, Marksheets)** | PostgreSQL database bloating if documents are stored as bytea/blobs. | High | High | • Zero BLOB storage in PostgreSQL.<br>• Abstracted `StorageService` interface storing files in local filesystem (`/var/vidya/uploads`) or S3-compatible object storage (MinIO, AWS S3).<br>• PostgreSQL stores only secure metadata, content type, and SHA-256 hash. |
 | **Unbounded Audit Log Table Growth** | `audit_logs` table growing into millions of rows degrading database backup and write performance. | Medium | High | • Partition `audit_logs` table by year/month.<br>• Provide automated archival commands to export aged audit logs to compressed parquet/JSON files. |
 
 ---

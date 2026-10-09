@@ -36,7 +36,7 @@ describe('Router Navigation Guards & Authentication Flow', () => {
     authStore.accessToken = 'valid_mock_jwt_token';
     authStore.user = {
       id: 'usr_admin',
-      email: 'admin@vidyasetu.org',
+      email: 'admin@vidya.org',
       firstName: 'Admin',
       lastName: 'User',
       primaryRole: 'SCHOOL_ADMIN',
@@ -60,7 +60,7 @@ describe('Router Navigation Guards & Authentication Flow', () => {
     authStore.accessToken = 'valid_mock_jwt_token';
     authStore.user = {
       id: 'usr_teacher',
-      email: 'teacher@vidyasetu.org',
+      email: 'teacher@vidya.org',
       firstName: 'Rajesh',
       lastName: 'Sharma',
       primaryRole: 'TEACHER',

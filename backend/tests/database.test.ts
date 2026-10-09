@@ -18,14 +18,14 @@ describe('Database Layer & Seed Verification (Milestone 2)', () => {
     expect(health.latencyMs).toBeGreaterThanOrEqual(0);
   });
 
-  it('should find the seeded school: VidyaSetu Academy, Bengaluru', async () => {
+  it('should find the seeded school: Vidya Academy, Bengaluru', async () => {
     const school = await prisma.school.findUnique({
       where: { code: 'VS-BLR-01' },
       include: { organization: true },
     });
 
     expect(school).not.toBeNull();
-    expect(school?.name).toBe('VidyaSetu Academy, Bengaluru');
+    expect(school?.name).toBe('Vidya Academy, Bengaluru');
     expect(school?.board).toBe('CBSE');
     expect(school?.currency).toBe('INR');
     expect(school?.organization?.name).toBe('Vidya Bharati Educational Trust');
@@ -72,7 +72,7 @@ describe('Database Layer & Seed Verification (Milestone 2)', () => {
 
   it('should verify demo users with proper role assignments', async () => {
     const admin = await prisma.user.findUnique({
-      where: { email: 'admin@vidyasetu.org' },
+      where: { email: 'admin@vidya.org' },
       include: { roles: { include: { role: true } } },
     });
 
