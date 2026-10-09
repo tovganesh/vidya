@@ -17,6 +17,7 @@ import AttendanceRegisterView from '../views/attendance/AttendanceRegisterView.v
 import TimetableGridView from '../views/timetable/TimetableGridView.vue';
 import AnnouncementsView from '../views/communication/AnnouncementsView.vue';
 import ExamsView from '../views/exams/ExamsView.vue';
+import FeesView from '../views/finance/FeesView.vue';
 import { useAuthStore } from '../stores/auth.js';
 
 const routes: RouteRecordRaw[] = [
@@ -133,6 +134,20 @@ const routes: RouteRecordRaw[] = [
     name: 'exam-report-card',
     component: ExamsView,
     meta: { title: 'CBSE Official Report Card — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/fees',
+    alias: ['/finance', '/receipts'],
+    name: 'fees-hub',
+    component: FeesView,
+    meta: { title: 'Fee Structures, Invoicing & Receipts — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/fees/receipts/:receiptNumber',
+    alias: ['/receipts/:receiptNumber'],
+    name: 'fee-receipt-view',
+    component: FeesView,
+    meta: { title: 'Official Fee Receipt — Vidya', requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',
