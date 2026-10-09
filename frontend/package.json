@@ -1,9 +1,9 @@
 {
-  "name": "@vidyasetu/frontend",
+  "name": "@vidya/frontend",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "VidyaSetu Modern Web Application & PWA",
+  "description": "Vidya Modern Web Application & PWA",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",

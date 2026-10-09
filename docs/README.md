@@ -24,7 +24,7 @@ This directory contains the foundational architectural blueprints, domain models
 The Vidya repository is organized as a clean, modular monorepo using npm workspaces:
 
 ```text
-vidyasetu/
+vidya/
 ├── .github/                     # CI/CD workflows (lint, test, build)
 ├── docs/                        # Architecture, domain models, ADRs, roadmap
 │   ├── README.md

@@ -166,7 +166,7 @@ export class TeachersService {
       throw new ConflictError(`User with email '${email}' already exists`, 'USER_EMAIL_CONFLICT');
     }
 
-    const rawPassword = dto.password || 'VidyaSetu@2026';
+    const rawPassword = dto.password || 'Vidya@2026';
     const passwordHash = await bcrypt.hash(rawPassword, 10);
 
     return await prisma.$transaction(async (tx) => {

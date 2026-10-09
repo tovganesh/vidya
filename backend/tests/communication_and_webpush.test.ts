@@ -22,8 +22,8 @@ describe('Communication, Announcements & Web Push Notifications (Milestone 7)', 
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'admin@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'admin@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(adminLogin.statusCode).toBe(200);
@@ -37,8 +37,8 @@ describe('Communication, Announcements & Web Push Notifications (Milestone 7)', 
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'teacher@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'teacher@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(teacherLogin.statusCode).toBe(200);
@@ -50,8 +50,8 @@ describe('Communication, Announcements & Web Push Notifications (Milestone 7)', 
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'parent@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'parent@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(parentLogin.statusCode).toBe(200);

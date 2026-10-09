@@ -24,14 +24,14 @@ describe('Frontend AuthStore (Milestone 3)', () => {
 
     authStore.user = {
       id: 'usr_1',
-      email: 'admin@vidyasetu.org',
+      email: 'admin@vidya.org',
       firstName: 'Rajesh',
       lastName: 'Kumar',
       primaryRole: 'SCHOOL_ADMIN',
       isTotpEnabled: false,
       school: {
         id: 'sch_1',
-        name: 'VidyaSetu Academy',
+        name: 'Vidya Academy',
         code: 'VS-BLR-01',
         board: 'CBSE',
       },

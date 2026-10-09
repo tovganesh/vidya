@@ -66,7 +66,7 @@ export function generateTOTPSecret(): string {
 export async function generateTOTPSetupData(
   email: string,
   secret: string,
-  issuer = 'VidyaSetu',
+  issuer = 'Vidya',
 ): Promise<{ otpauthUri: string; qrCodeDataUrl: string }> {
   const otpauthUri = generateURI({ secret, label: email, issuer });
   const qrCodeDataUrl = await QRCode.toDataURL(otpauthUri, {

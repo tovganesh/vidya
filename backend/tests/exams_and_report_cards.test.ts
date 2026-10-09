@@ -26,8 +26,8 @@ describe('Academics: Examinations, Marks & CBSE Report Cards (Milestone 8)', () 
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'admin@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'admin@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(adminLogin.statusCode).toBe(200);
@@ -40,8 +40,8 @@ describe('Academics: Examinations, Marks & CBSE Report Cards (Milestone 8)', () 
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'teacher@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'teacher@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(teacherLogin.statusCode).toBe(200);
@@ -52,8 +52,8 @@ describe('Academics: Examinations, Marks & CBSE Report Cards (Milestone 8)', () 
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'parent@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'parent@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(parentLogin.statusCode).toBe(200);
@@ -365,7 +365,7 @@ describe('Academics: Examinations, Marks & CBSE Report Cards (Milestone 8)', () 
       const report = JSON.parse(res.body);
 
       // School Information
-      expect(report.school.name).toBe('VidyaSetu Academy, Bengaluru');
+      expect(report.school.name).toBe('Vidya Academy, Bengaluru');
       expect(report.school.board).toBe('CBSE');
       expect(report.school.affiliationNumber).toBeDefined();
 

@@ -10,10 +10,10 @@
 
 ## Reporting a Vulnerability
 
-The VidyaSetu team takes the security of school and student data extremely seriously. If you discover a vulnerability, **do NOT open a public GitHub issue**.
+The Vidya team takes the security of school and student data extremely seriously. If you discover a vulnerability, **do NOT open a public GitHub issue**.
 
 Please report vulnerabilities privately via email to:
-**security@vidyasetu.org**
+**security@vidya.org**
 
 ### What to Include:
 - Description of the vulnerability.

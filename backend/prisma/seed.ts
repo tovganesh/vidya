@@ -24,7 +24,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting VidyaSetu Database Seeding...');
+  console.log('🌱 Starting Vidya Database Seeding...');
 
   // 1. Organization
   const org = await prisma.organization.upsert({
@@ -45,11 +45,11 @@ async function main() {
     create: {
       id: '00000000-0000-0000-0000-000000000002',
       organizationId: org.id,
-      name: 'VidyaSetu Academy, Bengaluru',
+      name: 'Vidya Academy, Bengaluru',
       code: 'VS-BLR-01',
       board: BoardType.CBSE,
       affiliationNumber: '830412',
-      email: 'contact@vidyasetu.org',
+      email: 'contact@vidya.org',
       phone: '+91 80 2525 0142',
       currency: 'INR',
       address: {
@@ -340,12 +340,12 @@ async function main() {
   }
   console.log('✅ Role-Permission mappings assigned');
 
-  // 10. Seed Realistic Demo Users (Password: VidyaSetu@2026)
-  const defaultPasswordHash = await bcrypt.hash('VidyaSetu@2026', 10);
+  // 10. Seed Realistic Demo Users (Password: Vidya@2026)
+  const defaultPasswordHash = await bcrypt.hash('Vidya@2026', 10);
 
   const demoUsers = [
     {
-      email: 'superadmin@vidyasetu.org',
+      email: 'superadmin@vidya.org',
       firstName: 'Vikram',
       lastName: 'Aditya',
       role: UserRole.SUPER_ADMIN,
@@ -353,7 +353,7 @@ async function main() {
       schoolId: null,
     },
     {
-      email: 'principal@vidyasetu.org',
+      email: 'principal@vidya.org',
       firstName: 'Dr. Ramesh',
       lastName: 'Sharma',
       role: UserRole.PRINCIPAL,
@@ -361,7 +361,7 @@ async function main() {
       schoolId: school.id,
     },
     {
-      email: 'admin@vidyasetu.org',
+      email: 'admin@vidya.org',
       firstName: 'Rajesh',
       lastName: 'Kumar',
       role: UserRole.SCHOOL_ADMIN,
@@ -369,7 +369,7 @@ async function main() {
       schoolId: school.id,
     },
     {
-      email: 'teacher@vidyasetu.org',
+      email: 'teacher@vidya.org',
       firstName: 'Ananya',
       lastName: 'Rao',
       role: UserRole.TEACHER,
@@ -377,7 +377,7 @@ async function main() {
       schoolId: school.id,
     },
     {
-      email: 'accountant@vidyasetu.org',
+      email: 'accountant@vidya.org',
       firstName: 'Suresh',
       lastName: 'Patel',
       role: UserRole.ACCOUNTANT,
@@ -385,7 +385,7 @@ async function main() {
       schoolId: school.id,
     },
     {
-      email: 'parent@vidyasetu.org',
+      email: 'parent@vidya.org',
       firstName: 'Priya',
       lastName: 'Sundaram',
       role: UserRole.PARENT,
@@ -393,7 +393,7 @@ async function main() {
       schoolId: school.id,
     },
     {
-      email: 'student@vidyasetu.org',
+      email: 'student@vidya.org',
       firstName: 'Aarav',
       lastName: 'Sundaram',
       role: UserRole.STUDENT,
@@ -441,10 +441,10 @@ async function main() {
       });
     }
   }
-  console.log(`✅ Demo accounts seeded (${demoUsers.length} users with password: VidyaSetu@2026)`);
+  console.log(`✅ Demo accounts seeded (${demoUsers.length} users with password: Vidya@2026)`);
 
   // 11. Teachers
-  const teacherUser = await prisma.user.findUnique({ where: { email: 'teacher@vidyasetu.org' } });
+  const teacherUser = await prisma.user.findUnique({ where: { email: 'teacher@vidya.org' } });
   if (teacherUser) {
     await prisma.teacher.upsert({
       where: { schoolId_employeeCode: { schoolId: school.id, employeeCode: 'EMP-2023-0101' } },
@@ -465,7 +465,7 @@ async function main() {
   }
 
   // 12. Guardians (Parents)
-  const parentUser = await prisma.user.findUnique({ where: { email: 'parent@vidyasetu.org' } });
+  const parentUser = await prisma.user.findUnique({ where: { email: 'parent@vidya.org' } });
   const guardianFather = await prisma.guardian.upsert({
     where: { id: '00000000-0000-0000-0000-000000000050' },
     update: {},
@@ -476,7 +476,7 @@ async function main() {
       name: 'Suresh Kumar',
       relationship: GuardianRelationship.FATHER,
       phone: '+91 98000 00005',
-      email: 'parent@vidyasetu.org',
+      email: 'parent@vidya.org',
       occupation: 'Software Engineer',
       annualIncome: '1800000',
       address: {
@@ -504,7 +504,7 @@ async function main() {
   });
 
   // 13. Students & Lifelong Trajectory
-  const studentUser = await prisma.user.findUnique({ where: { email: 'student@vidyasetu.org' } });
+  const studentUser = await prisma.user.findUnique({ where: { email: 'student@vidya.org' } });
   const student1 = await prisma.student.upsert({
     where: { schoolId_admissionNumber: { schoolId: school.id, admissionNumber: 'VS-2024-0101' } },
     update: {},
@@ -829,7 +829,7 @@ async function main() {
       where: { sectionId: section10A.id, academicYearId: ayCurrent.id },
     });
 
-    const adminUser = await prisma.user.findUnique({ where: { email: 'admin@vidyasetu.org' } });
+    const adminUser = await prisma.user.findUnique({ where: { email: 'admin@vidya.org' } });
 
     const dates = [
       new Date('2026-10-01T00:00:00Z'),
@@ -877,10 +877,10 @@ async function main() {
   }
 
   // 19. School Announcements (Milestone 7)
-  const commPrincipalUser = await prisma.user.findUnique({ where: { email: 'principal@vidyasetu.org' } });
-  const commTeacherUser = await prisma.user.findUnique({ where: { email: 'teacher@vidyasetu.org' } });
-  const commParentUser = await prisma.user.findUnique({ where: { email: 'parent@vidyasetu.org' } });
-  const commAdminUser = await prisma.user.findUnique({ where: { email: 'admin@vidyasetu.org' } });
+  const commPrincipalUser = await prisma.user.findUnique({ where: { email: 'principal@vidya.org' } });
+  const commTeacherUser = await prisma.user.findUnique({ where: { email: 'teacher@vidya.org' } });
+  const commParentUser = await prisma.user.findUnique({ where: { email: 'parent@vidya.org' } });
+  const commAdminUser = await prisma.user.findUnique({ where: { email: 'admin@vidya.org' } });
 
   const ann1 = await prisma.announcement.upsert({
     where: { id: '00000000-0000-0000-0000-000000000091' },
@@ -1269,7 +1269,7 @@ async function main() {
       entityType: 'System',
       entityId: school.id,
       diff: {
-        message: 'Initial demo school setup completed for VidyaSetu Academy, Bengaluru',
+        message: 'Initial demo school setup completed for Vidya Academy, Bengaluru',
         academicYear: '2026-2027',
         board: 'CBSE',
       },
@@ -1277,7 +1277,7 @@ async function main() {
   });
   console.log('✅ Audit log entry recorded');
 
-  console.log('✨ VidyaSetu database seeding completed successfully!');
+  console.log('✨ Vidya database seeding completed successfully!');
 }
 
 main()

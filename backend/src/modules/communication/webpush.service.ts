@@ -27,7 +27,7 @@ export class WebPushService {
   private static vapidPrivateKey =
     process.env.VAPID_PRIVATE_KEY || 'UUx1V3NMcUt4UjN5V2V4cGxTaWduZWRQcml2YXRlS2V5';
 
-  private static vapidSubject = process.env.VAPID_SUBJECT || 'mailto:support@vidyasetu.org';
+  private static vapidSubject = process.env.VAPID_SUBJECT || 'mailto:support@vidya.org';
 
   /**
    * Retrieves the active public VAPID key to provide to browsers for PushManager.subscribe()

@@ -34,8 +34,8 @@ describe('People Management & Academic Enrollment (Milestone 5)', () => {
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'admin@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'admin@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(adminLoginRes.statusCode).toBe(200);
@@ -48,8 +48,8 @@ describe('People Management & Academic Enrollment (Milestone 5)', () => {
       method: 'POST',
       url: '/api/v1/auth/login',
       payload: {
-        email: 'teacher@vidyasetu.org',
-        password: 'VidyaSetu@2026',
+        email: 'teacher@vidya.org',
+        password: 'Vidya@2026',
       },
     });
     expect(teacherLoginRes.statusCode).toBe(200);
@@ -325,7 +325,7 @@ describe('People Management & Academic Enrollment (Milestone 5)', () => {
   // ==========================================================================
   describe('5. Teacher Management', () => {
     const testEmpCode = `EMP-TEST-${Date.now().toString().slice(-4)}`;
-    const testEmail = `teacher.${Date.now()}@vidyasetu.org`;
+    const testEmail = `teacher.${Date.now()}@vidya.org`;
     let createdTeacherId: string;
 
     it('should list existing teachers with user account information', async () => {
@@ -378,7 +378,7 @@ describe('People Management & Academic Enrollment (Milestone 5)', () => {
           employeeCode: testEmpCode, // duplicate!
           firstName: 'Duplicate',
           lastName: 'Teacher',
-          email: `dup.${Date.now()}@vidyasetu.org`,
+          email: `dup.${Date.now()}@vidya.org`,
         },
       });
 

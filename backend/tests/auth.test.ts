@@ -24,8 +24,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'admin@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'admin@vidya.org',
+          password: 'Vidya@2026',
         },
       });
 
@@ -35,7 +35,7 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
       expect(body.data.requires2FA).toBe(false);
       expect(typeof body.data.accessToken).toBe('string');
       expect(typeof body.data.refreshToken).toBe('string');
-      expect(body.data.user.email).toBe('admin@vidyasetu.org');
+      expect(body.data.user.email).toBe('admin@vidya.org');
       expect(body.data.user.primaryRole).toBe('SCHOOL_ADMIN');
       expect(body.data.user.permissions.length).toBeGreaterThan(0);
       expect(body.data.user.school).not.toBeNull();
@@ -47,7 +47,7 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'admin@vidyasetu.org',
+          email: 'admin@vidya.org',
           password: 'WrongPassword123',
         },
       });
@@ -63,8 +63,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'nonexistent@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'nonexistent@vidya.org',
+          password: 'Vidya@2026',
         },
       });
 
@@ -78,8 +78,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'principal@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'principal@vidya.org',
+          password: 'Vidya@2026',
         },
       });
       const { accessToken } = JSON.parse(loginRes.payload).data;
@@ -95,7 +95,7 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
       expect(meRes.statusCode).toBe(200);
       const body = JSON.parse(meRes.payload);
       expect(body.success).toBe(true);
-      expect(body.data.email).toBe('principal@vidyasetu.org');
+      expect(body.data.email).toBe('principal@vidya.org');
       expect(body.data.primaryRole).toBe('PRINCIPAL');
     });
 
@@ -114,8 +114,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'teacher@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'teacher@vidya.org',
+          password: 'Vidya@2026',
         },
       });
       const initialTokens = JSON.parse(loginRes.payload).data;
@@ -155,8 +155,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'admin@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'admin@vidya.org',
+          password: 'Vidya@2026',
         },
       });
       const { accessToken } = JSON.parse(loginRes.payload).data;
@@ -176,8 +176,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'teacher@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'teacher@vidya.org',
+          password: 'Vidya@2026',
         },
       });
       const { accessToken } = JSON.parse(loginRes.payload).data;
@@ -197,8 +197,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'teacher@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'teacher@vidya.org',
+          password: 'Vidya@2026',
         },
       });
       const { accessToken } = JSON.parse(loginRes.payload).data;
@@ -217,8 +217,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'accountant@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'accountant@vidya.org',
+          password: 'Vidya@2026',
         },
       });
       const { accessToken } = JSON.parse(loginRes.payload).data;
@@ -241,8 +241,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'parent@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'parent@vidya.org',
+          password: 'Vidya@2026',
         },
       });
       let token = JSON.parse(loginRes.payload).data.accessToken;
@@ -278,8 +278,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'parent@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'parent@vidya.org',
+          password: 'Vidya@2026',
         },
       });
       expect(login2FARes.statusCode).toBe(200);
@@ -309,8 +309,8 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
         method: 'POST',
         url: '/api/v1/auth/login',
         payload: {
-          email: 'parent@vidyasetu.org',
-          password: 'VidyaSetu@2026',
+          email: 'parent@vidya.org',
+          password: 'Vidya@2026',
         },
       });
       const challengeBody2 = JSON.parse(login2FARes2.payload).data;

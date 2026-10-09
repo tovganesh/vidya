@@ -40,7 +40,7 @@ describe('App Layout Shell Switching (Authentication Boundaries)', () => {
       if (url.includes('/health')) {
         return Promise.resolve({
           ok: true,
-          json: async () => ({ success: true, data: { status: 'healthy', service: 'vidyasetu-api' } }),
+          json: async () => ({ success: true, data: { status: 'healthy', service: 'vidya-api' } }),
         });
       }
       return Promise.resolve({
@@ -74,7 +74,7 @@ describe('App Layout Shell Switching (Authentication Boundaries)', () => {
     authStore.accessToken = 'jwt_test_token';
     authStore.user = {
       id: 'usr_1',
-      email: 'admin@vidyasetu.org',
+      email: 'admin@vidya.org',
       firstName: 'Admin',
       lastName: 'User',
       primaryRole: 'SCHOOL_ADMIN',
@@ -100,7 +100,7 @@ describe('App Layout Shell Switching (Authentication Boundaries)', () => {
     await router.isReady();
 
     // Must render app shell with sidebar and topnav
-    expect(wrapper.find('#vidyasetu-root-app').exists()).toBe(true);
+    expect(wrapper.find('#vidya-root-app').exists()).toBe(true);
     expect(wrapper.find('#app-sidebar').exists()).toBe(true);
     expect(wrapper.find('#app-top-nav').exists()).toBe(true);
     expect(wrapper.find('#vidya-auth-shell').exists()).toBe(false);

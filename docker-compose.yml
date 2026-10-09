@@ -1,25 +1,27 @@
+name: vidya
+
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: vidyasetu_postgres
+    container_name: vidya_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-vidyasetu}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vidyasetu_password}
-      POSTGRES_DB: ${POSTGRES_DB:-vidyasetu_db}
+      POSTGRES_USER: ${POSTGRES_USER:-vidya}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vidya_password}
+      POSTGRES_DB: ${POSTGRES_DB:-vidya_db}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vidyasetu} -d ${POSTGRES_DB:-vidyasetu_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vidya} -d ${POSTGRES_DB:-vidya_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   valkey:
     image: valkey/valkey:8-alpine
-    container_name: vidyasetu_valkey
+    container_name: vidya_valkey
     restart: unless-stopped
     ports:
       - "${VALKEY_PORT:-6379}:6379"
@@ -33,6 +35,6 @@ services:
 
 volumes:
   pgdata:
-    name: vidyasetu_pgdata
+    name: vidya_pgdata
   valkeydata:
-    name: vidyasetu_valkeydata
+    name: vidya_valkeydata
