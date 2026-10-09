@@ -18,6 +18,9 @@ import {
   NotificationType,
   ExamTermType,
   AssessmentType,
+  FeeFrequency,
+  StudentFeeStatus,
+  PaymentMode,
 } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -1261,7 +1264,212 @@ async function main() {
     console.log('✅ Student Marks Records seeded for Class 10');
   }
 
-  // 26. Initial Audit Log
+  // 26. Fee Structures, Student Fees & Payments (Milestone 9)
+  if (class10) {
+    const feePlan10 = await prisma.feeStructure.upsert({
+      where: {
+        schoolId_academicYearId_classId_name: {
+          schoolId: school.id,
+          academicYearId: ayCurrent.id,
+          classId: class10.id,
+          name: 'Class 10 CBSE Standard Fee Plan 2026-27',
+        },
+      },
+      update: {},
+      create: {
+        schoolId: school.id,
+        academicYearId: ayCurrent.id,
+        classId: class10.id,
+        name: 'Class 10 CBSE Standard Fee Plan 2026-27',
+        description: 'Comprehensive annual fee structure covering tuition, lab, library and sports amenities',
+        totalAmount: 48000.0,
+        components: {
+          create: [
+            {
+              title: 'Tuition Fee',
+              amount: 36000.0,
+              frequency: FeeFrequency.ANNUAL,
+              dueDate: new Date('2026-04-10T00:00:00Z'),
+            },
+            {
+              title: 'Computer & Digital Lab Fee',
+              amount: 6000.0,
+              frequency: FeeFrequency.ANNUAL,
+              dueDate: new Date('2026-04-10T00:00:00Z'),
+            },
+            {
+              title: 'Library & Reading Room Fee',
+              amount: 2500.0,
+              frequency: FeeFrequency.ANNUAL,
+              dueDate: new Date('2026-04-10T00:00:00Z'),
+            },
+            {
+              title: 'Sports & Physical Education Fee',
+              amount: 3500.0,
+              frequency: FeeFrequency.ANNUAL,
+              dueDate: new Date('2026-04-10T00:00:00Z'),
+            },
+          ],
+        },
+      },
+    });
+
+    const accountantUser = await prisma.user.findUnique({
+      where: { email: 'accountant@vidya.org' },
+    });
+
+    // Seed student fees for Aarav (student1)
+    const enrAarav = await prisma.enrollment.findUnique({
+      where: {
+        studentId_academicYearId: {
+          studentId: student1.id,
+          academicYearId: ayCurrent.id,
+        },
+      },
+    });
+
+    if (enrAarav) {
+      const aaravFee = await prisma.studentFee.upsert({
+        where: {
+          enrollmentId_feeStructureId: {
+            enrollmentId: enrAarav.id,
+            feeStructureId: feePlan10.id,
+          },
+        },
+        update: {},
+        create: {
+          schoolId: school.id,
+          enrollmentId: enrAarav.id,
+          feeStructureId: feePlan10.id,
+          grossAmount: 48000.0,
+          concessionAmount: 0.0,
+          concessionReason: null,
+          netPayable: 48000.0,
+          paidAmount: 24000.0,
+          dueAmount: 24000.0,
+          status: StudentFeeStatus.PARTIALLY_PAID,
+          dueDate: new Date('2026-04-10T00:00:00Z'),
+        },
+      });
+
+      // Payment for Aarav
+      await prisma.feePayment.upsert({
+        where: {
+          schoolId_receiptNumber: {
+            schoolId: school.id,
+            receiptNumber: 'REC-2026-0001',
+          },
+        },
+        update: {},
+        create: {
+          schoolId: school.id,
+          studentFeeId: aaravFee.id,
+          receiptNumber: 'REC-2026-0001',
+          amountPaid: 24000.0,
+          paymentMode: PaymentMode.UPI,
+          transactionReference: 'UPI/20260415/9823471029',
+          paidOn: new Date('2026-04-15T10:30:00Z'),
+          notes: 'Term 1 installment received via UPI (Google Pay)',
+          collectedById: accountantUser?.id,
+        },
+      });
+    }
+
+    // Seed student fees for Diya (student2)
+    const enrDiyaCurrent = await prisma.enrollment.findUnique({
+      where: {
+        studentId_academicYearId: {
+          studentId: student2.id,
+          academicYearId: ayCurrent.id,
+        },
+      },
+    });
+
+    if (enrDiyaCurrent) {
+      const diyaFee = await prisma.studentFee.upsert({
+        where: {
+          enrollmentId_feeStructureId: {
+            enrollmentId: enrDiyaCurrent.id,
+            feeStructureId: feePlan10.id,
+          },
+        },
+        update: {},
+        create: {
+          schoolId: school.id,
+          enrollmentId: enrDiyaCurrent.id,
+          feeStructureId: feePlan10.id,
+          grossAmount: 48000.0,
+          concessionAmount: 4800.0,
+          concessionReason: 'Sibling Concession 10%',
+          netPayable: 43200.0,
+          paidAmount: 43200.0,
+          dueAmount: 0.0,
+          status: StudentFeeStatus.PAID,
+          dueDate: new Date('2026-04-10T00:00:00Z'),
+        },
+      });
+
+      await prisma.feePayment.upsert({
+        where: {
+          schoolId_receiptNumber: {
+            schoolId: school.id,
+            receiptNumber: 'REC-2026-0002',
+          },
+        },
+        update: {},
+        create: {
+          schoolId: school.id,
+          studentFeeId: diyaFee.id,
+          receiptNumber: 'REC-2026-0002',
+          amountPaid: 43200.0,
+          paymentMode: PaymentMode.NEFT_RTGS,
+          transactionReference: 'NEFT/HDFC/20260418/7718290',
+          paidOn: new Date('2026-04-18T14:15:00Z'),
+          notes: 'Full annual fee settlement with approved sibling concession',
+          collectedById: accountantUser?.id,
+        },
+      });
+    }
+
+    // Seed student fees for Rohan (student3)
+    const enrRohan = await prisma.enrollment.findUnique({
+      where: {
+        studentId_academicYearId: {
+          studentId: student3.id,
+          academicYearId: ayCurrent.id,
+        },
+      },
+    });
+
+    if (enrRohan) {
+      await prisma.studentFee.upsert({
+        where: {
+          enrollmentId_feeStructureId: {
+            enrollmentId: enrRohan.id,
+            feeStructureId: feePlan10.id,
+          },
+        },
+        update: {},
+        create: {
+          schoolId: school.id,
+          enrollmentId: enrRohan.id,
+          feeStructureId: feePlan10.id,
+          grossAmount: 48000.0,
+          concessionAmount: 0.0,
+          concessionReason: null,
+          netPayable: 48000.0,
+          paidAmount: 0.0,
+          dueAmount: 48000.0,
+          status: StudentFeeStatus.UNPAID,
+          dueDate: new Date('2026-04-10T00:00:00Z'),
+        },
+      });
+    }
+
+    console.log('✅ Fee Structures, Student Ledgers & Receipts seeded');
+  }
+
+  // 27. Initial Audit Log
   await prisma.auditLog.create({
     data: {
       schoolId: school.id,

@@ -203,6 +203,9 @@ model School {
   examTerms     ExamTerm[]
   exams         Exam[]
   gradingScales GradingScale[]
+  feeStructures FeeStructure[]
+  studentFees   StudentFee[]
+  feePayments   FeePayment[]
 
   @@map("schools")
 }
@@ -240,6 +243,7 @@ model AcademicYear {
   timetableSlots TimetableSlot[]
   teacherAllocations TeacherAllocation[]
   examTerms   ExamTerm[]
+  feeStructures FeeStructure[]
 
   @@unique([schoolId, name])
   @@index([schoolId, isCurrent])
@@ -264,6 +268,7 @@ model Class {
   timetableSlots TimetableSlot[]
   teacherAllocations TeacherAllocation[]
   exams         Exam[]
+  feeStructures FeeStructure[]
 
   @@unique([schoolId, code])
   @@index([schoolId, orderIndex])
@@ -358,6 +363,7 @@ model User {
   notifications Notification[]
   pushSubscriptions PushSubscription[]
   enteredMarks  MarksRecord[]
+  collectedFeePayments FeePayment[]
 
   @@index([schoolId, primaryRole])
   @@map("users")
@@ -572,6 +578,7 @@ model Enrollment {
 
   attendanceRecords AttendanceRecord[]
   marksRecords      MarksRecord[]
+  studentFees       StudentFee[]
 
   @@unique([studentId, academicYearId])
   @@index([schoolId, academicYearId, classId, sectionId])
@@ -866,5 +873,124 @@ model GradingScale {
   @@index([schoolId])
   @@map("grading_scales")
 }
+
+// ============================================================================
+// Finance: Fee Structures, Components, Student Fees & Payments (Milestone 9)
+// ============================================================================
+
+enum FeeFrequency {
+  ONE_TIME
+  ANNUAL
+  TERM_WISE
+  QUARTERLY
+  MONTHLY
+}
+
+enum StudentFeeStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+}
+
+enum PaymentMode {
+  UPI
+  NEFT_RTGS
+  CASH
+  CHEQUE
+  DEMAND_DRAFT
+  CARD
+}
+
+model FeeStructure {
+  id             String       @id @default(uuid())
+  schoolId       String
+  school         School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  classId        String
+  class          Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  totalAmount    Float        @default(0.0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  components  FeeComponent[]
+  studentFees StudentFee[]
+
+  @@unique([schoolId, academicYearId, classId, name])
+  @@index([schoolId, academicYearId])
+  @@index([classId])
+  @@map("fee_structures")
+}
+
+model FeeComponent {
+  id             String       @id @default(uuid())
+  feeStructureId String
+  feeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id], onDelete: Cascade)
+  title          String
+  amount         Float
+  frequency      FeeFrequency @default(ANNUAL)
+  dueDate        DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([feeStructureId])
+  @@map("fee_components")
+}
+
+model StudentFee {
+  id               String           @id @default(uuid())
+  schoolId         String
+  school           School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  enrollmentId     String
+  enrollment       Enrollment       @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  feeStructureId   String
+  feeStructure     FeeStructure     @relation(fields: [feeStructureId], references: [id], onDelete: Cascade)
+  grossAmount      Float
+  concessionAmount Float            @default(0.0)
+  concessionReason String?
+  netPayable       Float
+  paidAmount       Float            @default(0.0)
+  dueAmount        Float
+  status           StudentFeeStatus @default(UNPAID)
+  dueDate          DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  payments FeePayment[]
+
+  @@unique([enrollmentId, feeStructureId])
+  @@index([schoolId, status])
+  @@index([enrollmentId])
+  @@index([feeStructureId])
+  @@map("student_fees")
+}
+
+model FeePayment {
+  id                   String      @id @default(uuid())
+  schoolId             String
+  school               School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  studentFeeId         String
+  studentFee           StudentFee  @relation(fields: [studentFeeId], references: [id], onDelete: Cascade)
+  receiptNumber        String
+  amountPaid           Float
+  paymentMode          PaymentMode @default(UPI)
+  transactionReference String?
+  paidOn               DateTime    @default(now())
+  notes                String?
+  collectedById        String?
+  collectedBy          User?       @relation(fields: [collectedById], references: [id], onDelete: SetNull)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@unique([schoolId, receiptNumber])
+  @@index([schoolId, paidOn])
+  @@index([studentFeeId])
+  @@index([collectedById])
+  @@map("fee_payments")
+}
+
 
 
