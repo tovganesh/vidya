@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import TopNav from './TopNav.vue';
 import Sidebar from './Sidebar.vue';
+import PwaBanner from '../common/PwaBanner.vue';
 </script>
 
 <template>
   <div class="app-layout" id="vidya-root-app">
+    <PwaBanner />
     <TopNav />
     <div class="app-body">
       <Sidebar />

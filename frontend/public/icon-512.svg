@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGrad512" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="vsGrad512" x1="50" y1="50" x2="462" y2="462" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#818cf8" />
+      <stop offset="45%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="sunGrad512" x1="210" y1="100" x2="302" y2="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <filter id="glow512" x="160" y="50" width="192" height="192" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad512)" />
+  <!-- Radiant Aura -->
+  <circle cx="256" cy="192" r="54" fill="url(#sunGrad512)" filter="url(#glow512)" />
+  <!-- Core Knowledge Sun -->
+  <circle cx="256" cy="192" r="54" fill="url(#sunGrad512)" />
+  <!-- Upper Book Arch / The Bridge -->
+  <path d="M106 362C160 276 224 256 256 256C288 256 352 276 406 362" stroke="url(#vsGrad512)" stroke-width="32" stroke-linecap="round" />
+  <!-- Inner Reflective Arch -->
+  <path d="M150 406C192 330 234 320 256 320C278 320 320 330 362 406" stroke="url(#vsGrad512)" stroke-width="22" stroke-linecap="round" stroke-opacity="0.8" />
+  <!-- Foundation Pillars -->
+  <circle cx="106" cy="362" r="24" fill="#818cf8" />
+  <circle cx="406" cy="362" r="24" fill="#06b6d4" />
+</svg>
