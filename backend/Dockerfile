@@ -19,8 +19,9 @@ RUN npx prisma generate
 COPY tsconfig.json ./
 COPY src ./src/
 
-# Build TypeScript to dist/
+# Build TypeScript to dist/ and compile seed script
 RUN npm run build
+RUN npx tsc prisma/seed.ts --outDir dist/prisma --module NodeNext --moduleResolution NodeNext --target ES2022
 
 # Stage 2: Production runtime image
 FROM node:20-alpine AS runner
@@ -56,4 +57,4 @@ EXPOSE 4000
 HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:4000/api/v1/health || exit 1
 
-CMD ["node", "dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
