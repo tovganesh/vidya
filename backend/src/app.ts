@@ -96,6 +96,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   });
 
   // Register API Routes
+  await app.register(healthRoutes, { prefix: '/api' });
   await app.register(healthRoutes, { prefix: '/api/v1' });
   await app.register(authRoutes, { prefix: '/api/v1' });
   await app.register(schoolRoutes, { prefix: '/api/v1' });
