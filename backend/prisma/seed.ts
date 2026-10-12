@@ -1336,7 +1336,16 @@ async function main() {
             feeStructureId: feePlan10.id,
           },
         },
-        update: {},
+        update: {
+          grossAmount: 48000.0,
+          concessionAmount: 0.0,
+          concessionReason: null,
+          netPayable: 48000.0,
+          paidAmount: 24000.0,
+          dueAmount: 24000.0,
+          status: StudentFeeStatus.PARTIALLY_PAID,
+          dueDate: new Date('2026-04-10T00:00:00Z'),
+        },
         create: {
           schoolId: school.id,
           enrollmentId: enrAarav.id,
@@ -1393,7 +1402,16 @@ async function main() {
             feeStructureId: feePlan10.id,
           },
         },
-        update: {},
+        update: {
+          grossAmount: 48000.0,
+          concessionAmount: 4800.0,
+          concessionReason: 'Sibling Concession 10%',
+          netPayable: 43200.0,
+          paidAmount: 43200.0,
+          dueAmount: 0.0,
+          status: StudentFeeStatus.PAID,
+          dueDate: new Date('2026-04-10T00:00:00Z'),
+        },
         create: {
           schoolId: school.id,
           enrollmentId: enrDiyaCurrent.id,
@@ -1449,7 +1467,16 @@ async function main() {
             feeStructureId: feePlan10.id,
           },
         },
-        update: {},
+        update: {
+          grossAmount: 48000.0,
+          concessionAmount: 0.0,
+          concessionReason: null,
+          netPayable: 48000.0,
+          paidAmount: 0.0,
+          dueAmount: 48000.0,
+          status: StudentFeeStatus.UNPAID,
+          dueDate: new Date('2026-04-10T00:00:00Z'),
+        },
         create: {
           schoolId: school.id,
           enrollmentId: enrRohan.id,
@@ -1465,6 +1492,14 @@ async function main() {
         },
       });
     }
+
+    // Clean up any extra payments created by test suites
+    await prisma.feePayment.deleteMany({
+      where: {
+        schoolId: school.id,
+        receiptNumber: { notIn: ['REC-2026-0001', 'REC-2026-0002'] },
+      },
+    });
 
     console.log('✅ Fee Structures, Student Ledgers & Receipts seeded');
   }

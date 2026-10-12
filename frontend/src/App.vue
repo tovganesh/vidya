@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from './stores/auth.js';
 import AppShell from './components/layout/AppShell.vue';
+import PwaBanner from './components/common/PwaBanner.vue';
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -14,6 +15,7 @@ const isAuthPage = computed(() => {
 
 <template>
   <div v-if="isAuthPage" class="auth-viewport" id="vidya-auth-shell">
+    <PwaBanner />
     <router-view />
   </div>
   <AppShell v-else />

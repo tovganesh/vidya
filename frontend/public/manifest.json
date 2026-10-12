@@ -1,17 +1,68 @@
 {
-  "name": "Vidya — Open School Operating System",
+  "name": "Vidya — The Open School Operating System",
   "short_name": "Vidya",
-  "description": "The modern open-source operating system for schools",
+  "description": "Modern, modular, open-source school operating system designed for Indian schools, teachers, parents, and students.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#0f172a",
   "theme_color": "#4f46e5",
+  "categories": ["education", "productivity", "management"],
   "icons": [
     {
       "src": "/favicon.svg",
-      "sizes": "any",
+      "sizes": "48x48",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Fee Collection",
+      "short_name": "Fees",
+      "description": "Collect fees and issue Indian receipts",
+      "url": "/fees",
+      "icons": [{ "src": "/favicon.svg", "sizes": "48x48" }]
+    },
+    {
+      "name": "Attendance Register",
+      "short_name": "Attendance",
+      "description": "Mark and view student attendance",
+      "url": "/attendance",
+      "icons": [{ "src": "/favicon.svg", "sizes": "48x48" }]
+    },
+    {
+      "name": "Exam Report Cards",
+      "short_name": "Report Cards",
+      "description": "View marks and print CBSE report cards",
+      "url": "/exams/report-cards",
+      "icons": [{ "src": "/favicon.svg", "sizes": "48x48" }]
+    },
+    {
+      "name": "Notice Board",
+      "short_name": "Notices",
+      "description": "Publish and read school announcements",
+      "url": "/communication",
+      "icons": [{ "src": "/favicon.svg", "sizes": "48x48" }]
     }
   ]
 }
