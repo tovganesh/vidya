@@ -45,8 +45,9 @@ services:
       HOST: 0.0.0.0
       DATABASE_URL: postgresql://${POSTGRES_USER:-vidya}:${POSTGRES_PASSWORD:-vidya_password}@postgres:5432/${POSTGRES_DB:-vidya_db}?schema=public
       VALKEY_URL: redis://valkey:6379
-      JWT_SECRET: ${JWT_SECRET:-vidya_production_super_secret_jwt_key_2026_change_in_prod}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:80}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-vidya_production_super_secret_jwt_access_key_2026_min_32}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-vidya_production_super_secret_jwt_refresh_key_2026_min_32}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
     ports:
       - "4000:4000"
     depends_on:

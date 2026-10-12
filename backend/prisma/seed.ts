@@ -844,7 +844,7 @@ async function main() {
 
     for (const d of dates) {
       for (const enr of enrollments) {
-        let status = AttendanceStatus.PRESENT;
+        let status: AttendanceStatus = AttendanceStatus.PRESENT;
         let remarks: string | null = null;
         if (enr.rollNumber === 3 && d.toISOString().startsWith('2026-10-05')) {
           status = AttendanceStatus.ABSENT;
