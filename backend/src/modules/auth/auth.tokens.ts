@@ -8,6 +8,7 @@ import { UserRole } from '../../shared/types/index.js';
 export interface TokenPayload {
   sub: string;
   email: string;
+  username?: string | null;
   schoolId: string | null;
   role: UserRole;
   permissions: string[];

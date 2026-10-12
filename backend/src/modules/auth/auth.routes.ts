@@ -7,8 +7,12 @@ import { BadRequestError } from '../../shared/errors/index.js';
 
 // Request Validation Schemas
 const loginSchema = z.object({
-  email: z.string().email(),
+  identifier: z.string().min(1).optional(),
+  username: z.string().min(1).optional(),
+  email: z.string().min(1).optional(),
   password: z.string().min(1),
+}).refine(data => !!(data.identifier || data.username || data.email), {
+  message: 'Institutional code, username, or email is required',
 });
 
 const verify2FASchema = z.object({
@@ -50,9 +54,10 @@ export const authRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =
       throw new BadRequestError('Invalid login payload', parse.error.format());
     }
 
-    const { email, password } = parse.data;
+    const identifier = parse.data.identifier || parse.data.username || parse.data.email!;
+    const { password } = parse.data;
     const context = getClientContext(request);
-    const result = await authService.login(email, password, context);
+    const result = await authService.login(identifier, password, context);
 
     return reply.status(200).send({
       success: true,

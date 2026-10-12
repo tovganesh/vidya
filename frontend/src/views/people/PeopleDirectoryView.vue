@@ -676,8 +676,15 @@ async function submitTeacherOnboarding() {
       <div class="modal-card wide-modal">
         <div class="modal-header">
           <div class="modal-title-wrap">
-            <span class="badge-dot"></span>
-            <h3 class="modal-title">Admit New Student</h3>
+            <div class="modal-icon-badge">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="modal-title">Admit New Student</h3>
+              <p class="modal-subtitle">Enroll student, register APAAR ID, and configure primary guardian</p>
+            </div>
           </div>
           <button @click="showAdmitModal = false" class="close-btn" id="btn-close-admit-modal">&times;</button>
         </div>
@@ -686,147 +693,179 @@ async function submitTeacherOnboarding() {
           <div v-if="modalError" class="error-banner">{{ modalError }}</div>
 
           <!-- Section 1: Demographics -->
-          <div class="form-section-title">1. Student Identity & Bio</div>
-          <div class="form-row-3">
-            <div class="form-group">
-              <label>Admission Number *</label>
-              <input v-model="admitForm.admissionNumber" type="text" required class="form-input" id="input-admission-no" />
+          <div class="form-section-card">
+            <div class="section-card-header">
+              <div class="section-step-num">01</div>
+              <div class="section-header-text">
+                <h4 class="section-title">Student Identity & Bio</h4>
+                <p class="section-desc">Official identity, admission record, and Government APAAR registration</p>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Admission Date *</label>
-              <input v-model="admitForm.admissionDate" type="date" required class="form-input" id="input-admission-date" />
-            </div>
-            <div class="form-group">
-              <label>APAAR ID (National Student ID)</label>
-              <input v-model="admitForm.apaarId" type="text" placeholder="12-digit APAAR ID" class="form-input" id="input-apaar-id" />
-            </div>
-          </div>
 
-          <div class="form-row-3">
-            <div class="form-group">
-              <label>First Name *</label>
-              <input v-model="admitForm.firstName" type="text" required class="form-input" id="input-first-name" />
+            <div class="form-grid grid-3">
+              <div class="form-group">
+                <label for="input-admission-no">Admission Number <span class="req">*</span></label>
+                <div class="input-with-tag">
+                  <input v-model="admitForm.admissionNumber" type="text" required class="form-input font-mono" id="input-admission-no" />
+                  <span class="input-tag">System UID</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="input-admission-date">Admission Date <span class="req">*</span></label>
+                <input v-model="admitForm.admissionDate" type="date" required class="form-input" id="input-admission-date" />
+              </div>
+              <div class="form-group">
+                <label for="input-apaar-id">APAAR ID (National Student ID)</label>
+                <input v-model="admitForm.apaarId" type="text" placeholder="12-digit APAAR ID" class="form-input font-mono" id="input-apaar-id" />
+                <span class="field-hint">Automated Permanent Academic Account Registry</span>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Middle Name</label>
-              <input v-model="admitForm.middleName" type="text" class="form-input" id="input-middle-name" />
-            </div>
-            <div class="form-group">
-              <label>Last Name *</label>
-              <input v-model="admitForm.lastName" type="text" required class="form-input" id="input-last-name" />
-            </div>
-          </div>
 
-          <div class="form-row-4">
-            <div class="form-group">
-              <label>Gender *</label>
-              <select v-model="admitForm.gender" class="form-select" id="select-gender">
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-                <option value="OTHER">Other</option>
-              </select>
+            <div class="form-grid grid-3">
+              <div class="form-group">
+                <label for="input-first-name">First Name <span class="req">*</span></label>
+                <input v-model="admitForm.firstName" type="text" required placeholder="e.g. Aarav" class="form-input" id="input-first-name" />
+              </div>
+              <div class="form-group">
+                <label for="input-middle-name">Middle Name</label>
+                <input v-model="admitForm.middleName" type="text" placeholder="Optional" class="form-input" id="input-middle-name" />
+              </div>
+              <div class="form-group">
+                <label for="input-last-name">Last Name <span class="req">*</span></label>
+                <input v-model="admitForm.lastName" type="text" required placeholder="e.g. Sharma" class="form-input" id="input-last-name" />
+              </div>
             </div>
-            <div class="form-group">
-              <label>Date of Birth *</label>
-              <input v-model="admitForm.dateOfBirth" type="date" required class="form-input" id="input-dob" />
-            </div>
-            <div class="form-group">
-              <label>Blood Group</label>
-              <select v-model="admitForm.bloodGroup" class="form-select" id="select-blood-group">
-                <option value="UNKNOWN">Unknown</option>
-                <option value="A_POS">A+</option>
-                <option value="A_NEG">A-</option>
-                <option value="B_POS">B+</option>
-                <option value="B_NEG">B-</option>
-                <option value="AB_POS">AB+</option>
-                <option value="AB_NEG">AB-</option>
-                <option value="O_POS">O+</option>
-                <option value="O_NEG">O-</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Social Category</label>
-              <select v-model="admitForm.category" class="form-select" id="select-category">
-                <option value="GENERAL">General</option>
-                <option value="OBC">OBC</option>
-                <option value="SC">SC</option>
-                <option value="ST">ST</option>
-                <option value="EWS">EWS</option>
-              </select>
+
+            <div class="form-grid grid-4">
+              <div class="form-group">
+                <label for="select-gender">Gender <span class="req">*</span></label>
+                <select v-model="admitForm.gender" class="form-select" id="select-gender">
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="input-dob">Date of Birth <span class="req">*</span></label>
+                <input v-model="admitForm.dateOfBirth" type="date" required class="form-input" id="input-dob" />
+              </div>
+              <div class="form-group">
+                <label for="select-blood-group">Blood Group</label>
+                <select v-model="admitForm.bloodGroup" class="form-select" id="select-blood-group">
+                  <option value="UNKNOWN">Unknown</option>
+                  <option value="A_POS">A+ (Positive)</option>
+                  <option value="A_NEG">A- (Negative)</option>
+                  <option value="B_POS">B+ (Positive)</option>
+                  <option value="B_NEG">B- (Negative)</option>
+                  <option value="AB_POS">AB+ (Positive)</option>
+                  <option value="AB_NEG">AB- (Negative)</option>
+                  <option value="O_POS">O+ (Positive)</option>
+                  <option value="O_NEG">O- (Negative)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="select-category">Social Category</label>
+                <select v-model="admitForm.category" class="form-select" id="select-category">
+                  <option value="GENERAL">General</option>
+                  <option value="OBC">OBC</option>
+                  <option value="SC">SC</option>
+                  <option value="ST">ST</option>
+                  <option value="EWS">EWS</option>
+                </select>
+              </div>
             </div>
           </div>
 
           <!-- Section 2: Guardian Info -->
-          <div class="form-section-title">2. Primary Guardian / Parent</div>
-          <div class="form-row-3">
-            <div class="form-group">
-              <label>Guardian Name *</label>
-              <input v-model="admitForm.guardianName" type="text" required class="form-input" id="input-guardian-name" />
+          <div class="form-section-card">
+            <div class="section-card-header">
+              <div class="section-step-num">02</div>
+              <div class="section-header-text">
+                <h4 class="section-title">Primary Guardian / Parent</h4>
+                <p class="section-desc">Emergency communication, fee invoices, and daily notifications</p>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Relationship *</label>
-              <select v-model="admitForm.guardianRelationship" class="form-select" id="select-guardian-rel">
-                <option value="FATHER">Father</option>
-                <option value="MOTHER">Mother</option>
-                <option value="GUARDIAN">Local Guardian</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Phone Number *</label>
-              <input v-model="admitForm.guardianPhone" type="tel" required placeholder="+91 98000 00000" class="form-input" id="input-guardian-phone" />
-            </div>
-          </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>Email Address</label>
-              <input v-model="admitForm.guardianEmail" type="email" class="form-input" id="input-guardian-email" />
+            <div class="form-grid grid-3">
+              <div class="form-group">
+                <label for="input-guardian-name">Guardian Name <span class="req">*</span></label>
+                <input v-model="admitForm.guardianName" type="text" required placeholder="e.g. Rajesh Sharma" class="form-input" id="input-guardian-name" />
+              </div>
+              <div class="form-group">
+                <label for="select-guardian-rel">Relationship <span class="req">*</span></label>
+                <select v-model="admitForm.guardianRelationship" class="form-select" id="select-guardian-rel">
+                  <option value="FATHER">Father</option>
+                  <option value="MOTHER">Mother</option>
+                  <option value="GUARDIAN">Local Guardian</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="input-guardian-phone">Phone Number <span class="req">*</span></label>
+                <input v-model="admitForm.guardianPhone" type="tel" required placeholder="+91 98000 00000" class="form-input font-mono" id="input-guardian-phone" />
+              </div>
             </div>
-            <div class="form-group">
-              <label>Occupation</label>
-              <input v-model="admitForm.guardianOccupation" type="text" class="form-input" id="input-guardian-occ" />
+
+            <div class="form-grid grid-2">
+              <div class="form-group">
+                <label for="input-guardian-email">Email Address</label>
+                <input v-model="admitForm.guardianEmail" type="email" placeholder="guardian@example.com" class="form-input" id="input-guardian-email" />
+              </div>
+              <div class="form-group">
+                <label for="input-guardian-occ">Occupation</label>
+                <input v-model="admitForm.guardianOccupation" type="text" placeholder="e.g. Software Engineer, Doctor" class="form-input" id="input-guardian-occ" />
+              </div>
             </div>
           </div>
 
           <!-- Section 3: Academic Placement -->
-          <div class="form-section-title">3. Initial Academic Placement</div>
-          <div class="form-row-4">
-            <div class="form-group">
-              <label>Academic Session *</label>
-              <select v-model="admitForm.academicYearId" required class="form-select" id="input-enrollment-year">
-                <option v-for="y in academicsStore.academicYears" :key="y.id" :value="y.id">
-                  {{ y.name }} {{ y.isCurrent ? '(Active)' : '' }}
-                </option>
-              </select>
+          <div class="form-section-card">
+            <div class="section-card-header">
+              <div class="section-step-num">03</div>
+              <div class="section-header-text">
+                <h4 class="section-title">Initial Academic Placement</h4>
+                <p class="section-desc">Class allocation, academic session, and classroom roster section</p>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Class (Grade) *</label>
-              <select v-model="admitForm.classId" required class="form-select" id="input-enrollment-class">
-                <option value="">Select Class</option>
-                <option v-for="c in academicsStore.classes" :key="c.id" :value="c.id">
-                  {{ c.name }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Section *</label>
-              <select v-model="admitForm.sectionId" required class="form-select" id="input-enrollment-section" :disabled="!admitForm.classId">
-                <option value="">Select Section</option>
-                <option v-for="s in modalAvailableSections" :key="s.id" :value="s.id">
-                  Section {{ s.name }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Roll Number</label>
-              <input v-model="admitForm.rollNumber" type="number" placeholder="e.g. 1" class="form-input" id="input-enrollment-roll" />
+
+            <div class="form-grid grid-4">
+              <div class="form-group">
+                <label for="input-enrollment-year">Academic Session <span class="req">*</span></label>
+                <select v-model="admitForm.academicYearId" required class="form-select" id="input-enrollment-year">
+                  <option v-for="y in academicsStore.academicYears" :key="y.id" :value="y.id">
+                    {{ y.name }} {{ y.isCurrent ? '(Active)' : '' }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="input-enrollment-class">Class (Grade) <span class="req">*</span></label>
+                <select v-model="admitForm.classId" required class="form-select" id="input-enrollment-class">
+                  <option value="">Select Class</option>
+                  <option v-for="c in academicsStore.classes" :key="c.id" :value="c.id">
+                    {{ c.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="input-enrollment-section">Section <span class="req">*</span></label>
+                <select v-model="admitForm.sectionId" required class="form-select" id="input-enrollment-section" :disabled="!admitForm.classId">
+                  <option value="">Select Section</option>
+                  <option v-for="s in modalAvailableSections" :key="s.id" :value="s.id">
+                    Section {{ s.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="input-enrollment-roll">Roll Number</label>
+                <input v-model="admitForm.rollNumber" type="number" placeholder="e.g. 1" class="form-input" id="input-enrollment-roll" />
+              </div>
             </div>
           </div>
 
           <div class="modal-footer">
             <button type="button" @click="showAdmitModal = false" class="btn btn-secondary" id="btn-cancel-admit">Cancel</button>
-            <button type="submit" class="btn btn-primary" :disabled="modalLoading" id="btn-submit-admit">
-              {{ modalLoading ? 'Admitting Student...' : 'Admit & Enroll Student' }}
+            <button type="submit" class="btn btn-primary btn-submit-lg" :disabled="modalLoading" id="btn-submit-admit">
+              <span v-if="modalLoading">Admitting Student...</span>
+              <span v-else>Admit & Enroll Student</span>
             </button>
           </div>
         </form>
@@ -835,11 +874,18 @@ async function submitTeacherOnboarding() {
 
     <!-- TEACHER ONBOARDING MODAL -->
     <div v-if="showTeacherModal" class="modal-overlay" @click.self="showTeacherModal = false">
-      <div class="modal-card">
+      <div class="modal-card wide-modal">
         <div class="modal-header">
           <div class="modal-title-wrap">
-            <span class="badge-dot"></span>
-            <h3 class="modal-title">Onboard Teacher / Faculty</h3>
+            <div class="modal-icon-badge bg-cyan">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="modal-title">Onboard Faculty & Teacher</h3>
+              <p class="modal-subtitle">Register instructional staff, assign institutional credentials, and departments</p>
+            </div>
           </div>
           <button @click="showTeacherModal = false" class="close-btn" id="btn-close-teacher-modal">&times;</button>
         </div>
@@ -847,54 +893,75 @@ async function submitTeacherOnboarding() {
         <form @submit.prevent="submitTeacherOnboarding" class="modal-form">
           <div v-if="modalError" class="error-banner">{{ modalError }}</div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>Employee Code *</label>
-              <input v-model="teacherForm.employeeCode" type="text" required class="form-input" id="input-teacher-empcode" />
+          <div class="form-section-card">
+            <div class="section-card-header">
+              <div class="section-step-num">01</div>
+              <div class="section-header-text">
+                <h4 class="section-title">Employment & Identity</h4>
+                <p class="section-desc">Employee identification number and official date of joining</p>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Joining Date *</label>
-              <input v-model="teacherForm.joiningDate" type="date" required class="form-input" id="input-teacher-joining" />
+
+            <div class="form-grid grid-2">
+              <div class="form-group">
+                <label for="input-teacher-empcode">Employee Code <span class="req">*</span></label>
+                <input v-model="teacherForm.employeeCode" type="text" required placeholder="e.g. EMP-2026-101" class="form-input font-mono" id="input-teacher-empcode" />
+              </div>
+              <div class="form-group">
+                <label for="input-teacher-joining">Joining Date <span class="req">*</span></label>
+                <input v-model="teacherForm.joiningDate" type="date" required class="form-input" id="input-teacher-joining" />
+              </div>
+            </div>
+
+            <div class="form-grid grid-2">
+              <div class="form-group">
+                <label for="input-teacher-first-name">First Name <span class="req">*</span></label>
+                <input v-model="teacherForm.firstName" type="text" required placeholder="e.g. Priya" class="form-input" id="input-teacher-first-name" />
+              </div>
+              <div class="form-group">
+                <label for="input-teacher-last-name">Last Name <span class="req">*</span></label>
+                <input v-model="teacherForm.lastName" type="text" required placeholder="e.g. Nair" class="form-input" id="input-teacher-last-name" />
+              </div>
             </div>
           </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>First Name *</label>
-              <input v-model="teacherForm.firstName" type="text" required class="form-input" id="input-teacher-first-name" />
+          <div class="form-section-card">
+            <div class="section-card-header">
+              <div class="section-step-num">02</div>
+              <div class="section-header-text">
+                <h4 class="section-title">Account & Credentials</h4>
+                <p class="section-desc">Assigned institutional access code (e.g. VIDYA-TECHR-XXXX) and channels</p>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Last Name *</label>
-              <input v-model="teacherForm.lastName" type="text" required class="form-input" id="input-teacher-last-name" />
-            </div>
-          </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>Email Address (Portal Username) *</label>
-              <input v-model="teacherForm.email" type="email" required class="form-input" id="input-teacher-email" />
+            <div class="form-grid grid-2">
+              <div class="form-group">
+                <label for="input-teacher-email">Work Email Address <span class="req">*</span></label>
+                <input v-model="teacherForm.email" type="email" required placeholder="teacher@vidya.org" class="form-input" id="input-teacher-email" />
+                <span class="field-hint">Institutional login code (e.g. VIDYA-TECHR-0001) will be auto-linked</span>
+              </div>
+              <div class="form-group">
+                <label for="input-teacher-phone">Phone Number</label>
+                <input v-model="teacherForm.phone" type="tel" placeholder="+91 98000 00000" class="form-input font-mono" id="input-teacher-phone" />
+              </div>
             </div>
-            <div class="form-group">
-              <label>Phone Number</label>
-              <input v-model="teacherForm.phone" type="tel" class="form-input" id="input-teacher-phone" />
-            </div>
-          </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>Qualification</label>
-              <input v-model="teacherForm.qualification" type="text" placeholder="e.g. M.Sc, B.Ed" class="form-input" id="input-teacher-qual" />
-            </div>
-            <div class="form-group">
-              <label>Specialization / Subject</label>
-              <input v-model="teacherForm.specialization" type="text" placeholder="e.g. Mathematics" class="form-input" id="input-teacher-spec" />
+            <div class="form-grid grid-2">
+              <div class="form-group">
+                <label for="input-teacher-qual">Qualification</label>
+                <input v-model="teacherForm.qualification" type="text" placeholder="e.g. M.Sc, B.Ed" class="form-input" id="input-teacher-qual" />
+              </div>
+              <div class="form-group">
+                <label for="input-teacher-spec">Specialization / Subject</label>
+                <input v-model="teacherForm.specialization" type="text" placeholder="e.g. Senior Secondary Mathematics" class="form-input" id="input-teacher-spec" />
+              </div>
             </div>
           </div>
 
           <div class="modal-footer">
             <button type="button" @click="showTeacherModal = false" class="btn btn-secondary" id="btn-cancel-teacher">Cancel</button>
-            <button type="submit" class="btn btn-primary" :disabled="modalLoading" id="btn-submit-teacher">
-              {{ modalLoading ? 'Creating Profile...' : 'Create Teacher Account' }}
+            <button type="submit" class="btn btn-primary btn-submit-lg" :disabled="modalLoading" id="btn-submit-teacher">
+              {{ modalLoading ? 'Creating Profile...' : 'Onboard Faculty Member' }}
             </button>
           </div>
         </form>
@@ -1397,93 +1464,182 @@ async function submitTeacherOnboarding() {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-md);
+  padding: 1.5rem;
   z-index: 1000;
 }
 
 .modal-card {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-xl);
   width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
+  max-width: 650px;
+  max-height: 92vh;
   overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
 }
 
 .modal-card.wide-modal {
-  max-width: 800px;
+  max-width: 880px;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.015);
 }
 
 .modal-title-wrap {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.875rem;
+}
+
+.modal-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: var(--color-primary-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-icon-badge.bg-cyan {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.3);
+  color: var(--color-cyan-400);
 }
 
 .modal-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--color-text-main);
+  color: var(--text-primary);
   margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.modal-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0.125rem 0 0 0;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--color-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: all 150ms ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
 }
 
 .modal-form {
-  padding: var(--spacing-lg);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 1.25rem;
 }
 
-.form-section-title {
-  font-size: 0.875rem;
+.form-section-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.section-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.section-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(6, 182, 212, 0.25));
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: var(--color-primary-400);
+  font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding-bottom: 0.375rem;
-  border-bottom: 1px dashed var(--color-border);
-  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
 }
 
-.form-row-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--spacing-md);
+.section-header-text {
+  display: flex;
+  flex-direction: column;
 }
 
-.form-row-3 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--spacing-md);
+.section-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
 }
 
-.form-row-4 {
+.section-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0.125rem 0 0 0;
+}
+
+.form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: var(--spacing-md);
+  gap: 1.125rem;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 768px) {
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .form-group {
@@ -1494,41 +1650,92 @@ async function submitTeacherOnboarding() {
 
 .form-group label {
   font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
+  font-weight: 600;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  letter-spacing: 0.01em;
+}
+
+.form-group label .req {
+  color: var(--color-rose-400);
+  font-weight: 700;
+}
+
+.field-hint {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  margin-top: 0.125rem;
 }
 
 .form-input,
 .form-select {
-  padding: 0.625rem 0.875rem;
-  background: var(--color-surface-hover);
-  border: 1px solid var(--color-border);
+  width: 100%;
+  height: 2.625rem;
+  padding: 0.5rem 0.875rem;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-md);
-  color: var(--color-text-main);
+  color: #f8fafc;
   font-size: 0.875rem;
   outline: none;
+  transition: all var(--duration-fast);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .form-input:focus,
 .form-select:focus {
-  border-color: var(--color-primary);
+  background: rgba(15, 23, 42, 0.95);
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.input-with-tag {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-tag {
+  position: absolute;
+  right: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-primary-400);
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: var(--spacing-sm);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border);
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 0.25rem;
+}
+
+.btn-submit-lg {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
 }
 
 .error-banner {
   padding: 0.75rem 1rem;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
   border-radius: var(--radius-md);
-  color: #ef4444;
+  color: #f87171;
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .text-right {
@@ -1537,5 +1744,57 @@ async function submitTeacherOnboarding() {
 
 .text-muted {
   color: var(--color-text-muted);
+}
+
+/* Light Mode Overrides for Modal */
+[data-theme="light"] .modal-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .modal-header {
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+[data-theme="light"] .form-section-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .section-card-header {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .form-group label {
+  color: #334155;
+}
+
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-select {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .form-input:focus,
+[data-theme="light"] .form-select:focus {
+  background: #ffffff;
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+[data-theme="light"] .close-btn {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
+[data-theme="light"] .close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
 }
 </style>

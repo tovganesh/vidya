@@ -199,7 +199,11 @@ onUnmounted(() => {
           </div>
           <div class="user-meta">
             <span class="user-name">{{ authStore.userFullName }}</span>
-            <span class="user-role">{{ authStore.userRole }}</span>
+            <span class="user-role">
+              {{ authStore.userRole }}
+              <span v-if="authStore.user?.username" class="user-code-badge">{{ authStore.user.username }}</span>
+              <span v-else class="user-code-badge">{{ authStore.user?.email }}</span>
+            </span>
           </div>
         </router-link>
         <button class="sign-out-btn" title="Sign Out" @click="handleLogout" id="sign-out-btn">
@@ -633,6 +637,23 @@ onUnmounted(() => {
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 1.1;
+}
+
+.user-role {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.user-code-badge {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--color-cyan-500);
+  background: rgba(6, 182, 212, 0.1);
+  padding: 0.05rem 0.3rem;
+  border-radius: var(--radius-sm);
 }
 
 .user-pill-group {
