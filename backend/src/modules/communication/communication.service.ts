@@ -278,22 +278,38 @@ export class CommunicationService {
   }
 
   static async sendTestPush(schoolId: string, userId: string) {
+    let activeSchoolId = schoolId;
+    if (!activeSchoolId) {
+      const userRecord = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { schoolId: true },
+      });
+      activeSchoolId = userRecord?.schoolId || '';
+    }
+
+    const whereClause: { userId: string; schoolId?: string } = { userId };
+    if (activeSchoolId) {
+      whereClause.schoolId = activeSchoolId;
+    }
+
     const subscriptions = await prisma.pushSubscription.findMany({
-      where: { schoolId, userId },
+      where: whereClause,
     });
 
     // Create an in-app notification so user also receives an instant notification badge update
-    await prisma.notification.create({
-      data: {
-        schoolId,
-        userId,
-        title: 'Vidya Web Push Test Alert',
-        body: 'Native Web Push notifications are active and verified for your device.',
-        type: NotificationType.ANNOUNCEMENT,
-        data: { link: '/communication' },
-        isRead: false,
-      },
-    });
+    if (activeSchoolId) {
+      await prisma.notification.create({
+        data: {
+          schoolId: activeSchoolId,
+          userId,
+          title: 'Vidya Web Push Test Alert',
+          body: 'Native Web Push notifications are active and verified for your device.',
+          type: NotificationType.ANNOUNCEMENT,
+          data: { link: '/communication' },
+          isRead: false,
+        },
+      });
+    }
 
     if (subscriptions.length > 0) {
       await Promise.all(
