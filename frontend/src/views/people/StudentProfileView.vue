@@ -388,35 +388,45 @@ async function handleUnlinkGuardian(guardianId: string) {
     <div v-if="showEditModal" class="modal-overlay" @click.self="showEditModal = false">
       <div class="modal-card">
         <div class="modal-header">
-          <h3 class="modal-title">Edit Student Demographics</h3>
+          <div class="modal-title-wrap">
+            <div class="modal-icon-badge">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="modal-title">Edit Student Demographics</h3>
+              <p class="modal-subtitle">Update official bio, APAAR ID, and demographic category</p>
+            </div>
+          </div>
           <button @click="showEditModal = false" class="close-btn">&times;</button>
         </div>
         <form @submit.prevent="handleUpdateStudent" class="modal-form">
           <div v-if="modalError" class="error-banner">{{ modalError }}</div>
 
-          <div class="form-row-2">
+          <div class="form-grid grid-2">
             <div class="form-group">
-              <label>First Name *</label>
+              <label>First Name <span class="req">*</span></label>
               <input v-model="editForm.firstName" type="text" required class="form-input" />
             </div>
             <div class="form-group">
-              <label>Last Name *</label>
+              <label>Last Name <span class="req">*</span></label>
               <input v-model="editForm.lastName" type="text" required class="form-input" />
             </div>
           </div>
 
-          <div class="form-row-2">
+          <div class="form-grid grid-2">
             <div class="form-group">
-              <label>APAAR ID</label>
-              <input v-model="editForm.apaarId" type="text" class="form-input" />
+              <label>APAAR ID (National ID)</label>
+              <input v-model="editForm.apaarId" type="text" placeholder="12-digit Government APAAR" class="form-input font-mono" />
             </div>
             <div class="form-group">
               <label>Aadhaar Last 4</label>
-              <input v-model="editForm.aadhaarLastFour" type="text" maxlength="4" class="form-input" />
+              <input v-model="editForm.aadhaarLastFour" type="text" maxlength="4" placeholder="Last 4 digits" class="form-input font-mono" />
             </div>
           </div>
 
-          <div class="form-row-2">
+          <div class="form-grid grid-2">
             <div class="form-group">
               <label>Blood Group</label>
               <select v-model="editForm.bloodGroup" class="form-select">
@@ -445,7 +455,9 @@ async function handleUnlinkGuardian(guardianId: string) {
 
           <div class="modal-footer">
             <button type="button" @click="showEditModal = false" class="btn btn-secondary">Cancel</button>
-            <button type="submit" class="btn btn-primary" :disabled="modalLoading">Save Changes</button>
+            <button type="submit" class="btn btn-primary" :disabled="modalLoading">
+              {{ modalLoading ? 'Saving Changes...' : 'Save Demographics' }}
+            </button>
           </div>
         </form>
       </div>
@@ -455,19 +467,29 @@ async function handleUnlinkGuardian(guardianId: string) {
     <div v-if="showAddGuardianModal" class="modal-overlay" @click.self="showAddGuardianModal = false">
       <div class="modal-card">
         <div class="modal-header">
-          <h3 class="modal-title">Link Guardian / Contact</h3>
+          <div class="modal-title-wrap">
+            <div class="modal-icon-badge bg-cyan">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="modal-title">Link Guardian / Contact</h3>
+              <p class="modal-subtitle">Add verified parent or authorized emergency contact</p>
+            </div>
+          </div>
           <button @click="showAddGuardianModal = false" class="close-btn">&times;</button>
         </div>
         <form @submit.prevent="handleLinkGuardian" class="modal-form">
           <div v-if="modalError" class="error-banner">{{ modalError }}</div>
 
-          <div class="form-row-2">
+          <div class="form-grid grid-2">
             <div class="form-group">
-              <label>Guardian Name *</label>
-              <input v-model="guardianForm.name" type="text" required class="form-input" />
+              <label>Guardian Name <span class="req">*</span></label>
+              <input v-model="guardianForm.name" type="text" required placeholder="e.g. Suresh Kumar" class="form-input" />
             </div>
             <div class="form-group">
-              <label>Relationship *</label>
+              <label>Relationship <span class="req">*</span></label>
               <select v-model="guardianForm.relationship" class="form-select">
                 <option value="FATHER">Father</option>
                 <option value="MOTHER">Mother</option>
@@ -476,25 +498,27 @@ async function handleUnlinkGuardian(guardianId: string) {
             </div>
           </div>
 
-          <div class="form-row-2">
+          <div class="form-grid grid-2">
             <div class="form-group">
-              <label>Phone Number *</label>
-              <input v-model="guardianForm.phone" type="tel" required class="form-input" />
+              <label>Phone Number <span class="req">*</span></label>
+              <input v-model="guardianForm.phone" type="tel" required placeholder="+91 98000 00000" class="form-input font-mono" />
             </div>
             <div class="form-group">
               <label>Email Address</label>
-              <input v-model="guardianForm.email" type="email" class="form-input" />
+              <input v-model="guardianForm.email" type="email" placeholder="guardian@example.com" class="form-input" />
             </div>
           </div>
 
           <div class="form-group">
             <label>Occupation</label>
-            <input v-model="guardianForm.occupation" type="text" class="form-input" />
+            <input v-model="guardianForm.occupation" type="text" placeholder="e.g. Architect, Officer" class="form-input" />
           </div>
 
           <div class="modal-footer">
             <button type="button" @click="showAddGuardianModal = false" class="btn btn-secondary">Cancel</button>
-            <button type="submit" class="btn btn-primary" :disabled="modalLoading">Link Contact</button>
+            <button type="submit" class="btn btn-primary" :disabled="modalLoading">
+              {{ modalLoading ? 'Linking...' : 'Link Guardian' }}
+            </button>
           </div>
         </form>
       </div>
@@ -914,59 +938,115 @@ async function handleUnlinkGuardian(guardianId: string) {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-md);
+  padding: 1.5rem;
   z-index: 1000;
 }
 
 .modal-card {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-xl);
   width: 100%;
-  max-width: 550px;
+  max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.modal-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: var(--color-primary-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-icon-badge.bg-cyan {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.3);
+  color: var(--color-cyan-400);
 }
 
 .modal-title {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-text-main);
+  color: var(--text-primary);
   margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.modal-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0.125rem 0 0 0;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--color-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: all 150ms ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
 }
 
 .modal-form {
-  padding: var(--spacing-lg);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 1.25rem;
 }
 
-.form-row-2 {
+.form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-md);
+  gap: 1.125rem;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 640px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .form-group {
@@ -977,26 +1057,84 @@ async function handleUnlinkGuardian(guardianId: string) {
 
 .form-group label {
   font-size: 0.8125rem;
-  color: var(--color-text-muted);
+  font-weight: 600;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.form-group label .req {
+  color: var(--color-rose-400);
+  font-weight: 700;
 }
 
 .form-input,
 .form-select {
-  padding: 0.625rem 0.875rem;
-  background: var(--color-surface-hover);
-  border: 1px solid var(--color-border);
+  width: 100%;
+  height: 2.625rem;
+  padding: 0.5rem 0.875rem;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-md);
-  color: var(--color-text-main);
+  color: #f8fafc;
   font-size: 0.875rem;
   outline: none;
+  transition: all var(--duration-fast);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.form-input:focus,
+.form-select:focus {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: var(--spacing-sm);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-border);
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 0.25rem;
+}
+
+.error-banner {
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-md);
+  color: #f87171;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+[data-theme="light"] .modal-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .modal-header {
+  border-bottom-color: #f1f5f9;
+  background: #f8fafc;
+}
+
+[data-theme="light"] .form-group label {
+  color: #334155;
+}
+
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-select {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+[data-theme="light"] .close-btn {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #64748b;
 }
 
 .status-pill {

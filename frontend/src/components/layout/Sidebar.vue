@@ -1,52 +1,60 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth.js';
 
 const route = useRoute();
+const authStore = useAuthStore();
 
 interface NavItem {
   name: string;
   path: string;
   icon: string;
   badge?: string;
+  roles?: string[];
 }
 
 interface NavSection {
   title: string;
+  roles?: string[];
   items: NavItem[];
 }
 
-const navigationSections: NavSection[] = [
+const allSections: NavSection[] = [
   {
     title: 'OVERVIEW',
     items: [
       { name: 'Dashboard', path: '/', icon: 'dashboard' },
-      { name: 'System Health', path: '/health', icon: 'activity', badge: 'API' },
+      { name: 'System Health', path: '/health', icon: 'activity', badge: 'API', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'] },
     ],
   },
   {
     title: 'PEOPLE',
+    roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'TEACHER', 'ACCOUNTANT'],
     items: [
       { name: 'Students', path: '/students', icon: 'users' },
-      { name: 'Guardians / Parents', path: '/guardians', icon: 'heart' },
-      { name: 'Teachers & Staff', path: '/teachers', icon: 'briefcase' },
-      { name: 'Batch Promotion', path: '/people/promote', icon: 'trending-up' },
+      { name: 'Guardians / Parents', path: '/guardians', icon: 'heart', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'TEACHER'] },
+      { name: 'Teachers & Staff', path: '/teachers', icon: 'briefcase', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'] },
+      { name: 'Batch Promotion', path: '/people/promote', icon: 'trending-up', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'] },
     ],
   },
   {
     title: 'ACADEMICS',
+    roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'TEACHER', 'STUDENT', 'PARENT'],
     items: [
-      { name: 'Classes & Sections', path: '/classes', icon: 'grid' },
-      { name: 'Subjects Master', path: '/admin/subjects', icon: 'book' },
+      { name: 'Classes & Sections', path: '/classes', icon: 'grid', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'] },
+      { name: 'Subjects Master', path: '/admin/subjects', icon: 'book', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'] },
       { name: 'Daily Roll Call', path: '/attendance', icon: 'check-circle' },
-      { name: 'Monthly Register', path: '/attendance/register', icon: 'clipboard' },
+      { name: 'Monthly Register', path: '/attendance/register', icon: 'clipboard', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'TEACHER'] },
       { name: 'Class Timetable', path: '/timetable', icon: 'calendar' },
       { name: 'Exams & Results', path: '/exams', icon: 'award' },
     ],
   },
   {
     title: 'FINANCE & FEES',
+    roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'PARENT'],
     items: [
-      { name: 'Fee Structures', path: '/fees', icon: 'credit-card' },
+      { name: 'Fee Structures', path: '/fees', icon: 'credit-card', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'ACCOUNTANT'] },
       { name: 'Payment Receipts', path: '/receipts', icon: 'receipt' },
     ],
   },
@@ -54,19 +62,33 @@ const navigationSections: NavSection[] = [
     title: 'COMMUNICATION',
     items: [
       { name: 'Announcements', path: '/announcements', icon: 'bell' },
-      { name: 'Web Push Alerts', path: '/notifications', icon: 'send' },
+      { name: 'Web Push Alerts', path: '/notifications', icon: 'send', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'TEACHER', 'PARENT'] },
     ],
   },
   {
     title: 'ADMINISTRATION',
+    roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'],
     items: [
-      { name: 'School Setup', path: '/admin/school', icon: 'settings' },
-      { name: 'Academic Years', path: '/admin/academic-years', icon: 'clock' },
-      { name: 'Setup Wizard', path: '/admin/onboarding', icon: 'activity', badge: 'NEW' },
-      { name: 'Audit Trail', path: '/admin/audit', icon: 'shield' },
+      { name: 'School Setup', path: '/admin/school', icon: 'settings', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN'] },
+      { name: 'Academic Years', path: '/admin/academic-years', icon: 'clock', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'] },
+      { name: 'Setup Wizard', path: '/admin/onboarding', icon: 'activity', badge: 'NEW', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN'] },
+      { name: 'Audit Trail', path: '/admin/audit', icon: 'shield', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'] },
     ],
   },
 ];
+
+const navigationSections = computed(() => {
+  const currentRole = authStore.userRole;
+  if (!currentRole || currentRole === 'GUEST') return allSections;
+
+  return allSections
+    .filter(section => !section.roles || section.roles.includes(currentRole))
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => !item.roles || item.roles.includes(currentRole)),
+    }))
+    .filter(section => section.items.length > 0);
+});
 </script>
 
 <template>

@@ -349,6 +349,7 @@ async function main() {
   const demoUsers = [
     {
       email: 'superadmin@vidya.org',
+      username: null,
       firstName: 'Vikram',
       lastName: 'Aditya',
       role: UserRole.SUPER_ADMIN,
@@ -357,6 +358,7 @@ async function main() {
     },
     {
       email: 'principal@vidya.org',
+      username: null,
       firstName: 'Dr. Ramesh',
       lastName: 'Sharma',
       role: UserRole.PRINCIPAL,
@@ -365,6 +367,7 @@ async function main() {
     },
     {
       email: 'admin@vidya.org',
+      username: 'VIDYA-ADMN-0001',
       firstName: 'Rajesh',
       lastName: 'Kumar',
       role: UserRole.SCHOOL_ADMIN,
@@ -373,6 +376,7 @@ async function main() {
     },
     {
       email: 'teacher@vidya.org',
+      username: 'VIDYA-TECHR-0001',
       firstName: 'Ananya',
       lastName: 'Rao',
       role: UserRole.TEACHER,
@@ -381,6 +385,7 @@ async function main() {
     },
     {
       email: 'accountant@vidya.org',
+      username: 'VIDYA-ACCT-0001',
       firstName: 'Suresh',
       lastName: 'Patel',
       role: UserRole.ACCOUNTANT,
@@ -389,6 +394,7 @@ async function main() {
     },
     {
       email: 'parent@vidya.org',
+      username: 'VIDYA-PRNT-0001',
       firstName: 'Priya',
       lastName: 'Sundaram',
       role: UserRole.PARENT,
@@ -397,6 +403,7 @@ async function main() {
     },
     {
       email: 'student@vidya.org',
+      username: 'VIDYA-STUD-0001',
       firstName: 'Aarav',
       lastName: 'Sundaram',
       role: UserRole.STUDENT,
@@ -409,6 +416,7 @@ async function main() {
     const user = await prisma.user.upsert({
       where: { email: u.email },
       update: {
+        username: u.username,
         firstName: u.firstName,
         lastName: u.lastName,
         primaryRole: u.role,
@@ -417,6 +425,7 @@ async function main() {
       create: {
         schoolId: u.schoolId,
         email: u.email,
+        username: u.username,
         phone: u.phone,
         passwordHash: defaultPasswordHash,
         firstName: u.firstName,

@@ -8,34 +8,36 @@ const router = useRouter();
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
 
-const email = ref('');
+const identifier = ref('');
 const password = ref('');
 const totpCode = ref('');
 const isUsingBackupCode = ref(false);
 const localError = ref<string | null>(null);
 
 const demoAccounts = [
-  { role: 'School Admin', email: 'admin@vidya.org', color: 'indigo' },
-  { role: 'Principal', email: 'principal@vidya.org', color: 'emerald' },
-  { role: 'Teacher', email: 'teacher@vidya.org', color: 'cyan' },
-  { role: 'Accountant', email: 'accountant@vidya.org', color: 'amber' },
-  { role: 'Parent', email: 'parent@vidya.org', color: 'rose' },
+  { role: 'Super Admin', id: 'superadmin@vidya.org', label: 'superadmin@vidya.org', note: 'Email' },
+  { role: 'Principal', id: 'principal@vidya.org', label: 'principal@vidya.org', note: 'Email' },
+  { role: 'School Admin', id: 'VIDYA-ADMN-0001', label: 'VIDYA-ADMN-0001', note: 'Code' },
+  { role: 'Teacher', id: 'VIDYA-TECHR-0001', label: 'VIDYA-TECHR-0001', note: 'Code' },
+  { role: 'Accountant', id: 'VIDYA-ACCT-0001', label: 'VIDYA-ACCT-0001', note: 'Code' },
+  { role: 'Parent', id: 'VIDYA-PRNT-0001', label: 'VIDYA-PRNT-0001', note: 'Code' },
+  { role: 'Student', id: 'VIDYA-STUD-0001', label: 'VIDYA-STUD-0001', note: 'Code' },
 ];
 
-function selectDemo(demoEmail: string) {
-  email.value = demoEmail;
+function selectDemo(demoId: string) {
+  identifier.value = demoId;
   password.value = 'Vidya@2026';
 }
 
 async function handleLogin() {
   localError.value = null;
-  if (!email.value || !password.value) {
-    localError.value = 'Please provide both email and password';
+  if (!identifier.value || !password.value) {
+    localError.value = 'Please provide your institutional code or email and password';
     return;
   }
 
   try {
-    const res = await authStore.login(email.value, password.value);
+    const res = await authStore.login(identifier.value, password.value);
     if (!res.requires2FA) {
       const redirectPath = (router.currentRoute.value.query.redirect as string) || '/';
       router.push(redirectPath);
@@ -125,15 +127,19 @@ async function handleVerify2FA() {
         <!-- Step 1: Standard Credentials Form -->
         <form v-if="!authStore.requires2FA" @submit.prevent="handleLogin" class="auth-form" id="standard-login-form">
           <div class="form-group">
-            <label for="login-email">Official Email or Phone</label>
+            <div class="password-label-row">
+              <label for="login-email">Institutional ID or Email</label>
+              <span class="id-type-hint">Code: VIDYA-TECHR-0001</span>
+            </div>
             <input
               id="login-email"
-              v-model="email"
-              type="email"
-              placeholder="admin@vidya.org"
+              v-model="identifier"
+              type="text"
+              placeholder="e.g. VIDYA-TECHR-0001 or principal@vidya.org"
               required
-              autocomplete="email"
+              autocomplete="username"
             />
+            <span class="field-subnote">Super Admin & Principal use official email; Staff, Teachers, Parents & Students use Institutional ID.</span>
           </div>
 
           <div class="form-group">
@@ -162,12 +168,13 @@ async function handleVerify2FA() {
             <div class="demo-pills">
               <button
                 v-for="d in demoAccounts"
-                :key="d.email"
+                :key="d.id"
                 type="button"
                 class="demo-pill"
-                @click="selectDemo(d.email)"
+                @click="selectDemo(d.id)"
               >
-                {{ d.role }}
+                <span class="pill-role">{{ d.role }}</span>
+                <span class="pill-code">{{ d.note }}: {{ d.id }}</span>
               </button>
             </div>
           </div>
@@ -476,16 +483,43 @@ async function handleVerify2FA() {
   justify-content: center;
 }
 
+.id-type-hint {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--color-cyan-500);
+}
+
+.field-subnote {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
 .demo-pill {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.35rem 0.75rem;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   background: var(--color-surface-raised);
   border: 1px solid var(--color-card-border);
   color: var(--text-secondary);
   transition: all var(--duration-fast);
   cursor: pointer;
+}
+
+.pill-role {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pill-code {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--color-cyan-500);
 }
 
 .demo-pill:hover {

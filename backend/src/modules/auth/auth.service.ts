@@ -44,6 +44,7 @@ export type LoginResult = LoginSuccessResult | Login2FARequiredResult;
 export interface AuthUserProfile {
   id: string;
   email: string;
+  username?: string | null;
   firstName: string;
   lastName: string;
   primaryRole: UserRole;
@@ -82,17 +83,23 @@ export class AuthService {
   }
 
   /**
-   * Primary Login handler
+   * Primary Login handler (Accepts either institutional code/username or official email)
    */
   async login(
-    email: string,
+    identifier: string,
     password: string,
     context: ClientContext,
   ): Promise<LoginResult> {
-    const normalizedEmail = email.trim().toLowerCase();
+    const trimmed = identifier.trim();
 
-    const user = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: trimmed.toLowerCase() },
+          { username: trimmed.toUpperCase() },
+          { username: trimmed },
+        ],
+      },
       include: {
         school: true,
         roles: {
@@ -112,7 +119,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedError('Invalid email or password', 'INVALID_CREDENTIALS');
+      throw new UnauthorizedError('Invalid institutional code/email or password', 'INVALID_CREDENTIALS');
     }
 
     if (user.status !== 'ACTIVE') {
@@ -121,7 +128,7 @@ export class AuthService {
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      throw new UnauthorizedError('Invalid email or password', 'INVALID_CREDENTIALS');
+      throw new UnauthorizedError('Invalid institutional code/email or password', 'INVALID_CREDENTIALS');
     }
 
     // If Two-Factor Authentication is enabled, issue challenge token
@@ -139,6 +146,7 @@ export class AuthService {
     const tokenPayload: TokenPayload = {
       sub: user.id,
       email: user.email,
+      username: user.username,
       schoolId: user.schoolId,
       role: user.primaryRole,
       permissions,
@@ -174,6 +182,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
+        username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
         primaryRole: user.primaryRole,
@@ -260,6 +269,7 @@ export class AuthService {
     const tokenPayload: TokenPayload = {
       sub: user.id,
       email: user.email,
+      username: user.username,
       schoolId: user.schoolId,
       role: user.primaryRole,
       permissions,
@@ -293,6 +303,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
+        username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
         primaryRole: user.primaryRole,
@@ -472,6 +483,7 @@ export class AuthService {
     const tokenPayload: TokenPayload = {
       sub: existing.user.id,
       email: existing.user.email,
+      username: existing.user.username,
       schoolId: existing.user.schoolId,
       role: existing.user.primaryRole,
       permissions,

@@ -339,6 +339,7 @@ model User {
   schoolId      String?
   school        School?    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   email         String     @unique
+  username      String?    @unique
   phone         String?
   passwordHash  String
   firstName     String

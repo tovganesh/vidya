@@ -4,6 +4,7 @@ import { ref, computed } from 'vue';
 export interface UserProfile {
   id: string;
   email: string;
+  username?: string | null;
   firstName: string;
   lastName: string;
   primaryRole: string;
@@ -107,7 +108,7 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Login
    */
-  async function login(email: string, password: string): Promise<{ requires2FA: boolean }> {
+  async function login(identifier: string, password: string): Promise<{ requires2FA: boolean }> {
     isLoading.value = true;
     errorMessage.value = null;
     requires2FA.value = false;
@@ -117,7 +118,7 @@ export const useAuthStore = defineStore('auth', () => {
       const res = await fetch('/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier, email: identifier, password }),
       });
 
       const data = await res.json();

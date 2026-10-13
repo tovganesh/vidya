@@ -70,6 +70,57 @@ describe('Authentication, RBAC & 2FA Engine (Milestone 3)', () => {
 
       expect(response.statusCode).toBe(401);
     });
+
+    it('should successfully login as teacher using institutional code (VIDYA-TECHR-0001)', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/login',
+        payload: {
+          identifier: 'VIDYA-TECHR-0001',
+          password: 'Vidya@2026',
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.payload);
+      expect(body.success).toBe(true);
+      expect(body.data.user.primaryRole).toBe('TEACHER');
+      expect(body.data.user.username).toBe('VIDYA-TECHR-0001');
+    });
+
+    it('should successfully login as student using institutional code (VIDYA-STUD-0001)', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/login',
+        payload: {
+          username: 'VIDYA-STUD-0001',
+          password: 'Vidya@2026',
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.payload);
+      expect(body.success).toBe(true);
+      expect(body.data.user.primaryRole).toBe('STUDENT');
+      expect(body.data.user.username).toBe('VIDYA-STUD-0001');
+    });
+
+    it('should successfully login as principal using official email', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/login',
+        payload: {
+          identifier: 'principal@vidya.org',
+          password: 'Vidya@2026',
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.payload);
+      expect(body.success).toBe(true);
+      expect(body.data.user.primaryRole).toBe('PRINCIPAL');
+      expect(body.data.user.email).toBe('principal@vidya.org');
+    });
   });
 
   describe('2. User Profile (/api/v1/auth/me)', () => {
