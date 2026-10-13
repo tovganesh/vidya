@@ -44,15 +44,15 @@ const allSections: NavSection[] = [
     items: [
       { name: 'Classes & Sections', path: '/classes', icon: 'grid', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'] },
       { name: 'Subjects Master', path: '/admin/subjects', icon: 'book', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL'] },
-      { name: 'Daily Roll Call', path: '/attendance', icon: 'check-circle' },
-      { name: 'Monthly Register', path: '/attendance/register', icon: 'clipboard', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'TEACHER'] },
+      { name: 'Daily Roll Call', path: '/attendance', icon: 'check-circle', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'TEACHER'] },
+      { name: 'Monthly Register', path: '/attendance/register', icon: 'clipboard' },
       { name: 'Class Timetable', path: '/timetable', icon: 'calendar' },
       { name: 'Exams & Results', path: '/exams', icon: 'award' },
     ],
   },
   {
     title: 'FINANCE & FEES',
-    roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'PARENT'],
+    roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'ACCOUNTANT', 'PARENT', 'STUDENT'],
     items: [
       { name: 'Fee Structures', path: '/fees', icon: 'credit-card', roles: ['SUPER_ADMIN', 'SCHOOL_ADMIN', 'PRINCIPAL', 'ACCOUNTANT'] },
       { name: 'Payment Receipts', path: '/receipts', icon: 'receipt' },

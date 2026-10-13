@@ -258,6 +258,24 @@ export const useAuthStore = defineStore('auth', () => {
     return user.value?.primaryRole === role;
   }
 
+  // Convenient role & capability flags across views
+  const isParent = computed(() => userRole.value === 'PARENT');
+  const isStudent = computed(() => userRole.value === 'STUDENT');
+  const isTeacher = computed(() => userRole.value === 'TEACHER');
+  const isAccountant = computed(() => userRole.value === 'ACCOUNTANT');
+  const isPrincipal = computed(() => ['PRINCIPAL', 'VICE_PRINCIPAL'].includes(userRole.value));
+  const isAdmin = computed(() => ['SUPER_ADMIN', 'SCHOOL_ADMIN'].includes(userRole.value));
+  const isStaff = computed(() => !['PARENT', 'STUDENT', 'GUEST'].includes(userRole.value));
+  const isStudentOrParent = computed(() => ['PARENT', 'STUDENT'].includes(userRole.value));
+
+  const canManageExams = computed(() => isAdmin.value || isPrincipal.value || hasPermission('exams:manage'));
+  const canEnterMarks = computed(() => isAdmin.value || isPrincipal.value || isTeacher.value || hasPermission('exams:enter_marks'));
+  const canManageTimetable = computed(() => isAdmin.value || isPrincipal.value || hasPermission('timetable:manage'));
+  const canMarkAttendance = computed(() => isAdmin.value || isPrincipal.value || isTeacher.value || hasPermission('attendance:mark'));
+  const canManageFees = computed(() => isAdmin.value || isPrincipal.value || isAccountant.value || hasPermission('fees:manage'));
+  const canCollectFees = computed(() => isAdmin.value || isPrincipal.value || isAccountant.value || hasPermission('fees:collect'));
+  const canBroadcast = computed(() => isAdmin.value || isPrincipal.value || isTeacher.value || hasPermission('announcements:create'));
+
   return {
     user,
     accessToken,
@@ -271,6 +289,21 @@ export const useAuthStore = defineStore('auth', () => {
     userRole,
     hasPermission,
     hasRole,
+    isParent,
+    isStudent,
+    isTeacher,
+    isAccountant,
+    isPrincipal,
+    isAdmin,
+    isStaff,
+    isStudentOrParent,
+    canManageExams,
+    canEnterMarks,
+    canManageTimetable,
+    canMarkAttendance,
+    canManageFees,
+    canCollectFees,
+    canBroadcast,
     login,
     verify2FALogin,
     fetchMe,

@@ -89,11 +89,11 @@ const teacherForm = ref({
 });
 
 const canWriteStudent = computed(() =>
-  authStore.hasPermission('student:write') || authStore.hasRole('SCHOOL_ADMIN') || authStore.hasRole('SUPER_ADMIN'),
+  !authStore.isStudentOrParent && (authStore.hasPermission('student:write') || authStore.hasRole('SCHOOL_ADMIN') || authStore.hasRole('SUPER_ADMIN')),
 );
 
 const canManageStaff = computed(() =>
-  authStore.hasPermission('user:manage') || authStore.hasRole('SCHOOL_ADMIN') || authStore.hasRole('SUPER_ADMIN'),
+  !authStore.isStudentOrParent && (authStore.hasPermission('user:manage') || authStore.hasRole('SCHOOL_ADMIN') || authStore.hasRole('SUPER_ADMIN')),
 );
 
 onMounted(async () => {

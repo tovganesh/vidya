@@ -2,9 +2,12 @@
 import { ref, onMounted, computed } from 'vue';
 import { usePeopleStore, EnrollmentItem } from '../../stores/people.js';
 import { useAcademicsStore } from '../../stores/academics.js';
+import { useAuthStore } from '../../stores/auth.js';
 
 const peopleStore = usePeopleStore();
 const academicsStore = useAcademicsStore();
+const authStore = useAuthStore();
+const canPromote = computed(() => authStore.isAdmin || authStore.isPrincipal);
 
 // Step 1 & 2 selections
 const sourceYearId = ref('');
@@ -405,6 +408,7 @@ async function executePromotion() {
           Ready to progress <strong>{{ selectedCount }}</strong> selected students.
         </div>
         <button
+          v-if="canPromote"
           @click="executePromotion"
           class="btn btn-primary"
           :disabled="selectedCount === 0 || executing"
@@ -415,6 +419,9 @@ async function executePromotion() {
           </svg>
           {{ executing ? 'Executing Batch Promotion...' : 'Execute Batch Promotion' }}
         </button>
+        <span v-else class="text-sm text-muted">
+          Only School Administrators and Principals may commit batch student progressions.
+        </span>
       </div>
     </div>
   </div>

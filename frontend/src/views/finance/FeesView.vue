@@ -10,10 +10,12 @@ import {
   FeeStructure,
 } from '../../stores/fees.js';
 import { useAcademicsStore } from '../../stores/academics.js';
+import { useAuthStore } from '../../stores/auth.js';
 
 const route = useRoute();
 const feesStore = useFeesStore();
 const academicsStore = useAcademicsStore();
+const authStore = useAuthStore();
 
 // Tab state: 'ledgers' | 'terminal' | 'structures'
 const activeTab = ref<'ledgers' | 'terminal' | 'structures'>('ledgers');
@@ -94,6 +96,7 @@ const paymentForm = ref({
 const isSubmittingPayment = ref(false);
 
 function selectStudentForCollection(item: StudentFeeLedgerItem) {
+  if (!authStore.canCollectFees) return;
   selectedStudentLedger.value = item;
   paymentForm.value.amountPaid = item.dueAmount;
   paymentForm.value.paymentMode = 'UPI';
@@ -110,6 +113,7 @@ function setFullDueAmount() {
 }
 
 async function submitPayment() {
+  if (!authStore.canCollectFees) return;
   if (!selectedStudentLedger.value) {
     showError('Please select a student fee ledger first');
     return;
@@ -357,6 +361,7 @@ watch(selectedAcademicYearId, async (newVal) => {
         </div>
 
         <button
+          v-if="authStore.canManageFees"
           class="btn btn-primary create-plan-btn"
           @click="showCreateStructureModal = true"
         >
@@ -375,8 +380,8 @@ watch(selectedAcademicYearId, async (newVal) => {
       <span>{{ errorMessage }}</span>
     </div>
 
-    <!-- Executive KPI Dashboard Cards -->
-    <section class="kpi-grid" v-if="feesStore.stats">
+    <!-- Executive KPI Dashboard Cards (Staff) -->
+    <section class="kpi-grid" v-if="!authStore.isStudentOrParent && feesStore.stats">
       <div class="kpi-card">
         <div class="kpi-label">Gross Invoiced</div>
         <div class="kpi-value text-muted-val">
@@ -419,6 +424,39 @@ watch(selectedAcademicYearId, async (newVal) => {
       </div>
     </section>
 
+    <!-- Student / Parent Personal Summary Cards -->
+    <section class="kpi-grid parent-kpi-grid" v-else-if="authStore.isStudentOrParent && feesStore.studentFees.length > 0">
+      <div class="kpi-card">
+        <div class="kpi-label">Annual Tuition Plan</div>
+        <div class="kpi-value text-primary">
+          {{ formatIndianCurrency(feesStore.studentFees[0]?.grossAmount || 0) }}
+        </div>
+        <div class="kpi-subtext">
+          {{ feesStore.studentFees[0]?.feeStructure.name }}
+        </div>
+      </div>
+
+      <div class="kpi-card success-card">
+        <div class="kpi-label">Fees Paid Till Date</div>
+        <div class="kpi-value text-success">
+          {{ formatIndianCurrency(feesStore.studentFees[0]?.paidAmount || 0) }}
+        </div>
+        <div class="kpi-subtext">
+          Official Digital Receipts Issued
+        </div>
+      </div>
+
+      <div class="kpi-card" :class="feesStore.studentFees[0]?.dueAmount ? 'warning-card' : 'success-card'">
+        <div class="kpi-label">Current Outstanding Due</div>
+        <div class="kpi-value" :class="feesStore.studentFees[0]?.dueAmount ? 'text-warning' : 'text-success'">
+          {{ formatIndianCurrency(feesStore.studentFees[0]?.dueAmount || 0) }}
+        </div>
+        <div class="kpi-subtext">
+          Status: <strong>{{ feesStore.studentFees[0]?.status.replace('_', ' ') }}</strong>
+        </div>
+      </div>
+    </section>
+
     <!-- Navigation Tabs -->
     <div class="tab-nav">
       <button
@@ -426,9 +464,10 @@ watch(selectedAcademicYearId, async (newVal) => {
         :class="{ active: activeTab === 'ledgers' }"
         @click="activeTab = 'ledgers'"
       >
-        Student Fee Ledgers & Dues
+        {{ authStore.isStudentOrParent ? "My Fee Account & Receipts" : "Student Fee Ledgers & Dues" }}
       </button>
       <button
+        v-if="authStore.canCollectFees"
         class="tab-btn"
         :class="{ active: activeTab === 'terminal' }"
         @click="activeTab = 'terminal'"
@@ -437,6 +476,7 @@ watch(selectedAcademicYearId, async (newVal) => {
         <span v-if="selectedStudentLedger" class="tab-badge">Active</span>
       </button>
       <button
+        v-if="authStore.canManageFees"
         class="tab-btn"
         :class="{ active: activeTab === 'structures' }"
         @click="activeTab = 'structures'"
@@ -572,7 +612,7 @@ watch(selectedAcademicYearId, async (newVal) => {
               <td class="text-right">
                 <div class="action-buttons">
                   <button
-                    v-if="item.dueAmount > 0"
+                    v-if="authStore.canCollectFees && item.dueAmount > 0"
                     class="btn btn-sm btn-primary"
                     @click="selectStudentForCollection(item)"
                     title="Collect payment from student"
@@ -582,9 +622,9 @@ watch(selectedAcademicYearId, async (newVal) => {
                   <button
                     class="btn btn-sm btn-outline"
                     @click="openLedgerDetails(item)"
-                    title="View full fee statement"
+                    title="View full fee statement and download receipts"
                   >
-                    Statement
+                    {{ authStore.isStudentOrParent ? 'Receipts / Statement' : 'Statement' }}
                   </button>
                 </div>
               </td>

@@ -45,7 +45,7 @@ const guardianForm = ref({
 });
 
 const canEdit = computed(() =>
-  authStore.hasPermission('student:write') || authStore.hasRole('SCHOOL_ADMIN') || authStore.hasRole('SUPER_ADMIN'),
+  !authStore.isStudentOrParent && (authStore.hasPermission('student:write') || authStore.hasRole('SCHOOL_ADMIN') || authStore.hasRole('SUPER_ADMIN')),
 );
 
 onMounted(async () => {
@@ -122,11 +122,11 @@ async function handleUnlinkGuardian(guardianId: string) {
   <div class="profile-view" id="student-360-page">
     <!-- Back to Directory Breadcrumb -->
     <div class="breadcrumb-bar">
-      <router-link to="/students" class="breadcrumb-back" id="btn-back-directory">
+      <router-link :to="authStore.isStudentOrParent ? '/' : '/students'" class="breadcrumb-back" id="btn-back-directory">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        Back to People Registry
+        {{ authStore.isStudentOrParent ? 'Back to Dashboard' : 'Back to People Registry' }}
       </router-link>
     </div>
 

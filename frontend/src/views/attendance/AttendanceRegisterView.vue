@@ -2,9 +2,11 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { useAttendanceStore } from '../../stores/attendance.js';
 import { useAcademicsStore } from '../../stores/academics.js';
+import { useAuthStore } from '../../stores/auth.js';
 
 const attendanceStore = useAttendanceStore();
 const academicsStore = useAcademicsStore();
+const authStore = useAuthStore();
 
 const selectedClassId = ref('');
 const selectedSectionId = ref('');
@@ -136,7 +138,7 @@ function exportCsv() {
       </div>
 
       <div class="header-actions">
-        <router-link to="/attendance" class="btn btn-secondary" id="back-to-rollcall-btn">
+        <router-link v-if="authStore.canMarkAttendance" to="/attendance" class="btn btn-secondary" id="back-to-rollcall-btn">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="btn-icon">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
           </svg>
