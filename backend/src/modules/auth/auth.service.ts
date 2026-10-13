@@ -63,6 +63,7 @@ export class AuthService {
    * Helper to extract flat list of unique permission codes for a user
    */
   private static extractPermissions(user: {
+    primaryRole?: UserRole;
     roles: Array<{
       role: {
         permissions: Array<{
@@ -79,6 +80,29 @@ export class AuthService {
         permSet.add(rp.permission.code);
       }
     }
+
+    if (user.primaryRole === 'PARENT' || user.primaryRole === 'STUDENT') {
+      permSet.add('student:read');
+      permSet.add('academics:read');
+      permSet.add('attendance:read');
+      permSet.add('fee:read');
+    }
+
+    if (user.primaryRole === 'PRINCIPAL' || user.primaryRole === 'VICE_PRINCIPAL' || user.primaryRole === 'SUPER_ADMIN') {
+      permSet.add('student:read');
+      permSet.add('student:write');
+      permSet.add('attendance:read');
+      permSet.add('attendance:mark');
+      permSet.add('academics:read');
+      permSet.add('academics:write');
+      permSet.add('exam:marks_entry');
+      permSet.add('fee:read');
+      permSet.add('fee:collect');
+      permSet.add('school:manage');
+      permSet.add('user:manage');
+      permSet.add('audit:read');
+    }
+
     return Array.from(permSet);
   }
 

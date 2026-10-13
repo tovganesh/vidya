@@ -341,6 +341,68 @@ async function main() {
       });
     }
   }
+  // Principal gets all permissions
+  const principalRole = await prisma.role.findUniqueOrThrow({ where: { name: 'PRINCIPAL' } });
+  for (const p of allPerms) {
+    await prisma.rolePermission.upsert({
+      where: {
+        roleId_permissionId: {
+          roleId: principalRole.id,
+          permissionId: p.id,
+        },
+      },
+      update: {},
+      create: {
+        roleId: principalRole.id,
+        permissionId: p.id,
+      },
+    });
+  }
+
+  // Parent gets student:read, academics:read, attendance:read, fee:read
+  const parentRole = await prisma.role.findUniqueOrThrow({ where: { name: 'PARENT' } });
+  const parentPermCodes = ['student:read', 'academics:read', 'attendance:read', 'fee:read'];
+  for (const code of parentPermCodes) {
+    const p = allPerms.find((item) => item.code === code);
+    if (p) {
+      await prisma.rolePermission.upsert({
+        where: {
+          roleId_permissionId: {
+            roleId: parentRole.id,
+            permissionId: p.id,
+          },
+        },
+        update: {},
+        create: {
+          roleId: parentRole.id,
+          permissionId: p.id,
+        },
+      });
+    }
+  }
+
+  // Student gets student:read, academics:read, attendance:read, fee:read
+  const studentRole = await prisma.role.findUniqueOrThrow({ where: { name: 'STUDENT' } });
+  const studentPermCodes = ['student:read', 'academics:read', 'attendance:read', 'fee:read'];
+  for (const code of studentPermCodes) {
+    const p = allPerms.find((item) => item.code === code);
+    if (p) {
+      await prisma.rolePermission.upsert({
+        where: {
+          roleId_permissionId: {
+            roleId: studentRole.id,
+            permissionId: p.id,
+          },
+        },
+        update: {},
+        create: {
+          roleId: studentRole.id,
+          permissionId: p.id,
+        },
+      });
+    }
+  }
+
   console.log('✅ Role-Permission mappings assigned');
 
   // 10. Seed Realistic Demo Users (Password: Vidya@2026)
@@ -1513,7 +1575,102 @@ async function main() {
     console.log('✅ Fee Structures, Student Ledgers & Receipts seeded');
   }
 
-  // 27. Initial Audit Log
+  // 27. Daily Diary & Homework Notes (Classwork & Homework tracking)
+  const diaryClass10 = await prisma.class.findFirst({ where: { schoolId: school.id, code: 'STD-10' } });
+  const diarySection10A = diaryClass10 ? await prisma.section.findFirst({ where: { classId: diaryClass10.id, name: 'A' } }) : null;
+  const teacherRajesh = await prisma.teacher.findFirst({ where: { schoolId: school.id, employeeCode: 'EMP-2023-0101' } });
+  const subMath = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'MATH' } });
+  const subSci = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'SCI' } });
+  const subEng = await prisma.subject.findFirst({ where: { schoolId: school.id, code: 'ENG' } });
+
+  if (diaryClass10 && diarySection10A) {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setUTCDate(today.getUTCDate() - 1);
+
+    const tomorrow = new Date(today);
+    tomorrow.setUTCDate(today.getUTCDate() + 1);
+
+    if (subMath) {
+      await prisma.dailyDiaryEntry.upsert({
+        where: {
+          sectionId_subjectId_date: {
+            sectionId: diarySection10A.id,
+            subjectId: subMath.id,
+            date: today,
+          },
+        },
+        update: {},
+        create: {
+          schoolId: school.id,
+          academicYearId: ayCurrent.id,
+          classId: diaryClass10.id,
+          sectionId: diarySection10A.id,
+          subjectId: subMath.id,
+          teacherId: teacherRajesh?.id,
+          date: today,
+          classwork: 'Chapter 4: Quadratic Equations - Solved Exercise 4.2 Questions 1 to 8 on blackboard.',
+          homework: 'Complete Exercise 4.2 Questions 9 to 14 in Homework Notebook.',
+          dueDate: tomorrow,
+        },
+      });
+    }
+
+    if (subSci) {
+      await prisma.dailyDiaryEntry.upsert({
+        where: {
+          sectionId_subjectId_date: {
+            sectionId: diarySection10A.id,
+            subjectId: subSci.id,
+            date: today,
+          },
+        },
+        update: {},
+        create: {
+          schoolId: school.id,
+          academicYearId: ayCurrent.id,
+          classId: diaryClass10.id,
+          sectionId: diarySection10A.id,
+          subjectId: subSci.id,
+          teacherId: teacherRajesh?.id,
+          date: today,
+          classwork: 'Physics: Reflection of Light - Mirror Formula and sign convention explained with ray diagrams.',
+          homework: 'Draw ray diagrams for concave mirror positions 1 through 4.',
+          dueDate: tomorrow,
+        },
+      });
+    }
+
+    if (subEng) {
+      await prisma.dailyDiaryEntry.upsert({
+        where: {
+          sectionId_subjectId_date: {
+            sectionId: diarySection10A.id,
+            subjectId: subEng.id,
+            date: yesterday,
+          },
+        },
+        update: {},
+        create: {
+          schoolId: school.id,
+          academicYearId: ayCurrent.id,
+          classId: diaryClass10.id,
+          sectionId: diarySection10A.id,
+          subjectId: subEng.id,
+          teacherId: teacherRajesh?.id,
+          date: yesterday,
+          classwork: 'Prose: A Letter to God - Read pages 3-6 and discussed character sketches.',
+          homework: 'Write a short paragraph analyzing Lencho’s unwavering faith in God.',
+          dueDate: today,
+        },
+      });
+    }
+    console.log('✅ Daily Diary & Homework notes seeded for Class 10-A');
+  }
+
+  // 28. Initial Audit Log
   await prisma.auditLog.create({
     data: {
       schoolId: school.id,

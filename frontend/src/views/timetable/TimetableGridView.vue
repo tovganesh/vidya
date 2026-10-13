@@ -1,19 +1,36 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useTimetableStore, DayOfWeek, TimetableSlot } from '../../stores/timetable.js';
 import { useAcademicsStore } from '../../stores/academics.js';
 import { usePeopleStore } from '../../stores/people.js';
 import { useAuthStore } from '../../stores/auth.js';
+import { useDiaryStore, DailyDiaryEntry } from '../../stores/diary.js';
 
+const route = useRoute();
 const timetableStore = useTimetableStore();
 const academicsStore = useAcademicsStore();
 const peopleStore = usePeopleStore();
 const authStore = useAuthStore();
+const diaryStore = useDiaryStore();
 
-const activeTab = ref<'grid' | 'allocations'>('grid');
+const activeTab = ref<'grid' | 'diary' | 'allocations'>('grid');
 
 const selectedClassId = ref('');
 const selectedSectionId = ref('');
+
+// Daily Diary State
+const selectedDiaryDate = ref<string>(new Date().toISOString().slice(0, 10));
+const showDiaryModal = ref(false);
+const diaryModalSubjectId = ref('');
+const diaryModalClasswork = ref('');
+const diaryModalHomework = ref('');
+const diaryModalDueDate = ref('');
+const diaryModalError = ref<string | null>(null);
+const diaryModalSaving = ref(false);
+const diaryFeedback = ref<{ type: 'success' | 'error'; message: string } | null>(null);
+
+const canWriteDiary = computed(() => !authStore.isStudentOrParent);
 
 // Slot Edit Modal
 const showSlotModal = ref(false);
@@ -52,14 +69,26 @@ const days: { key: DayOfWeek; label: string }[] = [
 
 onMounted(async () => {
   await Promise.all([
-    academicsStore.fetchClasses(),
-    academicsStore.fetchSections(),
-    academicsStore.fetchSubjects(),
-    peopleStore.fetchTeachers(),
-    timetableStore.fetchPeriods(),
+    academicsStore.fetchClasses().catch(() => {}),
+    academicsStore.fetchSections().catch(() => {}),
+    academicsStore.fetchSubjects().catch(() => {}),
+    peopleStore.fetchTeachers().catch(() => {}),
+    peopleStore.fetchEnrollments().catch(() => {}),
+    timetableStore.fetchPeriods().catch(() => {}),
   ]);
 
-  if (academicsStore.classes.length > 0) {
+  if (route.query.tab === 'diary' || route.path.includes('/diary') || route.path.includes('/homework')) {
+    activeTab.value = 'diary';
+  }
+
+  // Auto-lock class & section for Student and Parent
+  if (authStore.isStudentOrParent && peopleStore.enrollments.length > 0) {
+    const myEnr = peopleStore.enrollments[0];
+    if (myEnr) {
+      selectedClassId.value = myEnr.classId;
+      selectedSectionId.value = myEnr.sectionId;
+    }
+  } else if (academicsStore.classes.length > 0) {
     const defaultClass = academicsStore.classes.find((c) => c.code === 'STD-10') || academicsStore.classes[0]!;
     selectedClassId.value = defaultClass.id;
 
@@ -69,7 +98,13 @@ onMounted(async () => {
 
     if (defaultSection) {
       selectedSectionId.value = defaultSection.id;
-      await refreshData();
+    }
+  }
+
+  if (selectedSectionId.value) {
+    await refreshData();
+    if (activeTab.value === 'diary') {
+      await refreshDiaryData();
     }
   }
 });
@@ -77,6 +112,21 @@ onMounted(async () => {
 watch(selectedSectionId, async (newSecId) => {
   if (newSecId) {
     await refreshData();
+    if (activeTab.value === 'diary') {
+      await refreshDiaryData();
+    }
+  }
+});
+
+watch(selectedDiaryDate, async () => {
+  if (activeTab.value === 'diary') {
+    await refreshDiaryData();
+  }
+});
+
+watch(activeTab, async (newTab) => {
+  if (newTab === 'diary') {
+    await refreshDiaryData();
   }
 });
 
@@ -93,6 +143,19 @@ async function refreshData() {
     timetableStore.fetchSectionTimetable(selectedSectionId.value),
     timetableStore.fetchAllocations(selectedSectionId.value),
   ]);
+}
+
+async function refreshDiaryData() {
+  if (!selectedSectionId.value) return;
+  try {
+    await diaryStore.fetchEntries({
+      date: selectedDiaryDate.value,
+      sectionId: selectedSectionId.value,
+      classId: selectedClassId.value,
+    });
+  } catch {
+    // Handled in store
+  }
 }
 
 function getSlotFor(day: DayOfWeek, periodId: string): TimetableSlot | undefined {
@@ -179,6 +242,123 @@ async function handleSaveAllocation() {
     allocError.value = err.message || 'Failed to allocate teacher';
   }
 }
+
+// -------------------------------------------------------------
+// Daily Diary Handlers (Classwork & Homework Notes)
+// -------------------------------------------------------------
+function openAddDiaryModal(subjectId?: string) {
+  diaryModalSubjectId.value = subjectId || (academicsStore.subjects[0]?.id ?? '');
+  diaryModalClasswork.value = '';
+  diaryModalHomework.value = '';
+  const tomorrow = new Date(selectedDiaryDate.value);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  diaryModalDueDate.value = tomorrow.toISOString().slice(0, 10);
+  diaryModalError.value = null;
+  showDiaryModal.value = true;
+}
+
+function editDiaryEntry(entry: DailyDiaryEntry) {
+  diaryModalSubjectId.value = entry.subjectId;
+  diaryModalClasswork.value = entry.classwork;
+  diaryModalHomework.value = entry.homework || '';
+  diaryModalDueDate.value = entry.dueDate ? entry.dueDate.slice(0, 10) : '';
+  diaryModalError.value = null;
+  showDiaryModal.value = true;
+}
+
+async function handleSaveDiaryEntry() {
+  if (!canWriteDiary.value) return;
+  if (!diaryModalSubjectId.value) {
+    diaryModalError.value = 'Please select a subject';
+    return;
+  }
+  if (!diaryModalClasswork.value.trim()) {
+    diaryModalError.value = 'Classwork notes are required';
+    return;
+  }
+
+  diaryModalSaving.value = true;
+  diaryModalError.value = null;
+
+  try {
+    await diaryStore.saveEntry({
+      classId: selectedClassId.value,
+      sectionId: selectedSectionId.value,
+      subjectId: diaryModalSubjectId.value,
+      date: selectedDiaryDate.value,
+      classwork: diaryModalClasswork.value.trim(),
+      homework: diaryModalHomework.value.trim() || null,
+      dueDate: diaryModalDueDate.value || null,
+    });
+
+    showDiaryModal.value = false;
+    diaryFeedback.value = {
+      type: 'success',
+      message: 'Classwork & Homework notes saved successfully!',
+    };
+    setTimeout(() => {
+      diaryFeedback.value = null;
+    }, 4000);
+    await refreshDiaryData();
+  } catch (err: any) {
+    diaryModalError.value = err.message || 'Failed to save diary entry';
+  } finally {
+    diaryModalSaving.value = false;
+  }
+}
+
+async function handleDeleteDiaryEntry(id: string) {
+  if (!canWriteDiary.value) return;
+  if (!confirm('Are you sure you want to delete this diary entry?')) return;
+  try {
+    await diaryStore.deleteEntry(id);
+    await refreshDiaryData();
+  } catch (err: any) {
+    alert(err.message || 'Failed to delete entry');
+  }
+}
+
+function changeDiaryDate(deltaDays: number) {
+  const d = new Date(selectedDiaryDate.value);
+  d.setDate(d.getDate() + deltaDays);
+  selectedDiaryDate.value = d.toISOString().slice(0, 10);
+}
+
+function setTodayDiaryDate() {
+  selectedDiaryDate.value = new Date().toISOString().slice(0, 10);
+}
+
+function formatDiaryDate(dateStr: string) {
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-IN', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+function formatDueDateBadge(dueDateStr: string | null | undefined) {
+  if (!dueDateStr) return null;
+  try {
+    const due = new Date(dueDateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    due.setHours(0, 0, 0, 0);
+    const diffDays = Math.round((due.getTime() - today.getTime()) / 86400000);
+    if (diffDays === 0) return 'Due Today';
+    if (diffDays === 1) return 'Due Tomorrow';
+    if (diffDays === -1) return 'Due Yesterday';
+    if (diffDays < 0) return `Overdue (${Math.abs(diffDays)}d ago)`;
+    return `Due: ${due.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`;
+  } catch {
+    return `Due: ${dueDateStr}`;
+  }
+}
 </script>
 
 <template>
@@ -206,6 +386,17 @@ async function handleSaveAllocation() {
           Weekly Timetable
         </button>
         <button
+          class="tab-btn"
+          :class="{ active: activeTab === 'diary' }"
+          id="tab-daily-diary-btn"
+          @click="activeTab = 'diary'"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="tab-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          Daily Diary & Homework
+        </button>
+        <button
           v-if="authStore.canManageTimetable"
           class="tab-btn"
           :class="{ active: activeTab === 'allocations' }"
@@ -222,26 +413,61 @@ async function handleSaveAllocation() {
 
     <!-- Section Filter Bar -->
     <div class="card control-panel" id="timetable-controls">
-      <div class="field-item">
-        <label for="tt-class-select">Class</label>
-        <select id="tt-class-select" v-model="selectedClassId">
-          <option v-for="c in academicsStore.classes" :key="c.id" :value="c.id">
-            {{ c.name }}
-          </option>
-        </select>
+      <div class="filters-row">
+        <div class="field-item">
+          <label for="tt-class-select">Class</label>
+          <select id="tt-class-select" v-model="selectedClassId" :disabled="authStore.isStudentOrParent">
+            <option v-for="c in academicsStore.classes" :key="c.id" :value="c.id">
+              {{ c.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field-item">
+          <label for="tt-section-select">Section</label>
+          <select id="tt-section-select" v-model="selectedSectionId" :disabled="authStore.isStudentOrParent">
+            <option v-for="s in availableSections" :key="s.id" :value="s.id">
+              Section {{ s.name }} ({{ s.roomNumber || 'Room Active' }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Date navigation for Daily Diary tab -->
+        <div v-if="activeTab === 'diary'" class="field-item diary-date-nav">
+          <label for="diary-date-picker">Calendar Date</label>
+          <div class="stepper-group">
+            <button class="btn btn-secondary btn-icon-only" @click="changeDiaryDate(-1)" title="Previous Day">◀</button>
+            <input
+              type="date"
+              id="diary-date-picker"
+              class="date-picker-input"
+              v-model="selectedDiaryDate"
+            />
+            <button class="btn btn-secondary btn-icon-only" @click="changeDiaryDate(1)" title="Next Day">▶</button>
+            <button class="btn btn-secondary btn-sm" @click="setTodayDiaryDate">Today</button>
+          </div>
+        </div>
       </div>
 
-      <div class="field-item">
-        <label for="tt-section-select">Section</label>
-        <select id="tt-section-select" v-model="selectedSectionId">
-          <option v-for="s in availableSections" :key="s.id" :value="s.id">
-            Section {{ s.name }} ({{ s.roomNumber || 'No Room' }})
-          </option>
-        </select>
-      </div>
+      <div class="action-item">
+        <button
+          v-if="activeTab === 'diary' && canWriteDiary"
+          class="btn btn-primary"
+          id="open-diary-modal-btn"
+          @click="openAddDiaryModal()"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="btn-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Record Classwork & Homework
+        </button>
 
-      <div v-if="activeTab === 'allocations' && authStore.canManageTimetable" class="action-item">
-        <button class="btn btn-primary" id="open-alloc-modal-btn" @click="showAllocationModal = true">
+        <button
+          v-else-if="activeTab === 'allocations' && authStore.canManageTimetable"
+          class="btn btn-primary"
+          id="open-alloc-modal-btn"
+          @click="showAllocationModal = true"
+        >
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="btn-icon">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -333,8 +559,131 @@ async function handleSaveAllocation() {
       </div>
     </div>
 
-    <!-- Tab 2: Teacher Allocations -->
-    <div v-else class="card allocations-card" id="allocations-table-card">
+    <!-- Tab 2: Daily Diary & Homework -->
+    <div v-else-if="activeTab === 'diary'" class="diary-tab-content" id="daily-diary-content">
+      <!-- Feedback Banner -->
+      <div v-if="diaryFeedback" class="alert-banner alert-success mb-4" :class="diaryFeedback.type" role="alert">
+        <span>{{ diaryFeedback.message }}</span>
+        <button @click="diaryFeedback = null" class="close-btn">&times;</button>
+      </div>
+
+      <!-- Diary Header Card -->
+      <div class="card diary-header-card">
+        <div class="diary-date-banner">
+          <div class="date-icon-box bg-indigo">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="banner-icon">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h2>{{ formatDiaryDate(selectedDiaryDate) }}</h2>
+            <p class="subtitle">
+              Daily Classwork Notes & Homework for Class {{ currentSection?.name ? academicsStore.classes.find(c => c.id === selectedClassId)?.name + ' - Section ' + currentSection?.name : 'Selected Section' }}
+            </p>
+          </div>
+        </div>
+        <div class="diary-meta-tags">
+          <span class="badge badge-indigo">{{ diaryStore.entries.length }} Subjects Recorded</span>
+          <span v-if="canWriteDiary" class="badge badge-emerald">Educator Portal</span>
+          <span v-else class="badge badge-cyan">View Only (Student & Parent)</span>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="diaryStore.loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Fetching classwork & homework notes...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else-if="diaryStore.entries.length === 0" class="card empty-diary-card">
+        <div class="empty-diary-illustration">
+          <span class="empty-icon">📖</span>
+        </div>
+        <h3>No Notes Logged for {{ formatDiaryDate(selectedDiaryDate) }}</h3>
+        <p class="empty-desc">
+          There are no classwork or homework notes recorded for this section on the selected date.
+        </p>
+        <div v-if="canWriteDiary" class="mt-4">
+          <button class="btn btn-primary" @click="openAddDiaryModal()">
+            ➕ Record First Subject Notes
+          </button>
+        </div>
+        <div v-else class="mt-2 text-xs text-muted">
+          Use the calendar date picker above to check previous or upcoming class days.
+        </div>
+      </div>
+
+      <!-- Entries Grid -->
+      <div v-else class="diary-cards-grid">
+        <div
+          v-for="entry in diaryStore.entries"
+          :key="entry.id"
+          class="card diary-subject-card"
+          :id="`diary-card-${entry.id}`"
+        >
+          <div class="card-subject-header">
+            <div class="subject-title-group">
+              <span class="subject-code-pill font-mono">{{ entry.subject.code }}</span>
+              <span class="subject-name">{{ entry.subject.name }}</span>
+            </div>
+
+            <div class="subject-header-actions">
+              <span v-if="entry.teacher?.user" class="teacher-tag">
+                👨‍🏫 {{ entry.teacher.user.firstName }} {{ entry.teacher.user.lastName }}
+              </span>
+              <div v-if="canWriteDiary" class="action-buttons-group">
+                <button
+                  class="btn-icon-subtle"
+                  title="Edit Notes"
+                  @click="editDiaryEntry(entry)"
+                >
+                  ✎
+                </button>
+                <button
+                  class="btn-icon-subtle text-rose-400"
+                  title="Delete Entry"
+                  @click="handleDeleteDiaryEntry(entry.id)"
+                >
+                  🗑
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Classwork Box -->
+          <div class="diary-section-box classwork-box">
+            <div class="section-box-header">
+              <span class="section-box-icon">📝</span>
+              <span class="section-box-title">Classwork & Topics Covered Today</span>
+            </div>
+            <p class="section-box-content">{{ entry.classwork }}</p>
+          </div>
+
+          <!-- Homework Box -->
+          <div class="diary-section-box homework-box" :class="{ 'has-hw': !!entry.homework }">
+            <div class="section-box-header justify-between">
+              <div class="flex items-center gap-1">
+                <span class="section-box-icon">📚</span>
+                <span class="section-box-title">Homework & Assignments</span>
+              </div>
+              <span
+                v-if="entry.dueDate"
+                class="badge"
+                :class="entry.dueDate.slice(0, 10) <= selectedDiaryDate ? 'badge-amber' : 'badge-emerald'"
+              >
+                {{ formatDueDateBadge(entry.dueDate) }}
+              </span>
+            </div>
+            <p v-if="entry.homework" class="section-box-content homework-text">{{ entry.homework }}</p>
+            <p v-else class="section-box-content text-muted italic">No homework assigned for this subject.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Teacher Allocations -->
+    <div v-else-if="activeTab === 'allocations'" class="card allocations-card" id="allocations-table-card">
       <div class="allocations-header">
         <h3>Staff Allocations for Section {{ currentSection?.name }}</h3>
         <p class="subtitle">Designated Class Teachers and Subject Specialists</p>
@@ -501,6 +850,92 @@ async function handleSaveAllocation() {
           </button>
           <button type="button" class="btn btn-primary" id="save-allocation-btn" @click="handleSaveAllocation">
             Save Allocation
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Diary Modal (Teachers & Leadership) -->
+    <div v-if="showDiaryModal" class="modal-backdrop" @click.self="showDiaryModal = false" id="diary-modal">
+      <div class="modal-card diary-modal-card">
+        <div class="modal-header">
+          <h3>Record Daily Classwork & Homework</h3>
+          <button class="close-btn" @click="showDiaryModal = false">&times;</button>
+        </div>
+
+        <div v-if="diaryModalError" class="alert-banner alert-error modal-alert">
+          <span>{{ diaryModalError }}</span>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="diary-subject-select">Subject *</label>
+              <select id="diary-subject-select" v-model="diaryModalSubjectId">
+                <option value="" disabled>-- Select Subject --</option>
+                <option v-for="sub in academicsStore.subjects" :key="sub.id" :value="sub.id">
+                  {{ sub.name }} ({{ sub.code }})
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="diary-modal-date">Calendar Date *</label>
+              <input
+                type="date"
+                id="diary-modal-date"
+                v-model="selectedDiaryDate"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="diary-classwork-input">Classwork Notes *</label>
+            <textarea
+              id="diary-classwork-input"
+              v-model="diaryModalClasswork"
+              rows="3"
+              class="diary-textarea"
+              placeholder="e.g. Chapter 4: Quadratic Equations — Solved Exercise 4.2 questions 1-8 on blackboard."
+            ></textarea>
+            <span class="hint-text">Summarize topics taught, board exercises, or experiments completed today.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="diary-homework-input">Homework Assignment (Optional)</label>
+            <textarea
+              id="diary-homework-input"
+              v-model="diaryModalHomework"
+              rows="2"
+              class="diary-textarea"
+              placeholder="e.g. Complete Exercise 4.2 questions 9-14 in homework notebook."
+            ></textarea>
+            <span class="hint-text">Assignments given to students to practice at home. Parents will see this on their daily calendar.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="diary-due-date-input">Submission Due Date</label>
+            <input
+              type="date"
+              id="diary-due-date-input"
+              v-model="diaryModalDueDate"
+            />
+            <span class="hint-text">Estimated due date for homework submission (defaults to next class day).</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="showDiaryModal = false">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="save-diary-modal-btn"
+            :disabled="diaryModalSaving"
+            @click="handleSaveDiaryEntry"
+          >
+            {{ diaryModalSaving ? 'Saving...' : '💾 Save Classwork & Homework' }}
           </button>
         </div>
       </div>
@@ -1023,5 +1458,278 @@ async function handleSaveAllocation() {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Daily Diary & Homework Styles
+   ========================================================================== */
+.filters-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.diary-date-nav {
+  min-width: 320px;
+}
+
+.stepper-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.date-picker-input {
+  height: 2.25rem;
+  padding: 0 0.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.btn-icon-only {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.diary-header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  margin-bottom: 1.5rem;
+}
+
+.diary-date-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.date-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.banner-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.diary-date-banner h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.diary-meta-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.empty-diary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.empty-diary-illustration {
+  margin-bottom: 1rem;
+}
+
+.empty-icon {
+  font-size: 3rem;
+}
+
+.empty-desc {
+  max-width: 480px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.diary-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.25rem;
+}
+
+.diary-subject-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+.diary-subject-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+.card-subject-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-card-border);
+}
+
+.subject-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.subject-code-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-primary-400);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.subject-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.subject-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.teacher-tag {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--color-surface-raised);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.action-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-icon-subtle {
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  transition: all var(--duration-fast);
+}
+
+.btn-icon-subtle:hover {
+  background: var(--color-surface-raised);
+  color: var(--text-primary);
+}
+
+.diary-section-box {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.classwork-box {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.homework-box {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.homework-box.has-hw {
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.section-box-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.section-box-content {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.homework-text {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.diary-textarea {
+  width: 100%;
+  padding: 0.65rem 0.875rem;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  color: #f8fafc;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: all var(--duration-fast);
+}
+
+.diary-textarea:focus {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
 }
 </style>

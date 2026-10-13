@@ -206,6 +206,7 @@ model School {
   feeStructures FeeStructure[]
   studentFees   StudentFee[]
   feePayments   FeePayment[]
+  diaryEntries  DailyDiaryEntry[]
 
   @@map("schools")
 }
@@ -244,6 +245,7 @@ model AcademicYear {
   teacherAllocations TeacherAllocation[]
   examTerms   ExamTerm[]
   feeStructures FeeStructure[]
+  diaryEntries  DailyDiaryEntry[]
 
   @@unique([schoolId, name])
   @@index([schoolId, isCurrent])
@@ -269,6 +271,7 @@ model Class {
   teacherAllocations TeacherAllocation[]
   exams         Exam[]
   feeStructures FeeStructure[]
+  diaryEntries  DailyDiaryEntry[]
 
   @@unique([schoolId, code])
   @@index([schoolId, orderIndex])
@@ -290,6 +293,7 @@ model Section {
   enrollments Enrollment[]
   timetableSlots TimetableSlot[]
   teacherAllocations TeacherAllocation[]
+  diaryEntries       DailyDiaryEntry[]
 
   @@unique([classId, name])
   @@index([schoolId])
@@ -310,6 +314,7 @@ model Subject {
   timetableSlots TimetableSlot[]
   teacherAllocations TeacherAllocation[]
   assessments   Assessment[]
+  diaryEntries  DailyDiaryEntry[]
 
   @@unique([schoolId, code])
   @@index([schoolId])
@@ -552,6 +557,7 @@ model Teacher {
 
   timetableSlots TimetableSlot[]
   allocations    TeacherAllocation[]
+  diaryEntries   DailyDiaryEntry[]
 
   @@unique([schoolId, employeeCode])
   @@index([schoolId, status])
@@ -678,6 +684,33 @@ model TeacherAllocation {
   @@index([teacherId, academicYearId])
   @@index([sectionId, academicYearId])
   @@map("teacher_allocations")
+}
+
+model DailyDiaryEntry {
+  id             String       @id @default(uuid())
+  schoolId       String
+  school         School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  classId        String
+  class          Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  sectionId      String
+  section        Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subjectId      String
+  subject        Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacherId      String?
+  teacher        Teacher?     @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+  date           DateTime     @db.Date
+  classwork      String       @db.Text
+  homework       String?      @db.Text
+  dueDate        DateTime?    @db.Date
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([sectionId, subjectId, date])
+  @@index([schoolId, sectionId, date])
+  @@index([schoolId, classId, date])
+  @@map("daily_diary_entries")
 }
 
 // ============================================================================
