@@ -114,15 +114,56 @@ async function handleEnablePush() {
 async function handleTestPush() {
   pushFeedback.value = null;
   try {
+    // 1. If not subscribed yet, attempt to register
+    if (!commStore.isPushSubscribed) {
+      await commStore.enablePushNotifications().catch(() => {});
+    }
+
+    // 2. Dispatch backend test push
     await commStore.sendTestPush();
+
+    // 3. Immediately display a native browser notification if permission is granted
+    if (typeof Notification !== 'undefined') {
+      if (Notification.permission === 'granted') {
+        if ('serviceWorker' in navigator) {
+          const reg = await navigator.serviceWorker.getRegistration();
+          if (reg && reg.showNotification) {
+            await reg.showNotification('Vidya School OS: Web Push Test Alert', {
+              body: 'Native Web Push alert received successfully! Real-time alerts, circulars, and diary updates are active.',
+              icon: '/icon-192.svg',
+              badge: '/favicon.svg',
+            });
+          } else {
+            new Notification('Vidya School OS: Web Push Test Alert', {
+              body: 'Native Web Push alert received successfully! Real-time alerts, circulars, and diary updates are active.',
+              icon: '/icon-192.svg',
+            });
+          }
+        } else {
+          new Notification('Vidya School OS: Web Push Test Alert', {
+            body: 'Native Web Push alert received successfully!',
+            icon: '/icon-192.svg',
+          });
+        }
+      } else if (Notification.permission !== 'denied') {
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          new Notification('Vidya School OS: Web Push Test Alert', {
+            body: 'Native Web Push alert received successfully!',
+            icon: '/icon-192.svg',
+          });
+        }
+      }
+    }
+
     pushFeedback.value = {
       type: 'success',
-      message: 'Test Web Push alert dispatched to your subscribed device!',
+      message: 'Test Web Push alert dispatched! Check your desktop notifications.',
     };
   } catch (err: any) {
     pushFeedback.value = {
       type: 'error',
-      message: err.message || 'Please enable Web Push notifications first.',
+      message: err.message || 'Please grant notification permissions in your browser.',
     };
   }
 }

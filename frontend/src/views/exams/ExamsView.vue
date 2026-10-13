@@ -28,6 +28,17 @@ function showSuccess(msg: string) {
 }
 
 function showError(msg: string) {
+  // Never show permission error banners to parents and students who have view-only access
+  if (
+    authStore.isStudentOrParent &&
+    (msg.toLowerCase().includes('permission') ||
+      msg.toLowerCase().includes('forbidden') ||
+      msg.toLowerCase().includes('access') ||
+      msg.toLowerCase().includes('unauthorized') ||
+      msg.toLowerCase().includes('403'))
+  ) {
+    return;
+  }
   errorMessage.value = msg;
   successMessage.value = null;
 }
@@ -152,12 +163,12 @@ const reportStudentsList = computed(() => {
 onMounted(async () => {
   try {
     await Promise.all([
-      academicsStore.fetchAcademicYears(),
-      academicsStore.fetchClasses(),
-      academicsStore.fetchSections(),
-      academicsStore.fetchSubjects(),
-      peopleStore.fetchEnrollments(),
-      examsStore.fetchGradingScales(),
+      academicsStore.fetchAcademicYears().catch(() => {}),
+      academicsStore.fetchClasses().catch(() => {}),
+      academicsStore.fetchSections().catch(() => {}),
+      academicsStore.fetchSubjects().catch(() => {}),
+      peopleStore.fetchEnrollments().catch(() => {}),
+      examsStore.fetchGradingScales().catch(() => {}),
     ]);
 
     // Set default academic year

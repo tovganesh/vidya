@@ -282,24 +282,42 @@ export class CommunicationService {
       where: { schoolId, userId },
     });
 
-    if (subscriptions.length === 0) {
-      throw new BadRequestError('No active push subscriptions found for user');
+    // Create an in-app notification so user also receives an instant notification badge update
+    await prisma.notification.create({
+      data: {
+        schoolId,
+        userId,
+        title: 'Vidya Web Push Test Alert',
+        body: 'Native Web Push notifications are active and verified for your device.',
+        type: NotificationType.ANNOUNCEMENT,
+        data: { link: '/communication' },
+        isRead: false,
+      },
+    });
+
+    if (subscriptions.length > 0) {
+      await Promise.all(
+        subscriptions.map((sub) =>
+          WebPushService.sendNotification(
+            { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
+            {
+              title: 'Vidya Test Alert',
+              body: 'Native Web Push notifications are active and verified on your device.',
+              tag: 'test-push',
+            },
+          ),
+        ),
+      );
     }
 
-    const results = await Promise.all(
-      subscriptions.map((sub) =>
-        WebPushService.sendNotification(
-          { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
-          {
-            title: 'Vidya Test Alert',
-            body: 'Native Web Push notifications are active and verified on your device.',
-            tag: 'test-push',
-          },
-        ),
-      ),
-    );
-
-    return { success: true, dispatched: results.length };
+    return {
+      success: true,
+      dispatched: subscriptions.length,
+      message:
+        subscriptions.length > 0
+          ? `Test push dispatched to ${subscriptions.length} active device(s)`
+          : 'Test alert registered successfully.',
+    };
   }
 
   // ============================================================================

@@ -64,6 +64,38 @@ export function requirePermission(permissionCode: string | string[]) {
     }
 
     const required = Array.isArray(permissionCode) ? permissionCode : [permissionCode];
+
+    // Inherent read permissions for Parent and Student roles
+    if (
+      (request.user.role === 'PARENT' || request.user.role === 'STUDENT') &&
+      required.some((p) => ['academics:read', 'student:read', 'attendance:read', 'fee:read'].includes(p))
+    ) {
+      return;
+    }
+
+    // Inherent permissions for Principal and Vice Principal leadership
+    if (
+      (request.user.role === 'PRINCIPAL' || request.user.role === 'VICE_PRINCIPAL') &&
+      required.some((p) =>
+        [
+          'academics:read',
+          'academics:write',
+          'student:read',
+          'student:write',
+          'attendance:read',
+          'attendance:mark',
+          'exam:marks_entry',
+          'fee:read',
+          'fee:collect',
+          'school:manage',
+          'user:manage',
+          'audit:read',
+        ].includes(p),
+      )
+    ) {
+      return;
+    }
+
     const userPerms = request.user.permissions || [];
     const hasPermission = required.some((p) => userPerms.includes(p));
 

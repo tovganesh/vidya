@@ -3,11 +3,13 @@ import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.js';
 import { useSystemStore } from '@/stores/system.js';
 import { useCommunicationStore } from '@/stores/communication.js';
+import { useDiaryStore } from '@/stores/diary.js';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 
 const authStore = useAuthStore();
 const systemStore = useSystemStore();
 const commStore = useCommunicationStore();
+const diaryStore = useDiaryStore();
 
 // Role preview switcher for demonstration and testing
 // Defaults to the actual logged-in user's role (or SUPER_ADMIN if unauthenticated)
@@ -38,6 +40,7 @@ const rolePerspectives = [
 onMounted(() => {
   systemStore.checkHealth();
   commStore.fetchAnnouncements();
+  diaryStore.fetchEntries({ date: new Date().toISOString().slice(0, 10) }).catch(() => {});
 });
 </script>
 
@@ -254,6 +257,14 @@ onMounted(() => {
               <div class="tile-text">
                 <span class="tile-title">Monthly Register</span>
                 <span class="tile-sub">Review CBSE 75% attendance compliance</span>
+              </div>
+            </router-link>
+
+            <router-link to="/timetable?tab=diary" class="action-tile">
+              <div class="tile-icon bg-indigo">📖</div>
+              <div class="tile-text">
+                <span class="tile-title">Daily Diary Notes</span>
+                <span class="tile-sub">Record today's classwork & homework</span>
               </div>
             </router-link>
 
@@ -498,6 +509,35 @@ onMounted(() => {
           </div>
         </section>
       </div>
+
+      <!-- Student Daily Diary & Homework Section -->
+      <section class="card mt-6" id="student-diary-preview">
+        <div class="section-header">
+          <div>
+            <h3>Today's Classwork & Homework Notes 📖</h3>
+            <p>Daily lessons taught and assignments due from your teachers</p>
+          </div>
+          <router-link to="/timetable?tab=diary" class="btn btn-secondary btn-sm" id="student-view-all-diary-btn">
+            Full Calendar Diary →
+          </router-link>
+        </div>
+
+        <div v-if="diaryStore.entries.length === 0" class="empty-box p-4 text-center text-sm text-muted">
+          No classwork or homework notes recorded for today yet. Use the calendar to view past dates.
+        </div>
+        <div v-else class="diary-preview-grid">
+          <div v-for="entry in diaryStore.entries.slice(0, 3)" :key="entry.id" class="diary-preview-card">
+            <div class="preview-header">
+              <span class="badge badge-indigo font-bold">{{ entry.subject.name }}</span>
+              <span v-if="entry.dueDate" class="badge badge-emerald text-xs">Due: {{ entry.dueDate.slice(0, 10) }}</span>
+            </div>
+            <div class="preview-body">
+              <p class="text-xs text-secondary"><strong>Classwork:</strong> {{ entry.classwork }}</p>
+              <p v-if="entry.homework" class="text-xs text-primary mt-1 font-semibold"><strong>Homework:</strong> {{ entry.homework }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </template>
 
     <!-- ===================================================================== -->
@@ -677,6 +717,35 @@ onMounted(() => {
           </div>
         </section>
       </div>
+
+      <!-- Parent Ward Daily Diary & Homework Section -->
+      <section class="card mt-6" id="parent-diary-preview">
+        <div class="section-header">
+          <div>
+            <h3>Ward's Daily Classwork & Homework Diary 📖</h3>
+            <p>Review what Aarav studied in class today and upcoming homework tasks</p>
+          </div>
+          <router-link to="/timetable?tab=diary" class="btn btn-secondary btn-sm" id="parent-view-all-diary-btn">
+            Open Diary & Calendar →
+          </router-link>
+        </div>
+
+        <div v-if="diaryStore.entries.length === 0" class="empty-box p-4 text-center text-sm text-muted">
+          No classwork or homework notes recorded for today yet. Check previous dates in the Diary calendar.
+        </div>
+        <div v-else class="diary-preview-grid">
+          <div v-for="entry in diaryStore.entries.slice(0, 3)" :key="entry.id" class="diary-preview-card">
+            <div class="preview-header">
+              <span class="badge badge-indigo font-bold">{{ entry.subject.name }}</span>
+              <span v-if="entry.dueDate" class="badge badge-emerald text-xs">Due: {{ entry.dueDate.slice(0, 10) }}</span>
+            </div>
+            <div class="preview-body">
+              <p class="text-xs text-secondary"><strong>Classwork:</strong> {{ entry.classwork }}</p>
+              <p v-if="entry.homework" class="text-xs text-primary mt-1 font-semibold"><strong>Homework:</strong> {{ entry.homework }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </template>
 
     <!-- ===================================================================== -->
@@ -1782,8 +1851,46 @@ onMounted(() => {
 [data-theme="light"] .grade-row,
 [data-theme="light"] .health-row,
 [data-theme="light"] .tx-item,
-[data-theme="light"] .sys-item {
+[data-theme="light"] .sys-item,
+[data-theme="light"] .diary-preview-card {
   background: #f8fafc;
   border-color: #e2e8f0;
+}
+
+/* Diary Preview Grid */
+.diary-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.diary-preview-card {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-card-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: transform var(--duration-fast);
+}
+
+.diary-preview-card:hover {
+  transform: translateY(-2px);
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  line-height: 1.45;
 }
 </style>

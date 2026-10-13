@@ -265,8 +265,30 @@ export const useCommunicationStore = defineStore('communication', () => {
       throw new Error('Could not retrieve VAPID public key from server.');
     }
 
-    const registration = await navigator.serviceWorker.ready;
-    let subscription = await registration.pushManager.getSubscription();
+    let registration: ServiceWorkerRegistration | undefined;
+    try {
+      registration = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise<ServiceWorkerRegistration | undefined>((resolve) =>
+          setTimeout(() => resolve(undefined), 2500),
+        ),
+      ]);
+    } catch {
+      // fallback
+    }
+
+    if (!registration) {
+      registration =
+        (await navigator.serviceWorker.getRegistration()) ||
+        (await navigator.serviceWorker.register('/sw.js', { scope: '/' }));
+    }
+
+    let subscription: PushSubscription | null = null;
+    try {
+      subscription = await registration.pushManager.getSubscription();
+    } catch {
+      // ignore
+    }
 
     if (!subscription) {
       const appServerKey = urlBase64ToUint8Array(key);

@@ -111,9 +111,10 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/timetable',
+    alias: ['/diary', '/homework'],
     name: 'timetable-grid',
     component: TimetableGridView,
-    meta: { title: 'Class Timetable & Allocations — Vidya', requiresAuth: true },
+    meta: { title: 'Class Timetable & Daily Diary — Vidya', requiresAuth: true },
   },
   {
     path: '/announcements',
