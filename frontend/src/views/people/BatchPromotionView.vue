@@ -599,55 +599,93 @@ async function executePromotion() {
   overflow-x: auto;
 }
 
+.checklist-table-wrap {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
+}
+
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
   font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .data-table th {
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--color-surface-hover);
+  padding: 0.95rem 1.25rem;
+  background: var(--color-surface-raised);
   color: var(--color-text-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.725rem;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.065em;
   border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
 }
 
 .data-table td {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   color: var(--color-text-main);
   vertical-align: middle;
 }
 
+[data-theme="light"] .data-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table-row {
+  transition: background-color var(--transition-fast);
+}
+
+.table-row:hover td {
+  background: var(--color-surface-hover);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .student-name-text {
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--color-text-main);
 }
 
 .code-badge {
-  font-family: monospace;
+  font-family: var(--font-mono, monospace);
   font-size: 0.8125rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.2rem 0.4rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.25rem 0.55rem;
   border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
 }
 
 .roll-badge {
-  font-weight: 600;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
 }
 
 .status-select {
-  padding: 0.375rem 0.625rem;
+  padding: 0.45rem 0.75rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   font-size: 0.8125rem;
   font-weight: 600;
   outline: none;
+  cursor: pointer;
 }
 
 .status-select.promoted {

@@ -58,10 +58,29 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-backdrop: blur(14px);
 
+  /* Spacing Scale */
+  --spacing-2xs: 0.125rem;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
   /* Transitions */
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-fast: 150ms;
   --duration-normal: 250ms;
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+
+  /* Semantic Aliases */
+  --color-primary: var(--color-primary-500);
+  --color-border: var(--color-card-border);
+  --color-border-hover: var(--color-card-border-hover);
+  --color-text-main: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
 }
 
 /* =========================================================================
@@ -113,4 +132,12 @@
   --glass-bg: rgba(255, 255, 255, 0.88);
   --glass-border: rgba(226, 232, 240, 0.85);
   --glass-backdrop: blur(14px);
+
+  /* Semantic Aliases */
+  --color-primary: var(--color-primary-500);
+  --color-border: #e2e8f0;
+  --color-border-hover: rgba(99, 102, 241, 0.45);
+  --color-text-main: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;
 }
