@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.js';
 import { useSystemStore } from '@/stores/system.js';
 import { useCommunicationStore } from '@/stores/communication.js';
@@ -11,31 +11,14 @@ const systemStore = useSystemStore();
 const commStore = useCommunicationStore();
 const diaryStore = useDiaryStore();
 
-// Role preview switcher for demonstration and testing
-// Defaults to the actual logged-in user's role (or SUPER_ADMIN if unauthenticated)
-const previewRole = ref<string | null>(null);
-
-const activeRole = computed(() => {
-  if (previewRole.value) return previewRole.value;
-  return authStore.user?.primaryRole || 'SUPER_ADMIN';
-});
+const activeRole = computed(() => authStore.user?.primaryRole || null);
 
 const isTeacher = computed(() => activeRole.value === 'TEACHER');
 const isStudent = computed(() => activeRole.value === 'STUDENT');
 const isParent = computed(() => activeRole.value === 'PARENT');
 const isPrincipal = computed(() => activeRole.value === 'PRINCIPAL' || activeRole.value === 'VICE_PRINCIPAL');
 const isAccountant = computed(() => activeRole.value === 'ACCOUNTANT');
-
-// Available role perspectives
-const rolePerspectives = [
-  { key: null, label: 'My Role' },
-  { key: 'PRINCIPAL', label: 'Principal' },
-  { key: 'TEACHER', label: 'Teacher' },
-  { key: 'STUDENT', label: 'Student' },
-  { key: 'PARENT', label: 'Parent' },
-  { key: 'ACCOUNTANT', label: 'Accountant' },
-  { key: 'SUPER_ADMIN', label: 'Admin' },
-];
+const isAdmin = computed(() => activeRole.value === 'SUPER_ADMIN' || activeRole.value === 'SCHOOL_ADMIN');
 
 onMounted(() => {
   systemStore.checkHealth();
@@ -46,33 +29,18 @@ onMounted(() => {
 
 <template>
   <div class="dashboard-page" id="dashboard-view">
-    <!-- PERSPECTIVE SWITCHER BAR -->
-    <div class="perspective-bar">
-      <div class="perspective-label">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4 text-indigo-400">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>
-        <span>Active Role View:</span>
-      </div>
-      <div class="perspective-pills">
-        <button
-          v-for="p in rolePerspectives"
-          :key="p.key ?? 'default'"
-          class="perspective-pill"
-          :class="{ active: (p.key === null && previewRole === null) || previewRole === p.key }"
-          @click="previewRole = p.key"
-        >
-          {{ p.label }}
-          <span v-if="p.key === null" class="pill-dot"></span>
-        </button>
+    <!-- Loading skeleton when user profile is loading -->
+    <div v-if="!activeRole" class="card dashboard-loading-box" id="dashboard-loading">
+      <div class="loading-spinner-wrap">
+        <div class="spinner"></div>
+        <p class="text-secondary text-sm font-semibold">Loading institutional cockpit...</p>
       </div>
     </div>
 
     <!-- ===================================================================== -->
     <!-- 1. TEACHER DASHBOARD VIEW                                             -->
     <!-- ===================================================================== -->
-    <template v-if="isTeacher">
+    <template v-else-if="isTeacher">
       <header class="hero-banner teacher-hero">
         <div class="hero-content">
           <div class="hero-tags">
@@ -300,7 +268,7 @@ onMounted(() => {
               {{ authStore.user?.username || 'VIDYA-STUD-0001' }}
             </span>
           </div>
-          <h1 class="hero-title">Welcome back, {{ authStore.user?.firstName || 'Aarav' }} Sharma 🎓</h1>
+          <h1 class="hero-title">Welcome back, {{ authStore.user?.firstName || 'Aarav' }} {{ authStore.user?.lastName || 'Sundaram' }} 🎓</h1>
           <p class="hero-subtitle">
             CBSE Secondary Candidate • APAAR ID: 9845-1234-5678 • Vidya Academy
           </p>
@@ -548,12 +516,12 @@ onMounted(() => {
         <div class="hero-content">
           <div class="hero-tags">
             <span class="badge badge-indigo">Parent & Guardian Desk</span>
-            <span class="badge badge-emerald">Ward: Aarav Sharma (Class 10-A)</span>
+            <span class="badge badge-emerald">Ward: Aarav Sundaram (Class 10-A)</span>
             <span class="user-code-pill font-mono">
               {{ authStore.user?.username || 'VIDYA-PRNT-0001' }}
             </span>
           </div>
-          <h1 class="hero-title">Welcome, {{ authStore.user?.firstName || 'Suresh' }} Sharma 👨‍👩‍👧</h1>
+          <h1 class="hero-title">Welcome, {{ authStore.user?.firstName || 'Priya' }} {{ authStore.user?.lastName || 'Sundaram' }} 👨‍👩‍👧</h1>
           <p class="hero-subtitle">
             Live attendance tracking, academic trajectory, and fee receipts for your child
           </p>
@@ -1106,7 +1074,7 @@ onMounted(() => {
     <!-- ===================================================================== -->
     <!-- 6. SUPER_ADMIN / SCHOOL_ADMIN DASHBOARD VIEW                          -->
     <!-- ===================================================================== -->
-    <template v-else>
+    <template v-else-if="isAdmin">
       <header class="hero-banner admin-hero">
         <div class="hero-content">
           <div class="hero-tags">
@@ -1283,6 +1251,15 @@ onMounted(() => {
         </section>
       </div>
     </template>
+
+    <!-- 7. Fallback for unexpected or custom institutional roles -->
+    <template v-else>
+      <div class="card p-8 text-center" id="dashboard-role-fallback">
+        <h2 class="text-xl font-bold">Welcome, {{ authStore.user?.firstName }} {{ authStore.user?.lastName }}</h2>
+        <p class="text-secondary mt-2">Active Role: {{ activeRole }}</p>
+        <p class="text-muted text-sm mt-1">Institutional member workspace for Vidya School OS.</p>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -1293,69 +1270,35 @@ onMounted(() => {
   gap: 1.5rem;
 }
 
-/* PERSPECTIVE SWITCHER */
-.perspective-bar {
+/* DASHBOARD LOADING STATE */
+.dashboard-loading-box {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 0.625rem 1rem;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(10px);
+  justify-content: center;
+  min-height: 280px;
+  background: var(--color-surface-raised);
 }
 
-.perspective-label {
+.loading-spinner-wrap {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-secondary);
+  gap: 1rem;
 }
 
-.perspective-pills {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  flex-wrap: wrap;
-}
-
-.perspective-pill {
-  padding: 0.25rem 0.625rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  cursor: pointer;
-  transition: all var(--duration-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.perspective-pill:hover {
-  background: rgba(99, 102, 241, 0.15);
-  color: var(--text-primary);
-  border-color: rgba(99, 102, 241, 0.3);
-}
-
-.perspective-pill.active {
-  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-cyan-500) 100%);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
-}
-
-.pill-dot {
-  width: 5px;
-  height: 5px;
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-top-color: var(--color-primary-500);
   border-radius: 50%;
-  background: var(--color-emerald-400);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* HERO BANNER */

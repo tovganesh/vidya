@@ -170,6 +170,7 @@ describe('Daily Diary (Classwork & Homework) and Web Push Test Alerts', () => {
   });
 
   it('5. Web push test alert endpoint should succeed gracefully and register notification', async () => {
+    // Test without payload
     const res = await app.inject({
       method: 'POST',
       url: '/api/v1/communication/push/test',
@@ -179,6 +180,21 @@ describe('Daily Diary (Classwork & Homework) and Web Push Test Alerts', () => {
     expect(res.statusCode).toBe(200);
     const body = JSON.parse(res.payload);
     expect(body.success).toBe(true);
+
+    // Test with Content-Type: application/json and empty string payload (previously 400 FST_ERR_CTP_EMPTY_JSON_BODY)
+    const resWithEmptyJson = await app.inject({
+      method: 'POST',
+      url: '/api/v1/communication/push/test',
+      headers: {
+        authorization: `Bearer ${parentToken}`,
+        'content-type': 'application/json',
+      },
+      payload: '',
+    });
+
+    expect(resWithEmptyJson.statusCode).toBe(200);
+    const body2 = JSON.parse(resWithEmptyJson.payload);
+    expect(body2.success).toBe(true);
   });
 
   it('6. Teacher should update an existing daily diary entry', async () => {
