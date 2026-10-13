@@ -18,6 +18,7 @@ import TimetableGridView from '../views/timetable/TimetableGridView.vue';
 import AnnouncementsView from '../views/communication/AnnouncementsView.vue';
 import ExamsView from '../views/exams/ExamsView.vue';
 import FeesView from '../views/finance/FeesView.vue';
+import AuditTrailView from '../views/admin/AuditTrailView.vue';
 import { useAuthStore } from '../stores/auth.js';
 
 const routes: RouteRecordRaw[] = [
@@ -75,6 +76,13 @@ const routes: RouteRecordRaw[] = [
     name: 'academic-onboarding',
     component: AcademicOnboardingView,
     meta: { title: 'Academic Setup Wizard — Vidya', requiresAuth: true },
+  },
+  {
+    path: '/admin/audit',
+    alias: '/audit',
+    name: 'admin-audit',
+    component: AuditTrailView,
+    meta: { title: 'Audit Trail & Compliance Ledger — Vidya', requiresAuth: true },
   },
   {
     path: '/people',

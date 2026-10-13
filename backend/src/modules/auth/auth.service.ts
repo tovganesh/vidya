@@ -88,7 +88,12 @@ export class AuthService {
       permSet.add('fee:read');
     }
 
-    if (user.primaryRole === 'PRINCIPAL' || user.primaryRole === 'VICE_PRINCIPAL' || user.primaryRole === 'SUPER_ADMIN') {
+    if (
+      user.primaryRole === 'PRINCIPAL' ||
+      user.primaryRole === 'VICE_PRINCIPAL' ||
+      user.primaryRole === 'SUPER_ADMIN' ||
+      user.primaryRole === 'SCHOOL_ADMIN'
+    ) {
       permSet.add('student:read');
       permSet.add('student:write');
       permSet.add('attendance:read');
