@@ -3,10 +3,12 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useTimetableStore, DayOfWeek, TimetableSlot } from '../../stores/timetable.js';
 import { useAcademicsStore } from '../../stores/academics.js';
 import { usePeopleStore } from '../../stores/people.js';
+import { useAuthStore } from '../../stores/auth.js';
 
 const timetableStore = useTimetableStore();
 const academicsStore = useAcademicsStore();
 const peopleStore = usePeopleStore();
+const authStore = useAuthStore();
 
 const activeTab = ref<'grid' | 'allocations'>('grid');
 
@@ -100,6 +102,7 @@ function getSlotFor(day: DayOfWeek, periodId: string): TimetableSlot | undefined
 }
 
 function openEditSlot(day: DayOfWeek, periodId: string) {
+  if (!authStore.canManageTimetable) return;
   selectedDay.value = day;
   selectedPeriodId.value = periodId;
   modalError.value = null;
@@ -119,6 +122,7 @@ function openEditSlot(day: DayOfWeek, periodId: string) {
 }
 
 async function handleSaveSlot() {
+  if (!authStore.canManageTimetable) return;
   if (!selectedSectionId.value || !selectedPeriodId.value) return;
   modalError.value = null;
   modalSaving.value = true;
@@ -141,6 +145,7 @@ async function handleSaveSlot() {
 }
 
 async function handleDeleteSlot(slotId: string) {
+  if (!authStore.canManageTimetable) return;
   if (!confirm('Remove this timetable slot?')) return;
   try {
     await timetableStore.deleteSlot(slotId, selectedSectionId.value);
@@ -151,6 +156,7 @@ async function handleDeleteSlot(slotId: string) {
 }
 
 async function handleSaveAllocation() {
+  if (!authStore.canManageTimetable) return;
   if (!selectedClassId.value || !selectedSectionId.value || !allocTeacherId.value) {
     allocError.value = 'Teacher is required';
     return;
@@ -200,6 +206,7 @@ async function handleSaveAllocation() {
           Weekly Timetable
         </button>
         <button
+          v-if="authStore.canManageTimetable"
           class="tab-btn"
           :class="{ active: activeTab === 'allocations' }"
           id="tab-allocations-btn"
@@ -233,7 +240,7 @@ async function handleSaveAllocation() {
         </select>
       </div>
 
-      <div v-if="activeTab === 'allocations'" class="action-item">
+      <div v-if="activeTab === 'allocations' && authStore.canManageTimetable" class="action-item">
         <button class="btn btn-primary" id="open-alloc-modal-btn" @click="showAllocationModal = true">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="btn-icon">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -288,9 +295,12 @@ async function handleSaveAllocation() {
                 <div
                   v-else
                   class="slot-box"
-                  :class="{ filled: Boolean(getSlotFor(day.key, period.id)) }"
-                  @click="openEditSlot(day.key, period.id)"
-                  title="Click to assign or edit period"
+                  :class="{
+                    filled: Boolean(getSlotFor(day.key, period.id)),
+                    clickable: authStore.canManageTimetable,
+                  }"
+                  @click="authStore.canManageTimetable ? openEditSlot(day.key, period.id) : undefined"
+                  :title="authStore.canManageTimetable ? 'Click to assign or edit period' : undefined"
                 >
                   <template v-if="getSlotFor(day.key, period.id)">
                     <div class="slot-content">
@@ -307,9 +317,12 @@ async function handleSaveAllocation() {
                     </div>
                   </template>
                   <template v-else>
-                    <div class="slot-empty">
+                    <div v-if="authStore.canManageTimetable" class="slot-empty">
                       <span class="plus-icon">+</span>
                       <span>Assign</span>
+                    </div>
+                    <div v-else class="slot-empty-readonly">
+                      <span>—</span>
                     </div>
                   </template>
                 </div>
@@ -685,13 +698,16 @@ async function handleSaveAllocation() {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  cursor: pointer;
   transition: all var(--duration-fast);
   background: var(--color-surface-raised);
   border: 1px solid var(--color-card-border);
 }
 
-.slot-box:hover {
+.slot-box.clickable {
+  cursor: pointer;
+}
+
+.slot-box.clickable:hover {
   border-color: var(--color-primary-500);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
@@ -757,6 +773,15 @@ async function handleSaveAllocation() {
 .slot-empty:hover {
   opacity: 1;
   color: var(--color-primary-400);
+}
+
+.slot-empty-readonly {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  opacity: 0.4;
 }
 
 .plus-icon {

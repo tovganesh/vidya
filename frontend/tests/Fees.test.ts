@@ -3,6 +3,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import { mount } from '@vue/test-utils';
 import { useFeesStore } from '../src/stores/fees.js';
 import { useAcademicsStore } from '../src/stores/academics.js';
+import { useAuthStore } from '../src/stores/auth.js';
 import FeesView from '../src/views/finance/FeesView.vue';
 
 vi.mock('vue-router', () => ({
@@ -302,6 +303,17 @@ describe('Frontend FeesStore & Views (Milestone 9: Fees, Dues & Indian Receipts)
       classBreakdown: [],
     };
 
+    const authStore = useAuthStore();
+    authStore.user = {
+      id: 'admin-1',
+      email: 'admin@vidya.org',
+      firstName: 'Admin',
+      lastName: 'User',
+      primaryRole: 'SUPER_ADMIN',
+      permissions: ['*'],
+      schoolId: 'sch-1',
+    } as any;
+
     const wrapper = mount(FeesView, {
       global: {
         mocks: {
@@ -325,5 +337,31 @@ describe('Frontend FeesStore & Views (Milestone 9: Fees, Dues & Indian Receipts)
     expect(kpiCards.length).toBe(4);
     expect(wrapper.text()).toContain('₹1,39,200.00'); // Net Expected
     expect(wrapper.text()).toContain('₹67,200.00');  // Total Paid
+  });
+
+  it('renders personalized view-only fee view for parent role without management tabs', () => {
+    const authStore = useAuthStore();
+    authStore.user = {
+      id: 'parent-1',
+      email: 'parent@vidya.org',
+      firstName: 'Priya',
+      lastName: 'Sundaram',
+      primaryRole: 'PARENT',
+      permissions: [],
+      schoolId: 'sch-1',
+    } as any;
+
+    const wrapper = mount(FeesView, {
+      global: {
+        mocks: {
+          $route: { params: {} },
+        },
+      },
+    });
+
+    const tabButtons = wrapper.findAll('.tab-btn');
+    expect(tabButtons.length).toBe(1);
+    expect(tabButtons[0]?.text()).toContain('My Fee Account & Receipts');
+    expect(wrapper.find('#open-create-plan-btn').exists()).toBe(false);
   });
 });

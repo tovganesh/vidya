@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import { useAcademicsStore, AcademicYearItem } from '@/stores/academics.js';
+import { useAuthStore } from '@/stores/auth.js';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 
 const academicsStore = useAcademicsStore();
+const authStore = useAuthStore();
+const canManage = computed(() => authStore.isAdmin || authStore.isPrincipal);
 
 const showCreateModal = ref(false);
 const showActivateConfirmModal = ref(false);
@@ -133,7 +136,7 @@ function formatDate(dateStr: string) {
         </p>
       </div>
 
-      <div class="header-actions">
+      <div class="header-actions" v-if="canManage">
         <button
           type="button"
           class="btn btn-primary"
@@ -223,27 +226,30 @@ function formatDate(dateStr: string) {
                 <span v-else class="inactive-badge">Inactive</span>
               </td>
               <td class="actions-cell">
-                <button
-                  v-if="!year.isCurrent"
-                  type="button"
-                  class="btn btn-secondary btn-sm"
-                  :id="`activate-year-btn-${year.id}`"
-                  @click="promptActivate(year)"
-                >
-                  Set as Active
-                </button>
-                <button
-                  v-if="!year.isCurrent"
-                  type="button"
-                  class="btn-icon-action danger"
-                  title="Delete Academic Year"
-                  :id="`delete-year-btn-${year.id}`"
-                  @click="handleDeleteYear(year.id, year.name)"
-                >
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                <template v-if="canManage">
+                  <button
+                    v-if="!year.isCurrent"
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    :id="`activate-year-btn-${year.id}`"
+                    @click="promptActivate(year)"
+                  >
+                    Set as Active
+                  </button>
+                  <button
+                    v-if="!year.isCurrent"
+                    type="button"
+                    class="btn-icon-action danger"
+                    title="Delete Academic Year"
+                    :id="`delete-year-btn-${year.id}`"
+                    @click="handleDeleteYear(year.id, year.name)"
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </template>
+                <span v-else class="text-muted text-xs">View Only</span>
               </td>
             </tr>
           </tbody>

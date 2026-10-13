@@ -2,9 +2,11 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { useAttendanceStore, AttendanceStatus, AttendanceStudentRosterItem } from '../../stores/attendance.js';
 import { useAcademicsStore } from '../../stores/academics.js';
+import { useAuthStore } from '../../stores/auth.js';
 
 const attendanceStore = useAttendanceStore();
 const academicsStore = useAcademicsStore();
+const authStore = useAuthStore();
 
 const selectedClassId = ref('');
 const selectedSectionId = ref('');
@@ -114,18 +116,21 @@ async function loadSheet() {
 }
 
 function setStudentStatus(index: number, status: AttendanceStatus) {
+  if (!authStore.canMarkAttendance) return;
   if (localRoster.value[index]) {
     localRoster.value[index]!.status = status;
   }
 }
 
 function markAllPresent() {
+  if (!authStore.canMarkAttendance) return;
   for (const item of localRoster.value) {
     item.status = 'PRESENT';
   }
 }
 
 async function submitAttendance() {
+  if (!authStore.canMarkAttendance) return;
   if (!selectedSectionId.value || !selectedDate.value) return;
   errorMessage.value = null;
   successMessage.value = null;
@@ -169,6 +174,7 @@ async function submitAttendance() {
           Monthly Register
         </router-link>
         <button
+          v-if="authStore.canMarkAttendance"
           class="btn btn-primary"
           :disabled="attendanceStore.saving || localRoster.length === 0"
           id="submit-attendance-top-btn"
@@ -228,7 +234,7 @@ async function submitAttendance() {
         </div>
       </div>
 
-      <div class="shortcut-actions">
+      <div v-if="authStore.canMarkAttendance" class="shortcut-actions">
         <button
           type="button"
           class="btn btn-secondary shortcut-btn"
@@ -306,8 +312,8 @@ async function submitAttendance() {
             </div>
           </div>
 
-          <!-- Middle: Status Toggle Buttons (One-Tap Touch Targets) -->
-          <div class="status-btn-group" role="group" aria-label="Attendance Status">
+          <!-- Middle: Status Toggle Buttons (One-Tap Touch Targets) or Readonly Badge -->
+          <div v-if="authStore.canMarkAttendance" class="status-btn-group" role="group" aria-label="Attendance Status">
             <button
               type="button"
               class="status-toggle-btn toggle-present"
@@ -352,22 +358,32 @@ async function submitAttendance() {
               <span class="toggle-text">Half Day</span>
             </button>
           </div>
+          <div v-else class="status-btn-group readonly-status-group">
+            <span
+              class="status-toggle-btn active"
+              :class="'toggle-' + student.status.toLowerCase().replace('_', '')"
+            >
+              <span class="toggle-text">{{ student.status.replace('_', ' ') }}</span>
+            </span>
+          </div>
 
           <!-- Right: Quick Remarks Note -->
           <div class="remarks-cell">
             <input
+              v-if="authStore.canMarkAttendance"
               type="text"
               v-model="student.remarks"
               placeholder="Add remark (e.g. sick, traffic)..."
               class="remarks-input"
               :id="`remark-input-${student.enrollmentId}`"
             />
+            <span v-else class="text-sm text-muted">{{ student.remarks || '—' }}</span>
           </div>
         </div>
       </div>
 
       <!-- Bottom Submit Bar -->
-      <div v-if="localRoster.length > 0" class="roster-footer">
+      <div v-if="localRoster.length > 0 && authStore.canMarkAttendance" class="roster-footer">
         <div class="footer-info">
           <span>{{ stats.present }} of {{ stats.total }} students marked present</span>
         </div>

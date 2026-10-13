@@ -28,16 +28,7 @@ const modalError = ref<string | null>(null);
 // Push Status Feedback
 const pushFeedback = ref<{ type: 'success' | 'error'; message: string } | null>(null);
 
-const canCreate = computed(() => {
-  const role = authStore.user?.primaryRole;
-  return (
-    role === 'SUPER_ADMIN' ||
-    role === 'SCHOOL_ADMIN' ||
-    role === 'PRINCIPAL' ||
-    role === 'TEACHER' ||
-    authStore.user?.permissions?.includes('school:manage')
-  );
-});
+const canCreate = computed(() => authStore.canBroadcast);
 
 const filteredAnnouncements = computed(() => {
   return commStore.announcements.filter((ann) => {

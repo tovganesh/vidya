@@ -117,7 +117,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/announcements',
-    alias: ['/notifications', '/notice-board'],
+    alias: ['/notifications', '/notice-board', '/communication'],
     name: 'announcements',
     component: AnnouncementsView,
     meta: { title: 'Notice Board & Announcements — Vidya', requiresAuth: true },
@@ -137,7 +137,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/fees',
-    alias: ['/finance', '/receipts'],
+    alias: ['/finance', '/receipts', '/finance/fees'],
     name: 'fees-hub',
     component: FeesView,
     meta: { title: 'Fee Structures, Invoicing & Receipts — Vidya', requiresAuth: true },

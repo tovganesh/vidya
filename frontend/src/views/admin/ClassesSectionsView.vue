@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, reactive } from 'vue';
 import { useAcademicsStore, ClassItem } from '@/stores/academics.js';
+import { useAuthStore } from '@/stores/auth.js';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 
 const academicsStore = useAcademicsStore();
+const authStore = useAuthStore();
+const canManage = computed(() => authStore.isAdmin || authStore.isPrincipal);
 
 const activeStageFilter = ref<string>('ALL');
 
@@ -216,7 +219,7 @@ function getStageName(stage: string) {
         </p>
       </div>
 
-      <div class="header-actions">
+      <div class="header-actions" v-if="canManage">
         <button
           type="button"
           class="btn btn-secondary"
@@ -321,7 +324,7 @@ function getStageName(stage: string) {
             <span class="class-code-tag">{{ cls.code }}</span>
             <span class="stage-tag">{{ getStageName(cls.stage) }}</span>
           </div>
-          <div class="class-header-actions">
+          <div class="class-header-actions" v-if="canManage">
             <button
               type="button"
               class="btn-icon-action"
@@ -360,7 +363,7 @@ function getStageName(stage: string) {
           <div class="sections-label">SECTIONS & CLASSROOM CAPACITIES</div>
           <div v-if="cls.sections.length === 0" class="no-sections-hint">
             No sections created yet.
-            <button type="button" class="link-btn" @click="() => openAddSectionModal(cls.id)">
+            <button v-if="canManage" type="button" class="link-btn" @click="() => openAddSectionModal(cls.id)">
               + Add Section
             </button>
           </div>
@@ -376,6 +379,7 @@ function getStageName(stage: string) {
               <span class="section-capacity">{{ sec.capacity }} seats</span>
               <span v-if="sec.roomNumber" class="section-room">Room {{ sec.roomNumber }}</span>
               <button
+                v-if="canManage"
                 type="button"
                 class="sec-remove-btn"
                 title="Remove Section"
@@ -386,6 +390,7 @@ function getStageName(stage: string) {
             </div>
 
             <button
+              v-if="canManage"
               type="button"
               class="add-sec-mini-btn"
               title="Add Section to Class"

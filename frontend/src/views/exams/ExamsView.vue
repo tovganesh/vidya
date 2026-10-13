@@ -4,11 +4,13 @@ import { useRoute } from 'vue-router';
 import { useExamsStore, ExamTermType, AssessmentType } from '../../stores/exams.js';
 import { useAcademicsStore } from '../../stores/academics.js';
 import { usePeopleStore } from '../../stores/people.js';
+import { useAuthStore } from '../../stores/auth.js';
 
 const route = useRoute();
 const examsStore = useExamsStore();
 const academicsStore = useAcademicsStore();
 const peopleStore = usePeopleStore();
+const authStore = useAuthStore();
 
 // Tab state: 'terms' | 'marks' | 'report-card'
 const activeTab = ref<'terms' | 'marks' | 'report-card'>('terms');
@@ -168,7 +170,8 @@ onMounted(async () => {
     }
 
     if (examsStore.terms.length > 0) {
-      selectedTermId.value = examsStore.terms[0]!.id;
+      const activeTerm = examsStore.terms.find((t) => t.isCurrent) || examsStore.terms[0]!;
+      selectedTermId.value = activeTerm.id;
       await examsStore.fetchExams({ termId: selectedTermId.value });
       if (examsStore.exams.length > 0) {
         selectedExamId.value = examsStore.exams[0]!.id;
@@ -176,8 +179,20 @@ onMounted(async () => {
         await examsStore.fetchAssessments(selectedExamId.value);
         if (examsStore.assessments.length > 0) {
           selectedAssessmentId.value = examsStore.assessments[0]!.id;
-          await loadMarksSheet(selectedAssessmentId.value);
+          if (authStore.canEnterMarks) {
+            await loadMarksSheet(selectedAssessmentId.value);
+          }
         }
+      }
+    }
+
+    // Auto-resolve ward/student report card for parents and students
+    if (authStore.isStudentOrParent && peopleStore.enrollments.length > 0) {
+      const myEnrollment = peopleStore.enrollments[0];
+      if (myEnrollment) {
+        selectedReportClassId.value = myEnrollment.classId;
+        selectedReportSectionId.value = myEnrollment.sectionId;
+        selectedReportEnrollmentId.value = myEnrollment.id;
       }
     }
 
@@ -188,6 +203,9 @@ onMounted(async () => {
       await loadReportCard();
     } else if (route.query.tab) {
       activeTab.value = route.query.tab as any;
+      if (activeTab.value === 'report-card' && selectedReportEnrollmentId.value) {
+        await loadReportCard();
+      }
     }
   } catch (err: any) {
     showError(err.message || 'Error initializing examination dashboard');
@@ -252,6 +270,7 @@ watch(selectedAssessmentId, async (newVal) => {
 // Methods: Tab 1 Actions
 // -------------------------------------------------------------
 function openCreateTerm() {
+  if (!authStore.canManageExams) return;
   newTermForm.value = {
     name: '',
     type: 'TERM_1',
@@ -263,6 +282,7 @@ function openCreateTerm() {
 }
 
 async function handleCreateTerm() {
+  if (!authStore.canManageExams) return;
   if (!selectedAcademicYearId.value) {
     showError('Please select an academic year');
     return;
@@ -291,9 +311,15 @@ async function handleCreateTerm() {
 }
 
 function openCreateExam() {
+  if (!authStore.canManageExams) return;
   if (!selectedTermId.value) {
-    showError('Please select an exam term first');
-    return;
+    if (examsStore.terms.length > 0) {
+      const activeTerm = examsStore.terms.find((t) => t.isCurrent) || examsStore.terms[0]!;
+      selectedTermId.value = activeTerm.id;
+    } else {
+      showError('Please create an exam term first');
+      return;
+    }
   }
   newExamForm.value = {
     termId: selectedTermId.value,
@@ -306,6 +332,7 @@ function openCreateExam() {
 }
 
 async function handleCreateExam() {
+  if (!authStore.canManageExams) return;
   if (!newExamForm.value.name.trim()) {
     showError('Exam name is required');
     return;
@@ -330,6 +357,7 @@ async function handleCreateExam() {
 }
 
 function openCreateAssessment(examId: string) {
+  if (!authStore.canManageExams) return;
   newAssessmentForm.value = {
     examId,
     subjectId: academicsStore.subjects[0]?.id || '',
@@ -512,13 +540,13 @@ function viewStudentReportCard(enrollmentId: string) {
         </div>
 
         <div class="header-actions">
-          <button v-if="activeTab === 'terms'" @click="openCreateTerm" class="btn btn-secondary">
+          <button v-if="activeTab === 'terms' && authStore.canManageExams" @click="openCreateTerm" class="btn btn-secondary">
             + New Exam Term
           </button>
-          <button v-if="activeTab === 'terms'" @click="openCreateExam" class="btn btn-primary">
+          <button v-if="activeTab === 'terms' && authStore.canManageExams" @click="openCreateExam" class="btn btn-primary">
             + Schedule Exam
           </button>
-          <button v-if="activeTab === 'marks'" @click="handleSaveMarks" :disabled="examsStore.saving" class="btn btn-primary">
+          <button v-if="activeTab === 'marks' && authStore.canEnterMarks" @click="handleSaveMarks" :disabled="examsStore.saving" class="btn btn-primary">
             <span v-if="examsStore.saving">Saving...</span>
             <span v-else>💾 Save Marks Sheet</span>
           </button>
@@ -536,9 +564,10 @@ function viewStudentReportCard(enrollmentId: string) {
           @click="activeTab = 'terms'"
         >
           <span class="tab-icon">📅</span>
-          <span>Exam Terms & Schedules</span>
+          <span>{{ authStore.isStudentOrParent ? 'Exam Datesheets & Schedules' : 'Exam Terms & Schedules' }}</span>
         </button>
         <button
+          v-if="authStore.canEnterMarks"
           class="tab-btn"
           :class="{ active: activeTab === 'marks' }"
           @click="activeTab = 'marks'"
@@ -553,7 +582,7 @@ function viewStudentReportCard(enrollmentId: string) {
           @click="activeTab = 'report-card'"
         >
           <span class="tab-icon">🎓</span>
-          <span>CBSE Report Card Generator</span>
+          <span>{{ authStore.isStudentOrParent ? "Ward's CBSE Report Card" : "CBSE Report Card Generator" }}</span>
         </button>
       </nav>
     </header>
@@ -612,7 +641,7 @@ function viewStudentReportCard(enrollmentId: string) {
           </p>
           <div class="term-footer">
             <span class="exam-count">📚 {{ term._count?.exams || 0 }} Scheduled Exams</span>
-            <button @click.stop="openCreateExam" class="btn-link">+ Schedule Exam</button>
+            <button v-if="authStore.canManageExams" @click.stop="openCreateExam" class="btn-link">+ Schedule Exam</button>
           </div>
         </div>
       </div>
@@ -622,14 +651,17 @@ function viewStudentReportCard(enrollmentId: string) {
         <div class="block-header">
           <div>
             <h2 class="block-title">Class Exams & Subject Assessments</h2>
-            <p class="block-subtitle">Configure theory, practical, and internal assessment maximum marks</p>
+            <p class="block-subtitle">
+              {{ authStore.isStudentOrParent ? 'Official exam timetable, subjects, dates and maximum marks' : 'Configure theory, practical, and internal assessment maximum marks' }}
+            </p>
           </div>
-          <button @click="openCreateExam" class="btn btn-sm btn-primary">+ Schedule Exam</button>
+          <button v-if="authStore.canManageExams" @click="openCreateExam" class="btn btn-sm btn-primary">+ Schedule Exam</button>
         </div>
 
         <div v-if="examsStore.exams.length === 0" class="empty-state">
           <p>No exams scheduled under this term yet.</p>
-          <button @click="openCreateExam" class="btn btn-secondary mt-2">Schedule First Exam</button>
+          <button v-if="authStore.canManageExams" @click="openCreateExam" class="btn btn-secondary mt-2">Schedule First Exam</button>
+          <p v-else class="text-muted mt-2">Official datesheets and schedules will appear here once published by the academic office.</p>
         </div>
 
         <div v-else class="exams-accordion">
@@ -642,7 +674,7 @@ function viewStudentReportCard(enrollmentId: string) {
                   {{ new Date(exam.startDate).toLocaleDateString() }} to {{ new Date(exam.endDate).toLocaleDateString() }}
                 </span>
               </div>
-              <div class="exam-actions">
+              <div v-if="authStore.canManageExams" class="exam-actions">
                 <button @click="openCreateAssessment(exam.id)" class="btn btn-sm btn-secondary">
                   + Add Subject Component
                 </button>
@@ -660,7 +692,7 @@ function viewStudentReportCard(enrollmentId: string) {
                     <th>Passing Marks</th>
                     <th>Exam Date</th>
                     <th>Records Status</th>
-                    <th class="text-right">Actions</th>
+                    <th v-if="authStore.canEnterMarks" class="text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -684,15 +716,16 @@ function viewStudentReportCard(enrollmentId: string) {
                         {{ ass._count?.marksRecords ? `${ass._count.marksRecords} marks recorded` : 'Pending entry' }}
                       </span>
                     </td>
-                    <td class="text-right">
+                    <td v-if="authStore.canEnterMarks" class="text-right">
                       <button @click="jumpToMarksEntry(exam.id, ass.id)" class="btn btn-sm btn-primary">
                         Enter Marks →
                       </button>
                     </td>
                   </tr>
                   <tr v-if="!exam.assessments || exam.assessments.length === 0">
-                    <td colspan="7" class="text-center text-muted py-3">
-                      No assessment components added yet. Click "+ Add Subject Component".
+                    <td :colspan="authStore.canEnterMarks ? 7 : 6" class="text-center text-muted py-3">
+                      <span v-if="authStore.canManageExams">No assessment components added yet. Click "+ Add Subject Component".</span>
+                      <span v-else>No assessment components published yet for this exam.</span>
                     </td>
                   </tr>
                 </tbody>
@@ -872,7 +905,8 @@ function viewStudentReportCard(enrollmentId: string) {
     <section v-if="activeTab === 'report-card'" class="tab-content" id="tab-report-card-content">
       <!-- Selector bar (Hidden during Print) -->
       <div class="report-card-selector no-print">
-        <div class="selector-row">
+        <!-- Staff Multi-Student Picker -->
+        <div v-if="!authStore.isStudentOrParent" class="selector-row">
           <div class="filter-group">
             <label>Filter by Class:</label>
             <select v-model="selectedReportClassId" class="form-select">
@@ -923,6 +957,38 @@ function viewStudentReportCard(enrollmentId: string) {
             </button>
             <button @click="handlePrint" :disabled="!examsStore.reportCard" class="btn btn-secondary">
               🖨️ Print Report Card
+            </button>
+          </div>
+        </div>
+
+        <!-- Student / Parent Personalized Bar -->
+        <div v-else class="selector-row student-parent-selector-row">
+          <div class="student-info-chip">
+            <span class="chip-icon">🎓</span>
+            <div>
+              <span class="chip-label">{{ authStore.isParent ? "Ward / Child Progress Report:" : "My Academic Progress Report:" }}</span>
+              <div class="chip-name">
+                {{ reportStudentsList.find(s => s.id === selectedReportEnrollmentId)?.fullName || 'Selected Student' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label>Examination Term:</label>
+            <select v-model="selectedReportTermId" @change="loadReportCard" class="form-select">
+              <option value="">All Terms (Cumulative Progress)</option>
+              <option v-for="t in examsStore.terms" :key="t.id" :value="t.id">
+                {{ t.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="btn-group-align">
+            <button @click="loadReportCard" class="btn btn-primary">
+              Reload Progress Card
+            </button>
+            <button @click="handlePrint" :disabled="!examsStore.reportCard" class="btn btn-secondary">
+              🖨️ Print / Download PDF
             </button>
           </div>
         </div>
@@ -1795,6 +1861,40 @@ function viewStudentReportCard(enrollmentId: string) {
 .btn-group-align {
   display: flex;
   gap: 0.5rem;
+}
+
+.student-parent-selector-row {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.student-info-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-card-border);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.chip-icon {
+  font-size: 1.5rem;
+}
+
+.chip-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.chip-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .report-card-sheet {

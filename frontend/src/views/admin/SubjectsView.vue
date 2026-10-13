@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, reactive } from 'vue';
 import { useAcademicsStore, SubjectItem } from '@/stores/academics.js';
+import { useAuthStore } from '@/stores/auth.js';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 
 const academicsStore = useAcademicsStore();
+const authStore = useAuthStore();
+const canManage = computed(() => authStore.isAdmin || authStore.isPrincipal);
 
 const searchQuery = ref('');
 const typeFilter = ref<string>('ALL');
@@ -129,7 +132,7 @@ function getTypeClass(type: string) {
         </p>
       </div>
 
-      <div class="header-actions">
+      <div class="header-actions" v-if="canManage">
         <button
           type="button"
           class="btn btn-primary"
@@ -237,7 +240,7 @@ function getTypeClass(type: string) {
           <span>Assigned to {{ sub._count?.classSubjects || 0 }} grade levels</span>
         </div>
 
-        <div class="sub-card-footer">
+        <div class="sub-card-footer" v-if="canManage">
           <button
             type="button"
             class="btn-icon-action"
