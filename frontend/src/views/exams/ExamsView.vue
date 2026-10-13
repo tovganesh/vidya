@@ -1678,20 +1678,32 @@ function viewStudentReportCard(enrollmentId: string) {
 /* Data Table */
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.88rem;
 }
 
-.data-table th, .data-table td {
-  padding: 0.75rem 1rem;
+.data-table th {
+  padding: 0.95rem 1.25rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.725rem;
+  text-transform: uppercase;
+  letter-spacing: 0.065em;
+  color: var(--text-muted);
+  background: var(--color-surface-raised);
   border-bottom: 1px solid var(--color-card-border);
+  white-space: nowrap;
 }
 
-.data-table th {
-  text-align: left;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: var(--color-surface);
+.data-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+[data-theme="light"] .data-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .component-pill {
@@ -1764,25 +1776,37 @@ function viewStudentReportCard(enrollmentId: string) {
   border: 1px solid var(--color-card-border);
   border-radius: 12px;
   overflow-x: auto;
+  box-shadow: var(--shadow-sm);
 }
 
 .spreadsheet-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.88rem;
 }
 
-.spreadsheet-table th, .spreadsheet-table td {
-  padding: 0.65rem 0.85rem;
+.spreadsheet-table th {
+  padding: 0.95rem 1.15rem;
+  background: var(--color-surface-raised);
+  font-weight: 700;
+  font-size: 0.725rem;
+  text-transform: uppercase;
+  letter-spacing: 0.065em;
+  color: var(--text-muted);
+  text-align: left;
   border-bottom: 1px solid var(--color-card-border);
+  white-space: nowrap;
+}
+
+.spreadsheet-table td {
+  padding: 0.85rem 1.15rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   vertical-align: middle;
 }
 
-.spreadsheet-table th {
-  background: var(--color-canvas);
-  font-weight: 700;
-  color: var(--text-muted);
-  text-align: left;
+[data-theme="light"] .spreadsheet-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .marks-input {

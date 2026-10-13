@@ -226,46 +226,139 @@ select option {
 }
 
 /* =========================================================================
-   Data Tables
+   Data Tables & Tabular Presentation
    ========================================================================= */
-.data-table-container {
+.data-table-container,
+.table-container,
+.table-responsive {
   width: 100%;
   overflow-x: auto;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-card-border);
-  background: var(--color-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
 }
 
-table.data-table {
+table.data-table,
+.data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
-table.data-table th {
+table.data-table th,
+.data-table th {
   background: var(--color-surface-raised);
-  color: var(--text-muted);
-  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.725rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 0.85rem 1rem;
+  letter-spacing: 0.065em;
+  padding: 0.95rem 1.25rem;
   border-bottom: 1px solid var(--color-card-border);
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
 }
 
-table.data-table td {
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid var(--color-card-border);
-  color: var(--text-secondary);
+table.data-table th:first-child,
+.data-table th:first-child {
+  border-top-left-radius: var(--radius-lg);
+}
+
+table.data-table th:last-child,
+.data-table th:last-child {
+  border-top-right-radius: var(--radius-lg);
+}
+
+table.data-table td,
+.data-table td {
+  padding: 1.05rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
   font-size: 0.875rem;
+  vertical-align: middle;
+  transition: background-color var(--duration-fast) ease;
 }
 
-table.data-table tr:last-child td {
+[data-theme="light"] table.data-table td,
+[data-theme="light"] .data-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+table.data-table tr.table-row,
+.data-table tr.table-row,
+table.data-table tbody tr,
+.data-table tbody tr {
+  transition: background-color var(--duration-fast) ease;
+}
+
+table.data-table tbody tr:hover td,
+.data-table tbody tr:hover td,
+table.data-table tr.table-row:hover td,
+.data-table tr.table-row:hover td {
+  background: var(--color-surface-hover);
+}
+
+table.data-table tbody tr:last-child td,
+.data-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-table.data-table tr:hover td {
-  background: var(--color-surface-hover);
+table.data-table tbody tr:last-child td:first-child,
+.data-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--radius-lg);
+}
+
+table.data-table tbody tr:last-child td:last-child,
+.data-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: var(--radius-lg);
+}
+
+/* Light Theme Data Table Overrides */
+[data-theme="light"] .data-table-container,
+[data-theme="light"] .table-container,
+[data-theme="light"] .table-responsive {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] table.data-table th,
+[data-theme="light"] .data-table th {
+  background: #f8fafc;
+  color: #475569;
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] table.data-table tbody tr:hover td,
+[data-theme="light"] .data-table tbody tr:hover td {
+  background: #f1f5f9;
+}
+
+/* Common Table Cell Modifiers */
+.text-left { text-align: left !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+.whitespace-nowrap, .nowrap { white-space: nowrap !important; }
+.align-middle { vertical-align: middle !important; }
+
+.font-mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.table-empty-cell,
+.empty-cell {
+  text-align: center !important;
+  padding: 3.5rem 1.5rem !important;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
 }
 
 /* =========================================================================

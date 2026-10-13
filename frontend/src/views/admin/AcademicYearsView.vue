@@ -533,34 +533,45 @@ function formatDate(dateStr: string) {
 
 .table-container {
   overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-card-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
 }
 
 .data-table th {
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--color-neutral-500);
+  padding: 0.95rem 1.25rem;
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: var(--color-neutral-50);
-  border-bottom: 1px solid var(--color-neutral-200);
+  letter-spacing: 0.065em;
+  background: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-card-border);
+  white-space: nowrap;
 }
 
 .data-table td {
-  padding: var(--space-4);
-  font-size: var(--text-sm);
-  color: var(--color-neutral-800);
-  border-bottom: 1px solid var(--color-neutral-100);
+  padding: 1.05rem 1.25rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
 }
 
-.highlight-row {
-  background: #f0fdf4;
+[data-theme="light"] .data-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.highlight-row td {
+  background: rgba(16, 185, 129, 0.08);
 }
 
 .year-name {

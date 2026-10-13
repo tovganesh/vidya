@@ -506,13 +506,13 @@ async function submitTeacherOnboarding() {
       <table v-else-if="activeTab === 'students'" class="data-table" id="table-students">
         <thead>
           <tr>
-            <th>Student</th>
-            <th>Admission No</th>
-            <th>Current Class</th>
-            <th>Roll No</th>
-            <th>Primary Guardian</th>
-            <th>Status</th>
-            <th class="text-right">Actions</th>
+            <th class="col-student">Student</th>
+            <th class="col-adm">Admission No</th>
+            <th class="col-class">Current Class</th>
+            <th class="col-roll">Roll No</th>
+            <th class="col-guardian">Primary Guardian</th>
+            <th class="col-status">Status</th>
+            <th class="col-actions text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -583,12 +583,12 @@ async function submitTeacherOnboarding() {
       <table v-else-if="activeTab === 'guardians'" class="data-table" id="table-guardians">
         <thead>
           <tr>
-            <th>Guardian Name</th>
-            <th>Relation</th>
-            <th>Primary Phone</th>
-            <th>Email</th>
-            <th>Linked Children</th>
-            <th>Occupation</th>
+            <th class="col-g-name">Guardian Name</th>
+            <th class="col-g-rel">Relation</th>
+            <th class="col-g-phone">Primary Phone</th>
+            <th class="col-g-email">Email</th>
+            <th class="col-g-children">Linked Children</th>
+            <th class="col-g-occ">Occupation</th>
           </tr>
         </thead>
         <tbody>
@@ -631,12 +631,12 @@ async function submitTeacherOnboarding() {
       <table v-else-if="activeTab === 'teachers'" class="data-table" id="table-teachers">
         <thead>
           <tr>
-            <th>Teacher</th>
-            <th>Employee Code</th>
-            <th>Contact</th>
-            <th>Qualification</th>
-            <th>Specialization</th>
-            <th>Status</th>
+            <th class="col-t-name">Teacher</th>
+            <th class="col-t-code">Employee Code</th>
+            <th class="col-t-contact">Contact</th>
+            <th class="col-t-qual">Qualification</th>
+            <th class="col-t-spec">Specialization</th>
+            <th class="col-t-status">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -1215,54 +1215,95 @@ async function submitTeacherOnboarding() {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow-x: auto;
+  box-shadow: var(--shadow-sm);
 }
 
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
   font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .data-table th {
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--color-surface-hover);
+  padding: 0.95rem 1.25rem;
+  background: var(--color-surface-raised);
   color: var(--color-text-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.725rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.065em;
   border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
 }
 
+.col-student { min-width: 240px; }
+.col-adm { min-width: 150px; }
+.col-class { min-width: 130px; }
+.col-roll { min-width: 85px; }
+.col-guardian { min-width: 220px; }
+.col-status { min-width: 130px; }
+.col-actions { min-width: 170px; }
+
+.col-g-name { min-width: 220px; }
+.col-g-rel { min-width: 120px; }
+.col-g-phone { min-width: 150px; }
+.col-g-email { min-width: 200px; }
+.col-g-children { min-width: 240px; }
+.col-g-occ { min-width: 150px; }
+
+.col-t-name { min-width: 220px; }
+.col-t-code { min-width: 140px; }
+.col-t-contact { min-width: 170px; }
+.col-t-qual { min-width: 150px; }
+.col-t-spec { min-width: 150px; }
+.col-t-status { min-width: 120px; }
+
 .data-table td {
-  padding: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
+  padding: 1.05rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   color: var(--color-text-main);
   vertical-align: middle;
+}
+
+[data-theme="light"] .data-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table-row {
+  transition: background-color var(--transition-fast);
 }
 
 .table-row:hover td {
   background: var(--color-surface-hover);
 }
 
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .person-cell {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 0.875rem;
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .avatar.male {
@@ -1284,11 +1325,14 @@ async function submitTeacherOnboarding() {
 .person-meta {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
 }
 
 .person-name {
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--color-text-main);
+  line-height: 1.35;
 }
 
 .person-sub {
@@ -1297,142 +1341,174 @@ async function submitTeacherOnboarding() {
 }
 
 .apaar-tag {
-  display: inline-block;
-  background: rgba(99, 102, 241, 0.1);
-  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--color-primary-400, #818cf8);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   border-radius: var(--radius-sm);
-  padding: 0.125rem 0.375rem;
-  font-size: 0.6875rem;
-  font-family: monospace;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.72rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
 }
 
 .code-badge {
-  font-family: monospace;
+  display: inline-block;
+  font-family: var(--font-mono, monospace);
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.3rem 0.6rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  white-space: nowrap;
 }
 
 .placement-badge {
   display: inline-block;
   background: rgba(59, 130, 246, 0.1);
   color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  padding: 0.25rem 0.625rem;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  padding: 0.25rem 0.65rem;
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 0.8125rem;
+  white-space: nowrap;
 }
 
 .roll-number {
+  font-family: var(--font-mono, monospace);
   font-weight: 700;
+  font-size: 0.875rem;
   color: var(--color-text-main);
 }
 
 .status-pill {
-  display: inline-block;
-  padding: 0.2rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: capitalize;
+  font-size: 0.725rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .status-pill.enrolled,
 .status-pill.active {
   background: rgba(16, 185, 129, 0.1);
   color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
 .status-pill.on_leave {
   background: rgba(245, 158, 11, 0.1);
   color: #f59e0b;
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .status-pill.alumni,
 .status-pill.resigned {
   background: rgba(156, 163, 175, 0.1);
   color: #9ca3af;
-  border: 1px solid rgba(156, 163, 175, 0.2);
+  border: 1px solid rgba(156, 163, 175, 0.25);
 }
 
 .status-pill.transferred,
 .status-pill.withdrawn {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
 .guardian-brief {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
 }
 
 .guardian-name {
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-text-main);
 }
 
 .guardian-contact {
-  font-size: 0.75rem;
+  font-size: 0.775rem;
   color: var(--color-text-muted);
+  font-family: var(--font-mono, monospace);
 }
 
 .children-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
+  gap: 0.4rem;
 }
 
 .child-pill {
-  background: rgba(99, 102, 241, 0.1);
-  color: var(--color-primary);
-  padding: 0.2rem 0.5rem;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--color-primary-400, #818cf8);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 0.25rem 0.6rem;
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 500;
 }
 
 .contact-link {
-  color: var(--color-primary);
+  color: var(--color-primary-400, #818cf8);
   text-decoration: none;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  transition: color var(--transition-fast);
 }
 .contact-link:hover {
+  color: var(--color-primary);
   text-decoration: underline;
 }
 
 .relationship-tag {
+  display: inline-block;
   background: rgba(255, 255, 255, 0.05);
-  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-border);
+  padding: 0.25rem 0.55rem;
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .btn-table-action {
   display: inline-flex;
   align-items: center;
-  padding: 0.375rem 0.75rem;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
   background: rgba(99, 102, 241, 0.1);
-  color: var(--color-primary);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  color: var(--color-primary-400, #818cf8);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   border-radius: var(--radius-md);
   font-size: 0.8125rem;
   font-weight: 600;
   text-decoration: none;
+  white-space: nowrap;
   transition: all var(--transition-fast);
 }
 
 .btn-table-action:hover {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: var(--color-primary);
+  background: rgba(99, 102, 241, 0.22);
+  border-color: var(--color-primary-500, #6366f1);
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .empty-cell {
   text-align: center;
-  padding: var(--spacing-xl) !important;
+  padding: 3.5rem 1.5rem !important;
   color: var(--color-text-muted);
 }
 
