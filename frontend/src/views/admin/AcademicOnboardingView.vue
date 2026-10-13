@@ -561,11 +561,18 @@ function toggleSection(sec: string) {
   display: flex;
   gap: var(--space-3);
   padding: var(--space-4);
-  background: #eff6ff;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: var(--radius-md);
   font-size: var(--text-xs);
-  color: #1e40af;
+  color: #93c5fd;
   align-items: center;
+}
+
+[data-theme="light"] .info-callout {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
 }
 
 .info-icon {

@@ -761,4 +761,27 @@ async function submitAttendance() {
     max-width: 100%;
   }
 }
+
+/* Light Theme Overrides */
+[data-theme="light"] .status-btn-group {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .status-toggle-btn {
+  color: #475569;
+}
+
+[data-theme="light"] .roster-row:hover {
+  background-color: #f8fafc;
+}
+
+[data-theme="light"] .roster-row {
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .roster-footer {
+  background: #f8fafc;
+  border-top-color: #e2e8f0;
+}
 </style>

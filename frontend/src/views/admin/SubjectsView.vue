@@ -621,54 +621,86 @@ function getTypeClass(type: string) {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: var(--space-4);
+  padding: 1.5rem;
 }
 
 .modal-card {
-  background: #ffffff;
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
   border-radius: var(--radius-xl);
   width: 100%;
-  max-width: 480px;
-  box-shadow: var(--shadow-xl);
+  max-width: 500px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
   overflow: hidden;
 }
 
+[data-theme="light"] .modal-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
 .modal-header {
-  padding: var(--space-4) var(--space-6);
+  padding: 1.25rem 1.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--color-neutral-100);
+  border-bottom: 1px solid var(--color-card-border);
+  background: var(--color-surface-raised);
+}
+
+[data-theme="light"] .modal-header {
+  background: #f8fafc;
+  border-bottom-color: #e2e8f0;
 }
 
 .modal-title {
   font-size: var(--text-lg);
   font-weight: 700;
-  color: var(--color-neutral-900);
+  color: var(--text-primary);
+  margin: 0;
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  font-size: 24px;
-  color: var(--color-neutral-400);
+  font-size: 1.4rem;
+  color: var(--text-muted);
   cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast);
+}
+
+.close-btn:hover {
+  background: var(--color-surface-hover);
+  color: var(--text-primary);
 }
 
 .modal-body {
-  padding: var(--space-6);
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  color: var(--text-primary);
 }
 
 .modal-footer {
-  padding: var(--space-4) var(--space-6);
-  background: var(--color-neutral-50);
+  padding: 1.25rem 1.75rem;
+  background: var(--color-surface-raised);
   display: flex;
   justify-content: flex-end;
   gap: var(--space-3);
-  border-top: 1px solid var(--color-neutral-100);
+  border-top: 1px solid var(--color-card-border);
+}
+
+[data-theme="light"] .modal-footer {
+  background: #f8fafc;
+  border-top-color: #e2e8f0;
 }
 
 .form-group {

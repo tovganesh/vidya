@@ -600,4 +600,31 @@ th.sticky-col-name {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Light Theme Overrides */
+[data-theme="light"] .matrix-table th {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+[data-theme="light"] .matrix-table td {
+  border-color: #e2e8f0;
+  color: #334155;
+}
+
+[data-theme="light"] .sticky-col-roll,
+[data-theme="light"] .sticky-col-name {
+  background: #ffffff;
+}
+
+[data-theme="light"] th.sticky-col-roll,
+[data-theme="light"] th.sticky-col-name {
+  background: #f8fafc;
+}
+
+[data-theme="light"] .sunday-col,
+[data-theme="light"] .sunday-cell {
+  background: #f8fafc;
+}
 </style>
