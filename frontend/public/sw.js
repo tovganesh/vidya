@@ -120,7 +120,14 @@ self.addEventListener('push', (event) => {
 
   if (event.data) {
     try {
-      data = Object.assign(data, event.data.json());
+      const parsed = event.data.json();
+      if (parsed && typeof parsed === 'object') {
+        if (parsed.notification && typeof parsed.notification === 'object') {
+          data = Object.assign(data, parsed.notification);
+        } else {
+          data = Object.assign(data, parsed);
+        }
+      }
     } catch {
       data.body = event.data.text();
     }
@@ -131,7 +138,7 @@ self.addEventListener('push', (event) => {
     icon: data.icon || '/icon-192.svg',
     badge: data.badge || '/favicon.svg',
     data: {
-      url: data.url || '/',
+      url: data.url || data.data?.url || data.data?.link || '/',
     },
     vibrate: [100, 50, 100],
   };

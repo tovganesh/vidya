@@ -224,7 +224,7 @@ export async function communicationRoutes(fastify: FastifyInstance) {
     { preHandler: [authenticate] },
     async (request, reply) => {
       const user = request.user!;
-      const schoolId = user.schoolId!;
+      const schoolId = user.schoolId || '';
       const userId = user.sub;
       const result = await CommunicationService.sendTestPush(schoolId, userId);
       return reply.send(result);

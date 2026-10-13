@@ -114,45 +114,42 @@ async function handleEnablePush() {
 async function handleTestPush() {
   pushFeedback.value = null;
   try {
-    // 1. If not subscribed yet, attempt to register
-    if (!commStore.isPushSubscribed) {
+    // 1. Immediately request notification permission if not yet decided (must be done in user click gesture)
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+    }
+
+    // 2. If supported and not subscribed, register push subscription
+    if (commStore.isPushSupported && !commStore.isPushSubscribed) {
       await commStore.enablePushNotifications().catch(() => {});
     }
 
-    // 2. Dispatch backend test push
+    // 3. Dispatch backend test push
     await commStore.sendTestPush();
 
-    // 3. Immediately display a native browser notification if permission is granted
-    if (typeof Notification !== 'undefined') {
-      if (Notification.permission === 'granted') {
-        if ('serviceWorker' in navigator) {
-          const reg = await navigator.serviceWorker.getRegistration();
-          if (reg && reg.showNotification) {
-            await reg.showNotification('Vidya School OS: Web Push Test Alert', {
-              body: 'Native Web Push alert received successfully! Real-time alerts, circulars, and diary updates are active.',
-              icon: '/icon-192.svg',
-              badge: '/favicon.svg',
-            });
-          } else {
-            new Notification('Vidya School OS: Web Push Test Alert', {
-              body: 'Native Web Push alert received successfully! Real-time alerts, circulars, and diary updates are active.',
-              icon: '/icon-192.svg',
-            });
-          }
+    // 4. Immediately trigger native browser/OS notification feedback
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg && reg.showNotification) {
+          await reg.showNotification('Vidya School OS: Web Push Test Alert', {
+            body: 'Native Web Push alert received successfully! Real-time alerts, circulars, and diary updates are active.',
+            icon: '/icon-192.svg',
+            badge: '/favicon.svg',
+          });
         } else {
           new Notification('Vidya School OS: Web Push Test Alert', {
-            body: 'Native Web Push alert received successfully!',
+            body: 'Native Web Push alert received successfully! Real-time alerts, circulars, and diary updates are active.',
             icon: '/icon-192.svg',
           });
         }
-      } else if (Notification.permission !== 'denied') {
-        const perm = await Notification.requestPermission();
-        if (perm === 'granted') {
-          new Notification('Vidya School OS: Web Push Test Alert', {
-            body: 'Native Web Push alert received successfully!',
-            icon: '/icon-192.svg',
-          });
-        }
+      } else {
+        new Notification('Vidya School OS: Web Push Test Alert', {
+          body: 'Native Web Push alert received successfully!',
+          icon: '/icon-192.svg',
+        });
       }
     }
 

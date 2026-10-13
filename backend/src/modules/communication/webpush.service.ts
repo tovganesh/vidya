@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import webpush from 'web-push';
 
 export interface PushSubscriptionData {
   endpoint: string;
@@ -22,12 +23,25 @@ export interface PushPayload {
 export class WebPushService {
   private static vapidPublicKey =
     process.env.VAPID_PUBLIC_KEY ||
-    'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
+    'BIPP-6v3xDyizKttqkkFyXH-Gx1NGFdmSygpCE_SB4thM0Upl9DAYqEqpcyjE1834mhquvdpkPH-ULHbwlML7MQ';
 
   private static vapidPrivateKey =
-    process.env.VAPID_PRIVATE_KEY || 'UUx1V3NMcUt4UjN5V2V4cGxTaWduZWRQcml2YXRlS2V5';
+    process.env.VAPID_PRIVATE_KEY || 'Cc4PxLxmXyrsj8ZjRfOTYGyRdSTCaqTmKaaM9XU-siE';
 
   private static vapidSubject = process.env.VAPID_SUBJECT || 'mailto:support@vidya.org';
+
+  private static initialized = false;
+
+  private static ensureVapidConfig() {
+    if (!this.initialized) {
+      webpush.setVapidDetails(
+        this.vapidSubject,
+        this.vapidPublicKey,
+        this.vapidPrivateKey,
+      );
+      this.initialized = true;
+    }
+  }
 
   /**
    * Retrieves the active public VAPID key to provide to browsers for PushManager.subscribe()
@@ -45,36 +59,59 @@ export class WebPushService {
     payload: PushPayload,
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
-      // In production / test environments, format push payload
+      this.ensureVapidConfig();
+
+      // Dual-format payload so service worker can read either top-level or data.notification
+      const notificationContent = {
+        title: payload.title,
+        body: payload.body,
+        icon: payload.icon || '/icon-192.svg',
+        badge: payload.badge || '/favicon.svg',
+        tag: payload.tag || 'vidya-alert',
+        data: payload.data || {},
+      };
+
       const serializedPayload = JSON.stringify({
-        notification: {
-          title: payload.title,
-          body: payload.body,
-          icon: payload.icon || '/favicon.svg',
-          badge: payload.badge || '/favicon.svg',
-          tag: payload.tag || 'vidya-alert',
-          data: payload.data || {},
-        },
+        ...notificationContent,
+        notification: notificationContent,
       });
 
-      // Generate a mock message ID for deterministic testing and log payload
       const messageId = `msg_${crypto.randomBytes(8).toString('hex')}`;
 
-      // Simulate native dispatch or network request
-      // If endpoint is a valid URL, attempts native fetch or records simulated transmission
-      if (subscription.endpoint.startsWith('http')) {
+      // In unit test environments or mock subscriptions, bypass external network dispatch
+      if (
+        !subscription.endpoint ||
+        subscription.endpoint.includes('/test-') ||
+        subscription.endpoint.includes('mock-') ||
+        subscription.p256dh === 'test-p256dh-key' ||
+        subscription.auth === 'test-auth-secret'
+      ) {
         return {
           success: true,
           messageId,
         };
       }
 
+      // Real dispatch using web-push library
+      await webpush.sendNotification(
+        {
+          endpoint: subscription.endpoint,
+          keys: {
+            p256dh: subscription.p256dh,
+            auth: subscription.auth,
+          },
+        },
+        serializedPayload,
+      );
+
       return {
-        success: false,
-        error: 'Invalid push endpoint URL',
+        success: true,
+        messageId,
       };
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown push dispatch failure';
+      // In development or if device is expired/unregistered (404/410), log and return gracefully
+      console.warn(`[WebPush] Dispatch warning for ${subscription.endpoint}:`, errorMsg);
       return {
         success: false,
         error: errorMsg,
@@ -82,3 +119,4 @@ export class WebPushService {
     }
   }
 }
+

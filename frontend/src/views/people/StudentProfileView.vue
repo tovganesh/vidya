@@ -548,6 +548,14 @@ async function handleUnlinkGuardian(guardianId: string) {
   transition: color var(--transition-fast);
 }
 
+.breadcrumb-back svg {
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
+  min-height: 1rem;
+  flex-shrink: 0;
+}
+
 .breadcrumb-back:hover {
   color: var(--color-primary);
 }
@@ -628,7 +636,7 @@ async function handleUnlinkGuardian(guardianId: string) {
 .apaar-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.375rem;
   background: rgba(99, 102, 241, 0.15);
   color: var(--color-primary);
   border: 1px solid rgba(99, 102, 241, 0.3);
@@ -637,6 +645,14 @@ async function handleUnlinkGuardian(guardianId: string) {
   font-size: 0.75rem;
   font-weight: 600;
   font-family: monospace;
+}
+
+.apaar-pill svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  min-width: 0.875rem;
+  min-height: 0.875rem;
+  flex-shrink: 0;
 }
 
 .profile-tabs {
@@ -740,7 +756,7 @@ async function handleUnlinkGuardian(guardianId: string) {
 
 .guardians-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: var(--spacing-md);
 }
 
@@ -751,7 +767,8 @@ async function handleUnlinkGuardian(guardianId: string) {
   padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 0.75rem;
+  position: relative;
 }
 
 .guardian-card.primary {
@@ -774,6 +791,7 @@ async function handleUnlinkGuardian(guardianId: string) {
   padding: 0.125rem 0.375rem;
   border-radius: var(--radius-sm);
   margin-bottom: 0.25rem;
+  letter-spacing: 0.05em;
 }
 
 .guardian-card-name {
@@ -785,6 +803,8 @@ async function handleUnlinkGuardian(guardianId: string) {
 
 .guardian-rel {
   font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   color: var(--color-text-muted);
 }
 
@@ -794,19 +814,45 @@ async function handleUnlinkGuardian(guardianId: string) {
   font-size: 1.25rem;
   color: var(--color-text-muted);
   cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem;
+}
+
+.unlink-btn:hover {
+  color: #f43f5e;
 }
 
 .guardian-details {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 0.5rem;
   font-size: 0.8125rem;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
+}
+
+.contact-item svg {
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
+  min-height: 1rem;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.contact-link {
+  color: var(--color-text-main);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.contact-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
 }
 
 .guardian-badges {
@@ -814,6 +860,8 @@ async function handleUnlinkGuardian(guardianId: string) {
   gap: 0.375rem;
   flex-wrap: wrap;
   margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--color-border);
 }
 
 .auth-pill {
@@ -984,6 +1032,14 @@ async function handleUnlinkGuardian(guardianId: string) {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-icon-badge svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  min-width: 1.25rem;
+  min-height: 1.25rem;
   flex-shrink: 0;
 }
 
