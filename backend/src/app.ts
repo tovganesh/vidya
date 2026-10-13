@@ -53,6 +53,21 @@ export async function buildApp(): Promise<FastifyInstance> {
     timeWindow: '1 minute',
   });
 
+  // Handle empty or whitespace application/json bodies without throwing FST_ERR_CTP_EMPTY_JSON_BODY
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body: string, done) => {
+    if (!body || body.trim() === '') {
+      done(null, {});
+      return;
+    }
+    try {
+      const parsed = JSON.parse(body);
+      done(null, parsed);
+    } catch (err: any) {
+      err.statusCode = 400;
+      done(err, undefined);
+    }
+  });
+
   // Central Error Handler
   app.setErrorHandler((error: FastifyError | Error, request, reply) => {
     request.log.error(error);

@@ -235,6 +235,7 @@ export const useCommunicationStore = defineStore('communication', () => {
       const res = await fetch('/api/v1/communication/notifications/read-all', {
         method: 'POST',
         headers: getAuthHeaders(),
+        body: JSON.stringify({}),
       });
       if (res.ok) {
         notifications.value.forEach((n) => {
@@ -328,6 +329,7 @@ export const useCommunicationStore = defineStore('communication', () => {
     const res = await fetch('/api/v1/communication/push/test', {
       method: 'POST',
       headers: getAuthHeaders(),
+      body: JSON.stringify({}),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to dispatch test push notification');

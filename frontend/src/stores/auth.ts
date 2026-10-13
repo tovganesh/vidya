@@ -25,8 +25,17 @@ export interface Setup2FAResult {
   backupCodes: string[];
 }
 
+function getStoredUser(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem('vs_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<UserProfile | null>(null);
+  const user = ref<UserProfile | null>(getStoredUser());
   const accessToken = ref<string | null>(localStorage.getItem('vs_access_token'));
   const refreshToken = ref<string | null>(localStorage.getItem('vs_refresh_token'));
 
@@ -41,6 +50,15 @@ export const useAuthStore = defineStore('auth', () => {
   const userFullName = computed(() => (user.value ? `${user.value.firstName} ${user.value.lastName}` : 'Guest'));
   const userRole = computed(() => user.value?.primaryRole || 'GUEST');
 
+  function setUser(newUser: UserProfile | null) {
+    user.value = newUser;
+    if (newUser) {
+      localStorage.setItem('vs_user', JSON.stringify(newUser));
+    } else {
+      localStorage.removeItem('vs_user');
+    }
+  }
+
   function setTokens(access: string, refresh: string) {
     accessToken.value = access;
     refreshToken.value = refresh;
@@ -51,7 +69,7 @@ export const useAuthStore = defineStore('auth', () => {
   function clearTokens() {
     accessToken.value = null;
     refreshToken.value = null;
-    user.value = null;
+    setUser(null);
     requires2FA.value = false;
     tempToken.value = null;
     localStorage.removeItem('vs_access_token');
@@ -133,7 +151,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       setTokens(data.data.accessToken, data.data.refreshToken);
-      user.value = data.data.user;
+      setUser(data.data.user);
       return { requires2FA: false };
     } catch (err: unknown) {
       errorMessage.value = err instanceof Error ? err.message : 'Login failed';
@@ -171,7 +189,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
 
       setTokens(data.data.accessToken, data.data.refreshToken);
-      user.value = data.data.user;
+      setUser(data.data.user);
       requires2FA.value = false;
       tempToken.value = null;
     } catch (err: unknown) {
@@ -190,7 +208,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const data = await apiFetch('/api/v1/auth/me');
-      user.value = data;
+      setUser(data);
       return data;
     } catch {
       clearTokens();
@@ -214,7 +232,7 @@ export const useAuthStore = defineStore('auth', () => {
       body: JSON.stringify({ secret, code, backupCodes }),
     });
     if (user.value) {
-      user.value.isTotpEnabled = true;
+      setUser({ ...user.value, isTotpEnabled: true });
     }
   }
 
