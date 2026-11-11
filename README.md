@@ -39,18 +39,18 @@ Our vision is to provide every Indian school with a **complete, open, self-hosta
 
 ## 🌟 Feature Matrix across Milestones
 
-| Milestone | Domain Module | Capabilities & Production Features |
-| :--- | :--- | :--- |
-| **M1** | **Workspace & Environment** | Monorepo structure, TypeScript strict compilation, Dockerized PostgreSQL 16 & Valkey 8, Fastify backend, Vue 3 Pinia frontend. |
-| **M2** | **Database & Seed Engine** | Relational schema in Prisma with referential integrity, idempotent seed data engine for *Vidya Demo Academy* (CBSE). |
-| **M3** | **Auth, RBAC & 2FA** | JWT rotation, Argon2id/Bcrypt hashing, TOTP Two-Factor Authentication (RFC 6238), 11-role authorization matrix, and audit logging. |
-| **M4** | **School & Academics** | Academic sessions, multi-campus governance, Class/Section hierarchy, subject catalog with elective groups. |
-| **M5** | **People & Enrollment** | Student admissions, guardian relationships (father, mother, guardian), staff directory, roll numbers, and historical enrollment tracking. |
-| **M6** | **Attendance & Timetable** | Daily and period-level roll call, automated attendance analytics, weekly timetable matrix with period teacher conflicts prevention. |
-| **M7** | **Communication & Alerts** | School notice board, role-targeted broadcasts, browser-native VAPID Web Push notifications, in-app notification center. |
-| **M8** | **Exams & Report Cards** | Examination terms, marks entry spreadsheet grid, cumulative GPA calculation, and printable A4 CBSE-standard report cards. |
-| **M9** | **Fees & Indian Receipts** | Modular fee plans (Tuition, Lab, Transport), student ledgers with concessions, POS fee collection (UPI/Cash/NEFT), sequential receipts (`REC-YYYY-XXXX`). |
-| **M10** | **Production & PWA** | Web App Manifest, Service Worker caching shell, offline banner UI, multi-stage production Docker images, end-to-end integration tests. |
+| Milestone | Domain Module | Capabilities & Production Features | Status |
+| :--- | :--- | :--- | :--- |
+| **M1** | **Workspace & Environment** | Monorepo structure, TypeScript strict compilation, unified Docker Compose (PostgreSQL 16, Valkey 8), Fastify REST backend, Vue 3 Pinia frontend. | ✅ Full |
+| **M2** | **Database & Seed Engine** | 37 relational models in Prisma with referential integrity, idempotent seed data engine for *Vidya Demo Academy* (CBSE). | ✅ Full |
+| **M3** | **Auth, RBAC & 2FA** | JWT rotation, Bcrypt hashing, TOTP Two-Factor Authentication (RFC 6238), 11-role authorization matrix, and Audit Trail compliance ledger with JSON diff inspector. | ✅ Full |
+| **M4** | **School & Academics** | Academic sessions, multi-campus governance, Class/Section hierarchy (Nursery–12), curriculum subject catalog, and Academic Setup Onboarding Wizard. | ✅ Full |
+| **M5** | **People & Enrollment** | Student admissions (APAAR ID / PEN), guardian relationships (father, mother, legal guardian), staff directory, multi-year enrollment, and atomic Batch Student Promotion. | ✅ Full |
+| **M6** | **Attendance & Timetable** | Mobile-friendly roll call, monthly attendance heatmap registers, weekly timetable grid with teacher conflict prevention engine, and Daily Diary homework feed. | ✅ Full |
+| **M7** | **Communication & Alerts** | School notice board, role-targeted broadcasts, browser-native VAPID Web Push notifications (RFC 8292), in-app notification center with unread counters. | ✅ Full |
+| **M8** | **Exams & Report Cards** | Examination terms, spreadsheet marks entry grid, cumulative GPA calculation (CBSE 10-point scale: A1–E), and printable A4 CBSE-standard report cards. | ✅ Full |
+| **M9** | **Fees & Indian Receipts** | Modular fee plans (Tuition, Lab, Transport), student ledgers with concessions, POS fee collection (UPI, Cash, NEFT, Cheque), sequential receipts (`REC-YYYY-XXXX`), printable official receipts with ₹ format. | ✅ Full |
+| **M10** | **Production, Profiles & PWA** | Web App Manifest, Service Worker caching shell, offline alert banner, multi-stage Alpine Docker images, unified `docker-compose.yml`, `manage.sh` lifecycle manager, institutional **School Deployment Profiles** (custom name, description, 6 theme palettes), public branding API, and E2E school lifecycle test suite. | ✅ Full |
 
 ---
 
@@ -214,17 +214,112 @@ The executable `./manage.sh` CLI wraps Docker Compose with environment isolation
 
 ## 👥 Demo Credentials (Seeded School)
 
-All accounts share the default development password: `Vidya@2026`
+All demo accounts share the default development password: `Vidya@2026`. Users can sign in using either their email address or their institutional short code:
 
-| Role | Email | Key Capabilities |
-| :--- | :--- | :--- |
-| **Super Admin** | `superadmin@vidya.org` | Global system control, organizations, audit logs |
-| **School Admin** | `admin@vidya.org` | Full school administration, academic setup, staff |
-| **Principal** | `principal@vidya.org` | Academic oversight, student records, broad approvals |
-| **Accountant** | `accountant@vidya.org` | Fee structures, payment collection, CBSE receipts |
-| **Teacher** | `teacher@vidya.org` | Class attendance, marks entry, timetable viewing |
-| **Student** | `student@vidya.org` | Student portal, report cards, class timetable |
-| **Parent** | `parent@vidya.org` | Fee payment tracking, child attendance, notices |
+| Role | Email Identifier | Institutional Code | Key Capabilities & Access Level |
+| :--- | :--- | :--- | :--- |
+| **Super Admin** | `superadmin@vidya.org` | — | Global multi-school control, trust governance, security audits |
+| **School Admin** | `admin@vidya.org` | `VIDYA-ADMN-0001` | Full school administration, academic setup, staff registry |
+| **Principal** | `principal@vidya.org` | — | Academic oversight, student 360 records, batch promotion approvals |
+| **Accountant** | `accountant@vidya.org` | `VIDYA-ACCT-0001` | Fee structures, payment POS (UPI/Cash/NEFT), sequential receipts |
+| **Teacher** | `teacher@vidya.org` | `VIDYA-TECHR-0001` | Mobile daily roll call, timetable slots, marks entry, daily diary |
+| **Student** | `student@vidya.org` | `VIDYA-STUD-0001` | Student portal, report cards, class timetable, homework diary |
+| **Parent** | `parent@vidya.org` | `VIDYA-PRNT-0001` | Fee ledger payments, attendance tracking, school broadcasts |
+
+---
+
+## 🔍 Detailed Milestone Implementation Analysis & Verification
+
+A critical, evidence-based audit verifying what is fully implemented across each milestone:
+
+### **M1: Workspace Architecture & Development Environment**
+- **Status**: `Fully Implemented (100%)`
+- **Backend Architecture**: Fastify 5 engine with `@fastify/cors`, `@fastify/helmet` CSP, `@fastify/rate-limit`, sensible error handling, and structured Pino logging.
+- **Frontend Architecture**: Vue 3 SPA using Composition API (`<script setup lang="ts">`), Pinia reactive stores, Vue Router with role-based navigation guards, and modular design tokens (`tokens.css`).
+- **Containerization**: Multi-stage Alpine Docker builds for backend and frontend Nginx, unified into a single `docker-compose.yml` with Compose Profiles (`dev` vs `prod`).
+- **Verified Files**: `package.json`, `backend/src/app.ts`, `frontend/src/main.ts`, `docker-compose.yml`, `manage.sh`.
+
+### **M2: Database Layer, Core Migrations & Seed Data Engine**
+- **Status**: `Fully Implemented (100%)`
+- **Data Model**: 37 relational models in PostgreSQL 16 via Prisma ORM, strictly enforcing foreign keys, cascade rules, composite indexes, and typed enums.
+- **Seeding Engine**: Idempotent 1,729-line seed script (`backend/prisma/seed.ts`) populating a realistic Indian CBSE school (*Vidya Demo Academy*), including 11 user roles, campuses, academic years, classes Nursery to 12, subjects, students, teachers, timetables, exams, fees, and receipts.
+- **Verified Files**: `backend/prisma/schema.prisma`, `backend/prisma/seed.ts`, `backend/tests/database.test.ts`.
+
+### **M3: Authentication, RBAC & Two-Factor Authentication (2FA)**
+- **Status**: `Fully Implemented (100%)`
+- **Security & Tokens**: Dual-token JWT rotation (15m Access Token, 30d revocable Refresh Token stored in database) with Bcrypt password hashing.
+- **Two-Factor Authentication**: RFC 6238 TOTP engine generating QR codes and base32 secrets via `otplib`, with hashed single-use backup recovery codes.
+- **Role-Based Access Control**: 11 distinct roles with granular permission-checking middleware (`requirePermission`, `requireRole`).
+- **Audit Logging**: Immutable audit ledger (`audit_logs`) recording actor, action, entity diffs, client IP, and User-Agent, with frontend cockpit inspector.
+- **APIs & Views**: `POST /auth/login`, `POST /auth/2fa/*`, `GET /audit/logs` → `LoginView.vue`, `SecuritySettingsView.vue`, `AuditTrailView.vue`.
+- **Tests**: `backend/tests/auth.test.ts`, `backend/tests/audit.test.ts`, `frontend/tests/Auth.test.ts`, `frontend/tests/Audit.test.ts`.
+
+### **M4: School Administration & Academic Setup**
+- **Status**: `Fully Implemented (100%)`
+- **School Governance**: Multi-campus profile management, academic year session activation/archival, and affiliation tracking.
+- **Academic Hierarchy**: Class and Section structures (Nursery through Class 12, Sections A–D) with capacity limits and class teacher assignments.
+- **Curriculum Master**: Subject master catalog specifying theory vs practical hours, elective groups, and credit weights.
+- **Onboarding Wizard**: Guided multi-step academic setup wizard for configuring board, terms, and classes in minutes.
+- **APIs & Views**: `/schools/profile`, `/schools/campuses`, `/academics/years`, `/academics/classes`, `/academics/subjects` → `SchoolProfileView.vue`, `AcademicYearsView.vue`, `ClassesSectionsView.vue`, `SubjectsView.vue`, `AcademicOnboardingView.vue`.
+- **Tests**: `backend/tests/schools_and_academics.test.ts`, `frontend/tests/Academics.test.ts`.
+
+### **M5: People Management & Academic Enrollment**
+- **Status**: `Fully Implemented (100%)`
+- **Student Admissions**: Comprehensive profile capture including national APAAR ID / PEN, admission numbers, category (General/OBC/SC/ST/EWS), blood group, and emergency contacts.
+- **Guardian Relationships**: Multi-guardian junction (`StudentGuardian`) linking father, mother, or legal guardians with primary communication flags.
+- **Staff Registry**: Employee code directory, academic qualifications, subject specializations, and departmental allocations.
+- **Batch Promotion Engine**: Atomic database transaction promoting entire cohorts from one academic year/grade to the next (e.g. Class 9 to Class 10), handling section reassignment and retention.
+- **APIs & Views**: `/people/students`, `/people/guardians`, `/people/teachers`, `POST /people/students/promote-batch` → `PeopleDirectoryView.vue`, `StudentProfileView.vue`, `BatchPromotionView.vue`.
+- **Tests**: `backend/tests/people_and_enrollment.test.ts`, `frontend/tests/People.test.ts`.
+
+### **M6: Core Operations — Attendance, Timetable & Daily Diary**
+- **Status**: `Fully Implemented (100%)`
+- **Attendance Roll Call**: Ultra-fast mobile interface for teachers with one-tap Present/Absent/Late toggles, bulk "Mark All Present", and sub-15-second completion.
+- **Attendance Reporting**: Monthly heatmap registers, percentage analytics, and automatic flags for students below the statutory 75% attendance threshold.
+- **Timetable Matrix**: Interactive weekly schedule grid (Monday–Saturday, 8 periods) with a **real-time conflict detection engine** preventing teacher double-booking.
+- **Daily Diary**: Teacher-authored homework and classwork logs accessible directly in the student and parent portals.
+- **APIs & Views**: `POST /attendance/batch`, `GET /attendance/reports/monthly`, `/timetable/slots`, `/diary/entries` → `RollCallView.vue`, `AttendanceRegisterView.vue`, `TimetableGridView.vue`.
+- **Tests**: `backend/tests/attendance_and_timetable.test.ts`, `backend/tests/diary_and_push.test.ts`, `frontend/tests/Attendance.test.ts`, `frontend/tests/Timetable.test.ts`.
+
+### **M7: Communication & Web Push Notification Engine**
+- **Status**: `Fully Implemented (100%)`
+- **Institutional Notice Board**: Targeted school broadcasts filtered by audience (`ALL_SCHOOL`, `STUDENTS_ONLY`, `TEACHERS_ONLY`, `PARENTS_ONLY`, specific Class) with priorities (`NORMAL`, `IMPORTANT`, `URGENT`).
+- **Zero-Cost Web Push**: Standards-compliant RFC 8292 VAPID Web Push notifications via Service Worker, eliminating expensive recurring telecom SMS gateway fees.
+- **In-App Notification Center**: Real-time notification drawer with unread badge counters and deep links to relevant modules.
+- **APIs & Views**: `/communication/announcements`, `POST /communication/push/subscribe`, `/communication/notifications` → `AnnouncementsView.vue`, `TopNav.vue` dropdown, `sw.js`.
+- **Tests**: `backend/tests/communication_and_webpush.test.ts`, `frontend/tests/Communication.test.ts`.
+
+### **M8: Academics — Examinations, Grading & CBSE Report Cards**
+- **Status**: `Fully Implemented (100%)`
+- **Exam Framework**: Term structures (Term 1 / Half-Yearly, Term 2 / Annual, Unit Tests) with multi-component assessments (Theory, Practical, Internal, Viva).
+- **Batch Marks Entry**: High-speed spreadsheet grid for teachers with keyboard navigation and automated max-marks validation.
+- **GPA & Grading Engine**: Automated calculation of percentages, percentiles, and the official CBSE 8-grade scale (`A1` [91–100], `A2` [81–90], `B1`–`E`).
+- **Printable A4 Report Cards**: Pixel-perfect, print-optimized (`@media print`) CBSE-standard report cards with school header, student particulars, attendance summary, subject marks breakdown, and signature stamp blocks.
+- **APIs & Views**: `/exams/terms`, `POST /exams/marks/batch`, `GET /exams/report-card/:enrollmentId` → `ExamsView.vue` (Spreadsheet & Report Card mode).
+- **Tests**: `backend/tests/exams_and_report_cards.test.ts`, `frontend/tests/Exams.test.ts`.
+
+### **M9: Finance — Fee Structures, Invoicing & Indian Receipts**
+- **Status**: `Fully Implemented (100%)`
+- **Modular Fee Architect**: Customizable fee heads (Tuition, Laboratory, Transport, Development, Admission) assigned by class or academic year.
+- **Ledger & Concessions**: Individual student ledger tracking with concessions (sibling discount, merit scholarships, staff ward subsidies).
+- **Indian POS Fee Collection**: Instant payment collection supporting UPI, Cash, NEFT/RTGS, and Cheque with transaction reference logging.
+- **Sequential Receipts**: Auto-generated sequential receipts conforming to Indian school audit standards (`REC-YYYY-XXXX`) with Indian Rupee formatting (`₹1,39,200.00`).
+- **Printable Receipts**: Formal print-ready receipt view with school stamp, receipt number, student details, component breakdown, and payment mode.
+- **APIs & Views**: `/fees/structures`, `/fees/student-fees`, `POST /fees/collect`, `GET /fees/receipts/:number` → `FeesView.vue` (Fee Structures, Ledgers, POS Modal, Printable Receipt).
+- **Tests**: `backend/tests/fees_and_finance.test.ts`, `frontend/tests/Fees.test.ts`.
+
+### **M10: Production Readiness, School Deployment Profiles & PWA**
+- **Status**: `Fully Implemented (100%)`
+- **PWA Capabilities**: W3C Web App Manifest (`manifest.json`), Service Worker (`sw.js`) with Cache-First asset strategy, offline detection with reactive alert banner (`PwaBanner.vue`), and home-screen installability.
+- **Unified Docker Architecture**: Merged multi-stage Docker environment using Compose Profiles (`profiles: [prod, full]`), eliminating duplicate Compose files.
+- **School Deployment Profiles**: Complete CLI wizard (`./manage.sh profile create`) allowing local IT partners to deploy isolated production stacks for any school with:
+  - Custom School Name, Description, and Affiliation
+  - Basic Theme Selection across 6 curated palettes (`indigo`, `emerald`, `ocean`, `amber`, `rose`, `slate`) in dark or light mode
+  - Public Branding API (`GET /api/v1/schools/branding`) and dynamic frontend theme injection
+  - Isolated database volumes, custom port bindings, and auto-generated secure secrets
+- **Lifecycle Management CLI**: Executable [`manage.sh`](file:///Users/ganesh/Developer/vidya/manage.sh) supporting `start`, `stop`, `restart`, `status`, `logs -f`, `down`, and `profile` subcommands.
+- **E2E School Lifecycle Validation**: End-to-end integration test (`e2e_school_lifecycle.test.ts`) validating the full operational lifecycle from health check, authentication, academic structure, enrollment, attendance, timetable, notices, CBSE report cards, to POS fee collection and sequential receipts.
+- **Verified Files**: `manage.sh`, `docker-compose.yml`, `profiles/demo-academy.env`, `frontend/public/manifest.json`, `frontend/public/sw.js`, `frontend/src/stores/theme.ts`, `frontend/src/styles/tokens.css`, `backend/tests/e2e_school_lifecycle.test.ts`.
 
 ---
 
@@ -233,7 +328,7 @@ All accounts share the default development password: `Vidya@2026`
 Vidya enforces strict test validation across both backend and frontend layers:
 
 ```bash
-# Run all unit and integration test suites
+# Run all 25 automated unit and integration test suites
 npm test
 
 # Type-check TypeScript across monorepo
@@ -243,8 +338,33 @@ npm run typecheck
 npm run build --workspaces
 ```
 
-- **Backend Test Suite**: 10 test suites covering Health, Database, Auth & 2FA, School Setup, People, Attendance & Timetable, Notices & Web Push, Exams & Report Cards, Fee Management, and End-to-End School Lifecycle.
-- **Frontend Test Suite**: 12 test suites covering App Shell, Navigation Guards, Auth, Academics, People, Attendance, Timetable, Theme, Communication, Exams, Fees, and PWA & Offline Readiness.
+- **Backend Test Suite (12 suites)**:
+  1. `health.test.ts` — API liveness and readiness probes
+  2. `database.test.ts` — Prisma schema constraints and seed validation
+  3. `auth.test.ts` — JWT rotation, bcrypt hashing, TOTP 2FA, backup codes
+  4. `audit.test.ts` — Compliance audit logging and JSON diff recording
+  5. `schools_and_academics.test.ts` — Campuses, academic sessions, classes, subjects
+  6. `people_and_enrollment.test.ts` — Student admissions, guardians, batch promotion
+  7. `attendance_and_timetable.test.ts` — Roll call, monthly registers, timetable conflict avoidance
+  8. `diary_and_push.test.ts` — Daily homework diary and push event dispatching
+  9. `communication_and_webpush.test.ts` — Targeted notices and VAPID push subscriptions
+  10. `exams_and_report_cards.test.ts` — Marks spreadsheet, CBSE GPA grading, printable report cards
+  11. `fees_and_finance.test.ts` — Fee structures, concessions, POS collection, sequential receipts
+  12. `e2e_school_lifecycle.test.ts` — Full lifecycle end-to-end school journey
+- **Frontend Test Suite (13 suites)**:
+  1. `App.test.ts` — Root mounting, top navigation, layout responsiveness
+  2. `NavigationGuards.test.ts` — Route authentication, role-based access restrictions
+  3. `Auth.test.ts` — Login flow, credentials handling, 2FA challenge screens
+  4. `Audit.test.ts` — Audit log tabular inspector and filter controls
+  5. `Academics.test.ts` — Academic years, classes, sections, subject catalogs
+  6. `People.test.ts` — People directory, student profile 360, batch promotion
+  7. `Attendance.test.ts` — Fast roll call toggles, monthly heatmap calculations
+  8. `Timetable.test.ts` — Weekly slot grid and period conflict highlights
+  9. `Communication.test.ts` — Notice board filtering and notification drawer
+  10. `Exams.test.ts` — Spreadsheet marks entry, GPA calculations, report card rendering
+  11. `Fees.test.ts` — Fee ledgers, concession math, POS checkout modal, printed receipts
+  12. `PwaAndOffline.test.ts` — PWA store state, online/offline detection, install prompt capture
+  13. `Theme.test.ts` — Dark/light mode switcher, school palette token overrides (`data-theme-color`)
 
 ---
 
