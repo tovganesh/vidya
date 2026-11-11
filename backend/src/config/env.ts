@@ -17,6 +17,18 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  // Institutional / School Deployment Profile Variables
+  SCHOOL_NAME: z.string().optional(),
+  SCHOOL_CODE: z.string().optional(),
+  SCHOOL_DESCRIPTION: z.string().optional(),
+  SCHOOL_BOARD: z.string().optional(),
+  SCHOOL_AFFILIATION_NO: z.string().optional(),
+  SCHOOL_EMAIL: z.string().optional(),
+  SCHOOL_PHONE: z.string().optional(),
+  SCHOOL_CITY: z.string().optional(),
+  SCHOOL_STATE: z.string().optional(),
+  SCHOOL_THEME_COLOR: z.string().optional(),
+  SCHOOL_THEME_MODE: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

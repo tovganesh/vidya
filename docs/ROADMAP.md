@@ -361,7 +361,7 @@ Vidya is built in tightly scoped, independently verifiable milestones. Each mile
 - Finalize PWA capabilities (W3C manifest, offline application shell caching via Service Worker, responsive banners, icon set).
 - Complete open-source documentation (`README.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, `SECURITY.md`, `LICENSE`).
 - Comprehensive end-to-end integration test suite covering the full school lifecycle.
-- Production multi-stage Docker build configurations (`backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx.conf`, `docker-compose.prod.yml`).
+- Production multi-stage Docker build configurations (`backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx.conf`, unified `docker-compose.yml`, and `manage.sh`).
 
 ### 10.2 Deliverables Completed
 - **PWA Capabilities**:
@@ -372,7 +372,7 @@ Vidya is built in tightly scoped, independently verifiable milestones. Each mile
 - **Production Packaging & Docker**:
   - `backend/Dockerfile`: Multi-stage Alpine container build compiling TypeScript with Prisma client generation, non-root user execution, and health check probe.
   - `frontend/Dockerfile` & `frontend/nginx.conf`: Multi-stage Alpine build serving production SPA via Nginx with gzip compression, security headers, immutable caching for `/assets/`, and reverse proxy for `/api/`.
-  - `docker-compose.prod.yml`: Production orchestration for PostgreSQL 16, Valkey 8, Backend, and Frontend Nginx with health checks and persistent volumes.
+  - `docker-compose.yml` & `manage.sh`: Unified multi-environment orchestration for PostgreSQL 16, Valkey 8, Backend, and Frontend Nginx with Compose Profiles, health checks, and persistent volumes.
 - **Testing & Quality Assurance**:
   - `backend/tests/e2e_school_lifecycle.test.ts`: End-to-end integration test validating the complete school operational lifecycle from health check, authentication, academic structure, student enrollment, attendance, timetable, communications, CBSE report card calculation, to atomic fee payment collection and sequential receipt generation.
   - `frontend/tests/PwaAndOffline.test.ts`: 8 unit and component tests validating PWA store state, online/offline events, install prompt capture, and banner rendering.
@@ -381,7 +381,7 @@ Vidya is built in tightly scoped, independently verifiable milestones. Each mile
   - Enhanced `CONTRIBUTING.md` and `SECURITY.md`.
 
 ### 10.3 Acceptance Criteria & Verification
-- `docker-compose.prod.yml` defines the complete compiled production environment.
+- `docker-compose.yml` and `manage.sh` manage the complete development and compiled production environments.
 - 100% test pass rate across all 10 backend test suites and all 12 frontend test suites.
 - Zero TypeScript compiler or lint errors (`vue-tsc --noEmit && vite build`, `tsc`).
 

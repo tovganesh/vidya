@@ -105,7 +105,8 @@ Our vision is to provide every Indian school with a **complete, open, self-hosta
 
 3. **Start PostgreSQL & Valkey:**
    ```bash
-   docker compose up -d
+   ./manage.sh start dev
+   # Or using docker compose directly: docker compose up -d
    ```
 
 4. **Install workspace dependencies & seed demo database:**
@@ -126,15 +127,88 @@ Our vision is to provide every Indian school with a **complete, open, self-hosta
 
 ### Option B: Production Container Deployment
 
-Vidya includes multi-stage, hardened Docker builds for production deployment:
+Vidya includes multi-stage, hardened Docker builds for production deployment using a single unified `docker-compose.yml`:
 
 ```bash
-# Build and run the complete production stack (PostgreSQL, Valkey, Backend, Frontend Nginx)
-docker compose -f docker-compose.prod.yml up -d --build
+# Using the management CLI:
+./manage.sh start prod
+
+# Or using docker compose directly with the prod profile:
+docker compose --profile prod up -d --build
+```
+
+You can check status or stop containers anytime:
+```bash
+./manage.sh status prod
+./manage.sh stop prod
 ```
 
 - **Frontend Application (Nginx SPA + PWA)**: [http://localhost](http://localhost)
 - **Backend API Engine**: [http://localhost:4000/api/v1/health](http://localhost:4000/api/v1/health)
+
+---
+
+### Option C: Institutional School Deployment Profiles
+
+When deploying Vidya for a specific school (e.g. Delhi Public School, St. Xavier's, etc.), create an isolated school deployment profile with custom branding, description, and visual theme selection:
+
+```bash
+# 1. Interactively create a profile (or pass CLI flags):
+./manage.sh profile create dps-blr
+
+# 2. Or create with non-interactive flags:
+./manage.sh profile create st-xaviers \
+  --name "St. Xavier's High School, Mumbai" \
+  --desc "Affiliated with ICSE Board, Mumbai — Excellence Since 1984" \
+  --theme emerald \
+  --mode dark \
+  --code STX-MUM-01 \
+  --board ICSE \
+  --http-port 8080 \
+  --backend-port 4001
+
+# 3. List and inspect configured profiles:
+./manage.sh profile list
+./manage.sh profile show st-xaviers
+
+# 4. Deploy and launch that specific school:
+./manage.sh start prod st-xaviers
+
+# 5. Check status, inspect logs, or stop:
+./manage.sh status prod st-xaviers
+./manage.sh logs prod st-xaviers -f
+./manage.sh stop prod st-xaviers
+```
+
+#### Available Theme Palettes:
+- **`indigo`**: Signature Royal Indigo (Vidya Default)
+- **`emerald`**: Forest & Nature Green (Growth / Modern / Ecology)
+- **`ocean`**: Academic Deep Cyan (Clean / Technology / Contemporary)
+- **`amber`**: Royal Heritage Gold (Excellence / Classic / Tradition)
+- **`rose`**: Vibrant Crimson Rose (Prestigious / High Energy)
+- **`slate`**: Minimalist Graphite Monochrome
+
+---
+
+### 🛠️ Container & Profile CLI Cheat Sheet
+
+The executable `./manage.sh` CLI wraps Docker Compose with environment isolation, profile loading, and health validation:
+
+| Command | Target / Arguments | Description |
+| :--- | :--- | :--- |
+| `./manage.sh start dev` | Local Dev | Starts PostgreSQL 16 & Valkey 8 dev infrastructure containers. |
+| `./manage.sh start prod` | Production | Builds images & launches full production stack on port 80. |
+| `./manage.sh start prod <slug>` | School Profile | Builds and launches full production stack for a specific school. |
+| `./manage.sh stop [env\|slug]` | Dev / Prod / School | Stops running containers without removing state or volumes. |
+| `./manage.sh restart [env\|slug]` | Dev / Prod / School | Restarts container services for the target environment. |
+| `./manage.sh status` | Global | Inspects running containers across dev, prod, and active school profiles. |
+| `./manage.sh status [env\|slug]` | Target Environment | Detailed container inspection, health checks, and port allocations. |
+| `./manage.sh logs [env\|slug] -f` | Dev / Prod / School | Streams real-time container log output. |
+| `./manage.sh down [env\|slug]` | Dev / Prod / School | Stops and destroys containers and virtual bridge networks. |
+| `./manage.sh profile create [slug]` | School Profile | Interactive wizard or CLI flag creator for new school deployment profiles. |
+| `./manage.sh profile list` | Profiles Directory | Tabulates all configured school deployment profiles and statuses. |
+| `./manage.sh profile show <slug>` | School Profile | Prints configuration parameters (credentials securely masked). |
+| `./manage.sh profile delete <slug>` | School Profile | Safely removes an inactive school deployment profile. |
 
 ---
 

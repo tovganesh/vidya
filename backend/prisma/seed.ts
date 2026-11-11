@@ -42,27 +42,57 @@ async function main() {
   console.log(`✅ Organization seeded: ${org.name}`);
 
   // 2. School
+  const schoolName = process.env.SCHOOL_NAME || 'Vidya Academy, Bengaluru';
+  const schoolCode = process.env.SCHOOL_CODE || 'VS-BLR-01';
+  const schoolBoard = (process.env.SCHOOL_BOARD as BoardType) || BoardType.CBSE;
+  const schoolAffiliation = process.env.SCHOOL_AFFILIATION_NO || '830412';
+  const schoolEmail = process.env.SCHOOL_EMAIL || 'contact@vidya.org';
+  const schoolPhone = process.env.SCHOOL_PHONE || '+91 80 2525 0142';
+  const schoolDescription = process.env.SCHOOL_DESCRIPTION || 'The Open School Operating System';
+  const themeColor = process.env.SCHOOL_THEME_COLOR || 'indigo';
+  const themeMode = process.env.SCHOOL_THEME_MODE || 'dark';
+  const city = process.env.SCHOOL_CITY || 'Bengaluru';
+  const state = process.env.SCHOOL_STATE || 'Karnataka';
+
   const school = await prisma.school.upsert({
     where: { code: 'VS-BLR-01' },
-    update: {},
+    update: {
+      name: schoolName,
+      code: schoolCode,
+      board: schoolBoard,
+      affiliationNumber: schoolAffiliation,
+      email: schoolEmail,
+      phone: schoolPhone,
+      settings: {
+        description: schoolDescription,
+        themeColor,
+        themeMode,
+        academicStartMonth: 6,
+        attendanceType: 'ONCE_DAILY',
+        enableWebPush: true,
+      },
+    },
     create: {
       id: '00000000-0000-0000-0000-000000000002',
       organizationId: org.id,
-      name: 'Vidya Academy, Bengaluru',
-      code: 'VS-BLR-01',
-      board: BoardType.CBSE,
-      affiliationNumber: '830412',
-      email: 'contact@vidya.org',
-      phone: '+91 80 2525 0142',
+      name: schoolName,
+      code: schoolCode,
+      board: schoolBoard,
+      affiliationNumber: schoolAffiliation,
+      email: schoolEmail,
+      phone: schoolPhone,
       currency: 'INR',
       address: {
         street: '14/B, 100ft Road, HAL 2nd Stage, Indiranagar',
-        city: 'Bengaluru',
-        state: 'Karnataka',
+        city,
+        state,
         postalCode: '560038',
         country: 'India',
       },
       settings: {
+        description: schoolDescription,
+        themeColor,
+        themeMode,
         academicStartMonth: 6, // June start (South India convention)
         attendanceType: 'ONCE_DAILY',
         enableWebPush: true,
@@ -963,7 +993,7 @@ async function main() {
       id: '00000000-0000-0000-0000-000000000091',
       schoolId: school.id,
       title: 'Annual Sports Day 2026-27: Registration & Track Events',
-      content: 'We are delighted to announce that Vidya Academy Annual Athletic Meet will be held on November 14, 2026. All students from Class 1 to 12 can register for track and field events with their respective house captains.',
+      content: `We are delighted to announce that ${schoolName} Annual Athletic Meet will be held on November 14, 2026. All students from Class 1 to 12 can register for track and field events with their respective house captains.`,
       priority: AnnouncementPriority.NORMAL,
       targetAudience: AnnouncementAudience.ALL_SCHOOL,
       authorId: commPrincipalUser?.id || commAdminUser!.id,
@@ -1678,7 +1708,7 @@ async function main() {
       entityType: 'System',
       entityId: school.id,
       diff: {
-        message: 'Initial demo school setup completed for Vidya Academy, Bengaluru',
+        message: `Initial demo school setup completed for ${schoolName}`,
         academicYear: '2026-2027',
         board: 'CBSE',
       },

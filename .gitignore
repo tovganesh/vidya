@@ -19,9 +19,16 @@ pnpm-debug.log*
 # Environment & Secrets
 .env
 .env.local
+.env.prod
+.env.dev
 .env.production
 .env.staging
 !.env.example
+!.env.prod.example
+
+# School Deployment Profiles (protect institutional secrets)
+profiles/*.env
+!profiles/demo-academy.env
 
 # IDE & Editor files
 .vscode/*

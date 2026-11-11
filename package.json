@@ -15,9 +15,13 @@
     "test": "npm run test --workspaces",
     "lint": "npm run lint --workspaces",
     "typecheck": "npm run typecheck --workspaces",
-    "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down",
-    "docker:logs": "docker compose logs -f"
+    "docker:up": "./manage.sh start dev",
+    "docker:down": "./manage.sh down dev",
+    "docker:logs": "./manage.sh logs dev -f",
+    "docker:status": "./manage.sh status",
+    "docker:prod:up": "./manage.sh start prod",
+    "docker:prod:down": "./manage.sh down prod",
+    "docker:prod:logs": "./manage.sh logs prod -f"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

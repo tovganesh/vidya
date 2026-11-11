@@ -31,6 +31,49 @@ export interface UpdateCampusDto {
 
 export class SchoolsService {
   /**
+   * Synchronize school profile from deployment profile environment variables
+   */
+  async syncSchoolProfileFromEnv() {
+    const schoolName = process.env.SCHOOL_NAME;
+    if (!schoolName) return null;
+
+    try {
+      const schoolCode = process.env.SCHOOL_CODE || 'VS-01';
+      const schoolBoard = (process.env.SCHOOL_BOARD as BoardType) || BoardType.CBSE;
+      const schoolAffiliation = process.env.SCHOOL_AFFILIATION_NO || null;
+      const schoolEmail = process.env.SCHOOL_EMAIL || null;
+      const schoolPhone = process.env.SCHOOL_PHONE || null;
+      const schoolDescription = process.env.SCHOOL_DESCRIPTION || 'The Open School Operating System';
+      const themeColor = process.env.SCHOOL_THEME_COLOR || 'indigo';
+      const themeMode = process.env.SCHOOL_THEME_MODE || 'dark';
+
+      const existingSchool = await prisma.school.findFirst();
+      if (existingSchool) {
+        const currentSettings = (existingSchool.settings as Record<string, any>) || {};
+        return await prisma.school.update({
+          where: { id: existingSchool.id },
+          data: {
+            name: schoolName,
+            board: schoolBoard,
+            affiliationNumber: schoolAffiliation,
+            email: schoolEmail || existingSchool.email,
+            phone: schoolPhone || existingSchool.phone,
+            settings: {
+              ...currentSettings,
+              description: schoolDescription,
+              themeColor,
+              themeMode,
+            },
+          },
+        });
+      }
+    } catch {
+      // Gracefully ignore if database is initializing
+    }
+    return null;
+  }
+
+  /**
    * Retrieve school profile with campus and academic stats
    */
   async getSchoolProfile(schoolId: string) {
