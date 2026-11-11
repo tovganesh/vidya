@@ -71,8 +71,8 @@ onUnmounted(() => {
           </svg>
         </div>
         <div class="brand-text">
-          <span class="brand-title">Vidya</span>
-          <span class="brand-tagline">Open School OS</span>
+          <span class="brand-title">{{ themeStore.schoolBranding?.name || 'Vidya' }}</span>
+          <span class="brand-tagline">{{ themeStore.schoolBranding?.description || 'Open School OS' }}</span>
         </div>
       </router-link>
     </div>
@@ -82,7 +82,7 @@ onUnmounted(() => {
       <div class="academic-badge" title="Active Academic Session">
         <span class="year-label">AY:</span>
         <span class="year-val">2026–27</span>
-        <span class="board-val">CBSE</span>
+        <span class="board-val">{{ themeStore.schoolBranding?.board || 'CBSE' }}</span>
       </div>
 
       <div class="search-bar" id="global-search-bar">

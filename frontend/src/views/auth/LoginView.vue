@@ -77,8 +77,8 @@ async function handleVerify2FA() {
             <path d="M14 38C18 31 22 30 24 30C26 30 30 31 34 38" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" />
           </svg>
         </div>
-        <span class="auth-brand-name">Vidya</span>
-        <span class="auth-brand-tag">Open School OS</span>
+        <span class="auth-brand-name">{{ themeStore.schoolBranding?.name || 'Vidya' }}</span>
+        <span class="auth-brand-tag">{{ themeStore.schoolBranding?.description || 'Open School OS' }}</span>
       </div>
 
       <div class="auth-header-actions">
@@ -114,8 +114,8 @@ async function handleVerify2FA() {
               <path d="M14 38C18 31 22 30 24 30C26 30 30 31 34 38" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" />
             </svg>
           </div>
-          <h2>Vidya</h2>
-          <p class="tagline">The Open School Operating System</p>
+          <h2>{{ themeStore.schoolBranding?.name || 'Vidya' }}</h2>
+          <p class="tagline">{{ themeStore.schoolBranding?.description || 'The Open School Operating System' }}</p>
           <p class="sub-tagline">Sign in to access your school's administration, academics & operations</p>
         </div>
 

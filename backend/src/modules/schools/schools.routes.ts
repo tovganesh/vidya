@@ -17,6 +17,54 @@ function resolveSchoolId(request: FastifyRequest): string {
 
 export async function schoolRoutes(app: FastifyInstance): Promise<void> {
   /**
+   * GET /schools/branding
+   * Public endpoint retrieving active school branding, name, description, and theme configuration
+   */
+  app.get('/schools/branding', async (_request, reply) => {
+    // Sync deployment profile settings from environment if present
+    await schoolsService.syncSchoolProfileFromEnv();
+
+    const school = await prisma.school.findFirst({
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        board: true,
+        affiliationNumber: true,
+        email: true,
+        phone: true,
+        currency: true,
+        address: true,
+        settings: true,
+      },
+    });
+
+    const settings = (school?.settings as Record<string, any>) || {};
+
+    const branding = {
+      name: school?.name || process.env.SCHOOL_NAME || 'Vidya Academy',
+      code: school?.code || process.env.SCHOOL_CODE || 'VS-BLR-01',
+      board: school?.board || process.env.SCHOOL_BOARD || 'CBSE',
+      affiliationNumber: school?.affiliationNumber || process.env.SCHOOL_AFFILIATION_NO || null,
+      description: settings.description || process.env.SCHOOL_DESCRIPTION || 'The Open School Operating System',
+      themeColor: settings.themeColor || process.env.SCHOOL_THEME_COLOR || 'indigo',
+      themeMode: settings.themeMode || process.env.SCHOOL_THEME_MODE || 'dark',
+      email: school?.email || process.env.SCHOOL_EMAIL || null,
+      phone: school?.phone || process.env.SCHOOL_PHONE || null,
+      address: school?.address || {
+        city: process.env.SCHOOL_CITY || 'Bengaluru',
+        state: process.env.SCHOOL_STATE || 'Karnataka',
+        country: 'India',
+      },
+    };
+
+    return reply.send({
+      success: true,
+      data: branding,
+    });
+  });
+
+  /**
    * GET /schools/profile
    * Retrieve active school profile
    */
